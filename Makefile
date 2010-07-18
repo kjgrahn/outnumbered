@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2010-07-18 18:59:01 grahn Exp $
+# $Id: Makefile,v 1.3 2010-07-18 19:01:06 grahn Exp $
 #
 # Makefile
 #
@@ -28,7 +28,7 @@ checkv: tests
 libgresabladet.a: version.o
 	$(AR) -r $@ $^
 
-gresabladet: gresabladet.o libprefer.a
+gresabladet: gresabladet.o libgresabladet.a
 	$(CXX) -o $@ gresabladet.o -L. -lgresabladet
 
 libtest.a: 
@@ -70,4 +70,5 @@ love:
 
 # DO NOT DELETE
 
+gresabladet.o: version.h
 version.o: version.h

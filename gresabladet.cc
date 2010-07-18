@@ -1,21 +1,12 @@
-/* $Id: gresabladet.cc,v 1.1 2010-07-18 18:59:01 grahn Exp $
+/* $Id: gresabladet.cc,v 1.2 2010-07-18 19:01:06 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
  *
  */
 #include <iostream>
-#include <fstream>
-#include <vector>
-
-#include <cstdlib>
-#include <cerrno>
 #include <getopt.h>
 
-#include "bibdb.h"
-#include "twinstate.h"
-#include "filter.h"
-#include "cite.h"
 #include "version.h"
 
 
@@ -28,7 +19,7 @@ int main(int argc, char ** argv)
 	+ prog +
 	" [-d]"
 	" [-a listen-address]"
-	" [-p port]"
+	" [-p port]";
     const char optstring[] = "+dp:a:";
     struct option long_options[] = {
 	{"--daemon",       0, 0, 'd'},
