@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2010-07-18 09:46:23 grahn Exp $
+# $Id: Makefile,v 1.2 2010-07-18 18:59:01 grahn Exp $
 #
 # Makefile
 #
@@ -70,3 +70,4 @@ love:
 
 # DO NOT DELETE
 
+version.o: version.h

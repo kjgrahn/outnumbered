@@ -1,7 +1,7 @@
 /* -*- c++ -*-
- * $Id: version.h,v 1.1 2010-07-18 16:24:16 grahn Exp $
+ * $Id: version.h,v 1.2 2010-07-18 18:59:01 grahn Exp $
  *
- * Copyright (c) 2009 Jörgen Grahn
+ * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
  *
  */
