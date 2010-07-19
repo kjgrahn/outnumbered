@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2010-07-18 19:01:06 grahn Exp $
+# $Id: Makefile,v 1.4 2010-07-19 10:26:06 grahn Exp $
 #
 # Makefile
 #
@@ -7,7 +7,7 @@
 
 SHELL=/bin/sh
 INSTALLBASE=/usr/local
-CXXFLAGS=-Wall -Wextra -pedantic -std=c++98 -g -O2
+CXXFLAGS=-Wall -Wextra -pedantic -std=c++98 -g -O3
 
 .PHONY: all
 all: libgresabladet.a

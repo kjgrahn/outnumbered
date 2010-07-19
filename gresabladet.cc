@@ -1,4 +1,4 @@
-/* $Id: gresabladet.cc,v 1.2 2010-07-18 19:01:06 grahn Exp $
+/* $Id: gresabladet.cc,v 1.3 2010-07-19 10:26:06 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -6,8 +6,76 @@
  */
 #include <iostream>
 #include <getopt.h>
+#include <string.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <errno.h>
 
 #include "version.h"
+
+namespace {
+
+    bool reuse_addr(int fd)
+    {
+	int val = 1;
+	return setsockopt(fd,
+			  SOL_SOCKET, SO_REUSEADDR,
+			  &val, sizeof val) == 0;
+    }
+
+    /* Create a listening socket on host:port (the wildcard address if
+     * host is empty). Does everything including listen(), and prints
+     * relevant error messages on std::error.
+     */
+    int listening_socket(const std::string& host,
+			 const std::string& port)
+    {
+	struct addrinfo hints;
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_protocol = 0;
+	hints.ai_canonname = NULL;
+	hints.ai_addr = NULL;
+	hints.ai_next = NULL;
+
+	struct addrinfo *result;
+	const int s = getaddrinfo(host.empty()? 0: host.c_str(),
+				  port.c_str(),
+				  &hints, &result);
+	if(s) {
+	    std::cerr << "error: " << gai_strerror(s) << '\n';
+	    return -1;
+	}
+
+	int fd;
+	const addrinfo* rp;
+	for(rp = result; rp; rp = rp->ai_next) {
+	    const addrinfo& r = *rp;
+
+	    fd = socket(r.ai_family, r.ai_socktype, r.ai_protocol);
+	    if(fd == -1) continue;
+
+	    if(reuse_addr(fd) && bind(fd, r.ai_addr, r.ai_addrlen) == 0) {
+		break;
+	    }
+
+	    close(fd);
+	}
+
+	freeaddrinfo(result);
+
+	if(!rp || listen(fd, 10)==-1) {
+	    std::cerr << "socket error: " << strerror(errno) << '\n';
+	    return -1;
+	}
+
+	return fd;
+    }
+}
 
 
 int main(int argc, char ** argv)
@@ -67,6 +135,9 @@ int main(int argc, char ** argv)
 	    break;
 	}
     }
+
+    const int lfd = listening_socket(addr, port);
+    close(lfd);
 
     return 0;
 }
