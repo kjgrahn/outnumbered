@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2010-07-19 10:26:06 grahn Exp $
+# $Id: Makefile,v 1.5 2010-07-20 12:25:03 grahn Exp $
 #
 # Makefile
 #
@@ -70,5 +70,5 @@ love:
 
 # DO NOT DELETE
 
-gresabladet.o: version.h
+gresabladet.o: version.h client.h
 version.o: version.h

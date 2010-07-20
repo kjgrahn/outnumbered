@@ -1,4 +1,4 @@
-/* $Id: gresabladet.cc,v 1.4 2010-07-20 10:29:47 grahn Exp $
+/* $Id: gresabladet.cc,v 1.5 2010-07-20 12:25:03 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -16,6 +16,7 @@
 #include <sys/epoll.h>
 
 #include "version.h"
+#include "client.h"
 
 namespace {
 
@@ -85,10 +86,33 @@ namespace {
 	return fd;
     }
 
-    void loop(const int lfd)
-    {
 
-	sleep(30);
+    /**
+     * The main event loop. It is epoll(7)-based not only because it's
+     * more scalable than select(2), but because it's a much better
+     * interface, with the event structs being managed by the kernel
+     * and all. But yes, it's Linux-specific.
+     */
+    bool loop(const int epfd, const int lfd)
+    {
+	{
+	    epoll_event ev = { EPOLLIN, { 0 } };
+	    if(epoll_ctl(epfd, EPOLL_CTL_ADD, lfd, &ev)==-1) {
+		return false;
+	    }
+	}
+
+	std::vector<Client> clients;
+
+	while(1) {
+	    epoll_event events[10];
+	    const int n = epoll_wait(epfd, events, 10, -1);
+	    for(int i=0; i<n; ++i) {
+		const epoll_event& ev = events[i];
+	    }
+	}
+
+	return true;
     }
 
 }
@@ -159,8 +183,15 @@ int main(int argc, char ** argv)
 
     ignore_sigpipe();
 
-    loop(lfd);
+    const int epfd = epoll_create(10);
+    if(epfd==-1) {
+	std::cerr << "error: failed to create epoll fd: " << strerror(errno) << '\n';
+	return 1;
+    }
 
+    loop(epfd, lfd);
+
+    close(epfd);
     close(lfd);
 
     return 0;
