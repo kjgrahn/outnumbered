@@ -1,4 +1,4 @@
-/* $Id: gresabladet.cc,v 1.3 2010-07-19 10:26:06 grahn Exp $
+/* $Id: gresabladet.cc,v 1.4 2010-07-20 10:29:47 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -12,6 +12,8 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <errno.h>
+#include <signal.h>
+#include <sys/epoll.h>
 
 #include "version.h"
 
@@ -23,6 +25,13 @@ namespace {
 	return setsockopt(fd,
 			  SOL_SOCKET, SO_REUSEADDR,
 			  &val, sizeof val) == 0;
+    }
+
+    void ignore_sigpipe()
+    {
+	static struct sigaction ignore;
+	ignore.sa_handler = SIG_IGN;
+	(void)sigaction(SIGPIPE, &ignore, 0);
     }
 
     /* Create a listening socket on host:port (the wildcard address if
@@ -75,6 +84,13 @@ namespace {
 
 	return fd;
     }
+
+    void loop(const int lfd)
+    {
+
+	sleep(30);
+    }
+
 }
 
 
@@ -137,6 +153,14 @@ int main(int argc, char ** argv)
     }
 
     const int lfd = listening_socket(addr, port);
+    if(lfd==-1) {
+	return 1;
+    }
+
+    ignore_sigpipe();
+
+    loop(lfd);
+
     close(lfd);
 
     return 0;
