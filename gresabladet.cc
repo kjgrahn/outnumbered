@@ -1,10 +1,12 @@
-/* $Id: gresabladet.cc,v 1.5 2010-07-20 12:25:03 grahn Exp $
+/* $Id: gresabladet.cc,v 1.6 2010-07-20 14:19:44 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
  *
  */
 #include <iostream>
+#include <vector>
+
 #include <getopt.h>
 #include <string.h>
 
@@ -14,6 +16,8 @@
 #include <errno.h>
 #include <signal.h>
 #include <sys/epoll.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "version.h"
 #include "client.h"
@@ -26,6 +30,13 @@ namespace {
 	return setsockopt(fd,
 			  SOL_SOCKET, SO_REUSEADDR,
 			  &val, sizeof val) == 0;
+    }
+
+    bool nonblock(int fd)
+    {
+	int n = fcntl(fd, F_GETFL, 0);
+	if(n<0) return false;
+	return fcntl(fd, F_SETFL, n | O_NONBLOCK) >= 0;
     }
 
     void ignore_sigpipe()
@@ -87,6 +98,13 @@ namespace {
     }
 
 
+    typedef std::vector<Client> Clients;
+
+
+    unsigned insert_client(Clients& clients, int fd, struct sockaddr_storage& sa);
+    void remove_client(Clients& clients, unsigned n);
+
+
     /**
      * The main event loop. It is epoll(7)-based not only because it's
      * more scalable than select(2), but because it's a much better
@@ -95,20 +113,46 @@ namespace {
      */
     bool loop(const int epfd, const int lfd)
     {
+	static const unsigned LFD = ~0;
+
 	{
-	    epoll_event ev = { EPOLLIN, { 0 } };
+	    epoll_event ev;
+	    ev.events = EPOLLIN;
+	    ev.data.u32 = LFD;
 	    if(epoll_ctl(epfd, EPOLL_CTL_ADD, lfd, &ev)==-1) {
 		return false;
 	    }
 	}
 
-	std::vector<Client> clients;
+	Clients clients;
 
 	while(1) {
 	    epoll_event events[10];
 	    const int n = epoll_wait(epfd, events, 10, -1);
 	    for(int i=0; i<n; ++i) {
 		const epoll_event& ev = events[i];
+
+		if(ev.data.u32==LFD) {
+		    struct sockaddr_storage sa;
+		    socklen_t slen = sizeof sa;
+		    int fd = accept(lfd, reinterpret_cast<sockaddr*>(&sa), &slen);
+		    if(fd!=-1) {
+			nonblock(fd);
+
+			const unsigned n = insert_client(clients, fd, sa);
+			epoll_event ev;
+			ev.events = EPOLLIN | EPOLLOUT;
+			ev.data.u32 = n;
+			if(epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev)==-1) {
+			    remove_client(clients, n);
+			}
+		    }
+		    continue;
+		}
+
+		Client& client = clients[ev.data.u32];
+
+
 	    }
 	}
 
