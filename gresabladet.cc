@@ -1,4 +1,4 @@
-/* $Id: gresabladet.cc,v 1.6 2010-07-20 14:19:44 grahn Exp $
+/* $Id: gresabladet.cc,v 1.7 2010-07-20 14:34:39 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -6,6 +6,7 @@
  */
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include <getopt.h>
 #include <string.h>
@@ -98,11 +99,34 @@ namespace {
     }
 
 
+    /* Clients are stored in a never-shrinking std::vector, and registered
+     * by epoll using their vector index. Thus you can get holes in the vector;
+     * these are filled with default-constructed Clients.
+     */
+
     typedef std::vector<Client> Clients;
 
 
-    unsigned insert_client(Clients& clients, int fd, struct sockaddr_storage& sa);
-    void remove_client(Clients& clients, unsigned n);
+    unsigned insert_client(Clients& clients, int fd, struct sockaddr_storage& sa)
+    {
+	const Client nullclient;
+
+	Client client(fd, sa);
+	Clients::iterator i = std::find(clients.begin(), clients.end(), nullclient);
+	if(i==clients.end()) {
+	    clients.push_back(nullclient);
+	    i = clients.end() - 1;
+	}
+	std::swap(client, *i);
+	return i - clients.begin();
+    }
+
+
+    void remove_client(Clients& clients, unsigned n)
+    {
+	Client nullclient;
+	std::swap(clients[n], nullclient);
+    }
 
 
     /**
