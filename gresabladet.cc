@@ -1,4 +1,4 @@
-/* $Id: gresabladet.cc,v 1.7 2010-07-20 14:34:39 grahn Exp $
+/* $Id: gresabladet.cc,v 1.8 2010-07-25 20:20:35 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -99,33 +99,30 @@ namespace {
     }
 
 
-    /* Clients are stored in a never-shrinking std::vector, and registered
-     * by epoll using their vector index. Thus you can get holes in the vector;
-     * these are filled with default-constructed Clients.
+    /* Clients are stored by pointer in a never-shrinking std::vector, and registered
+     * by epoll using their vector index. Thus you can get holes in the vector, NULL
+     * Client pointers.
      */
 
-    typedef std::vector<Client> Clients;
-
+    typedef std::vector<Client*> Clients;
+    static Client* const nullclient = 0;
 
     unsigned insert_client(Clients& clients, int fd, struct sockaddr_storage& sa)
     {
-	const Client nullclient;
-
-	Client client(fd, sa);
 	Clients::iterator i = std::find(clients.begin(), clients.end(), nullclient);
 	if(i==clients.end()) {
-	    clients.push_back(nullclient);
+	    clients.push_back(0);
 	    i = clients.end() - 1;
 	}
-	std::swap(client, *i);
+	*i = new Client(fd, sa);
 	return i - clients.begin();
     }
 
 
     void remove_client(Clients& clients, unsigned n)
     {
-	Client nullclient;
-	std::swap(clients[n], nullclient);
+	delete clients[n];
+	clients[n] = nullclient;
     }
 
 
@@ -140,8 +137,7 @@ namespace {
 	static const unsigned LFD = ~0;
 
 	{
-	    epoll_event ev;
-	    ev.events = EPOLLIN;
+	    epoll_event ev = {EPOLLIN, {0}};
 	    ev.data.u32 = LFD;
 	    if(epoll_ctl(epfd, EPOLL_CTL_ADD, lfd, &ev)==-1) {
 		return false;
@@ -164,8 +160,8 @@ namespace {
 			nonblock(fd);
 
 			const unsigned n = insert_client(clients, fd, sa);
-			epoll_event ev;
-			ev.events = EPOLLIN | EPOLLOUT;
+			epoll_event ev = {EPOLLIN, {0}};
+			// ev.events = EPOLLIN | EPOLLOUT;
 			ev.data.u32 = n;
 			if(epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev)==-1) {
 			    remove_client(clients, n);
@@ -174,9 +170,12 @@ namespace {
 		    continue;
 		}
 
-		Client& client = clients[ev.data.u32];
-
-
+		Client& client = *clients[ev.data.u32];
+		client.feed();
+		if(client.eof()) {
+		    epoll_ctl(epfd, EPOLL_CTL_DEL, client.fd(), 0);
+		    remove_client(clients, ev.data.u32);
+		}
 	    }
 	}
 

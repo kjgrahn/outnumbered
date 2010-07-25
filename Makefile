@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.5 2010-07-20 12:25:03 grahn Exp $
+# $Id: Makefile,v 1.6 2010-07-25 20:20:35 grahn Exp $
 #
 # Makefile
 #
@@ -8,6 +8,7 @@
 SHELL=/bin/sh
 INSTALLBASE=/usr/local
 CXXFLAGS=-Wall -Wextra -pedantic -std=c++98 -g -O3
+CPPFLAGS=-I..
 
 .PHONY: all
 all: libgresabladet.a
@@ -26,10 +27,12 @@ checkv: tests
 	valgrind -q ./tests
 
 libgresabladet.a: version.o
+libgresabladet.a: client.o
+libgresabladet.a: response.o
 	$(AR) -r $@ $^
 
 gresabladet: gresabladet.o libgresabladet.a
-	$(CXX) -o $@ gresabladet.o -L. -lgresabladet
+	$(CXX) -o $@ gresabladet.o -L. -lgresabladet -L../sockutil -lsocket
 
 libtest.a: 
 	$(AR) -r $@ $^
@@ -70,5 +73,7 @@ love:
 
 # DO NOT DELETE
 
-gresabladet.o: version.h client.h
+client.o: client.h ../sockutil/textread.h
+gresabladet.o: version.h client.h ../sockutil/textread.h
+response.o: response.h
 version.o: version.h
