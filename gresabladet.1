@@ -1,5 +1,5 @@
 .ig
-$Id: gresabladet.1,v 1.2 2010-07-25 20:20:35 grahn Exp $
+$Id: gresabladet.1,v 1.3 2010-07-28 12:39:37 grahn Exp $
 $Name:  $
 ..
 .ss 12 0
@@ -38,9 +38,10 @@ gresabladet \- local Netnews (NNTP) server
 .B gresabladet
 is an NNTP server
 intended for local use, perhaps on a single LAN.
-It does not support authentication or peering.
-Thus, it's simpler and easier to configure than e.g.
-.IR INN .
+It does not support authentication, moderation or peering.
+Thus, it's simpler and easier to configure than what I presume
+.I INN
+is.
 .
 .
 .SH "OPTIONS"
@@ -141,11 +142,13 @@ This is a brief overview of the NNTP commands supported by gresabladet.
 .BP "LIST\ ACTIVE"
 .SM "[RFC\~3977 7.6.3]"
 .
+.ig
 .BP "LIST\ ACTIVE.TIMES"
 .SM "[RFC\~3977 7.6.4]"
 .
 .BP "LIST\ DISTRIB.PATS"
 .SM "[RFC\~3977 7.6.5]"
+..
 .
 .BP "LIST\ NEWSGROUPS"
 .SM "[RFC\~3977 7.6.6]"
@@ -193,7 +196,11 @@ J\(:orgen Grahn \[fo]grahn+src@snipabacken.se\[fc]
 .
 .
 .SH "LICENSE"
-The Modified BSD license (also known as the 3-clause BSD license).
+The GNU General Public License, version 2.
+.PP
+(I would have used
+the Modified BSD license \- also known as the 3-clause BSD license \-
+but gdbm is GPLed and Oracle controls BerkeleyDB.)
 .
 .
 .SH "SEE ALSO"
@@ -207,3 +214,63 @@ Common NNTP Extensions
 Netnews Article Format
 .BP RFC\~5537
 Netnews Architecture and Protocols
+.
+.
+.ig
+
+GROUP     group	      -> nr low high group ×
+
+LISTGROUP group	      -> nr low high group ×
+			 n
+			 ...
+LISTGROUP group range -> nr low high group ×
+			 n
+			 ...
+
+LAST cursor    -> n msgid  ×
+NEXT cursor    -> n msgid  ×
+
+ARTICLE cursor -> n msgid *
+ARTICLE n      -> n msgid *×
+ARTICLE msgid  -> 0 msgid *
+
+HEAD    cursor -> n msgid *
+HEAD    n      -> n msgid *×
+HEAD    msgid  -> 0 msgid *
+
+BODY    cursor -> n msgid *
+BODY    n      -> n msgid *×
+BODY    msgid  -> 0 msgid *
+
+STAT    cursor -> n msgid
+STAT    n      -> n msgid  ×
+STAT    msgid  -> 0 msgid
+
+NEWNEWS pattern date time -> msgid
+			     ...
+
+NEWGROUPS	date time -> group low high ynm
+			     ...
+
+LIST ACTIVE pattern 	  -> group low high ynm
+		    	     ...
+LIST ACTIVE         	  -> group low high ynm
+		    	     ...
+
+LIST NEWSGROUPS           -> group group-description
+			     ...
+
+OVER cursor  -> n subject from date msgid refs bytes lines ...
+OVER range   -> n subject from date msgid refs bytes lines ...
+		...
+OVER msgid   -> 0 subject from date msgid refs bytes lines ...
+
+HDR header cursor  -> n content
+HDR header range   -> n content
+		      ...
+HDR header msgid   -> 0 content
+
+(*) Response also includes article, headers or body.
+(×) Command modifies the currently selected article.
+
+..

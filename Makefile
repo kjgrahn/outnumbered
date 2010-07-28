@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2010-07-25 20:20:35 grahn Exp $
+# $Id: Makefile,v 1.7 2010-07-28 12:39:37 grahn Exp $
 #
 # Makefile
 #
@@ -73,7 +73,7 @@ love:
 
 # DO NOT DELETE
 
-client.o: client.h ../sockutil/textread.h
+client.o: client.h ../sockutil/textread.h response.h
 gresabladet.o: version.h client.h ../sockutil/textread.h
 response.o: response.h
 version.o: version.h

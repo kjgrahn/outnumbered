@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: session.h,v 1.3 2010-07-25 20:20:35 grahn Exp $
+ * $Id: session.h,v 1.4 2010-07-28 12:39:37 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -35,9 +35,12 @@ private:
     Client(const Client&);
     Client& operator= (const Client& other);
 
-    int fd_;
-    sockutil::TextReader* reader_;
-    std::string peer_;
+    void read(const char* a, const char* b);
+
+    const int fd_;
+    sockutil::TextReader reader_;
+    const std::string peer_;
+    std::string backlog_;
 };
 
 #endif

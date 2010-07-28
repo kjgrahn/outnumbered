@@ -1,10 +1,12 @@
-/* $Id: session.cc,v 1.1 2010-07-25 20:20:35 grahn Exp $
+/* $Id: session.cc,v 1.2 2010-07-28 12:39:37 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
  *
  */
 #include "client.h"
+
+#include "response.h"
 
 #include <iostream>
 #include <sstream>
@@ -41,23 +43,23 @@ namespace {
 	oss << sa;
 	return oss.str();
     }
-
 }
 
 
 Client::Client(int fd, const sockaddr_storage& sa)
     : fd_(fd),
-      reader_(new sockutil::TextReader(fd, "\r\n")),
+      reader_(sockutil::TextReader(fd, "\r\n")),
       peer_(getnameinfo(sa))
-{}
+{
+    const char* welcome = "welcome,";
+    Response r(200); r << welcome << peer_;
+    r.write(fd_, backlog_);
+}
 
 
 Client::~Client()
 {
-    delete reader_;
-    if(fd_!=-1) {
-	close(fd_);
-    }
+    close(fd_);
 }
 
 
@@ -66,14 +68,19 @@ Client::~Client()
  */
 void Client::feed()
 {
-    sockutil::TextReader& reader = *reader_;
-    reader.feed();
+    reader_.feed();
 
     char* a;
     char* b;
-    while(reader.read(a, b)) {
-	std::cerr << peer_ << " - " << std::string(a, b);
+    while(reader_.read(a, b)) {
+	read(a, b);
     }
+}
+
+
+void Client::read(const char* a, const char* b)
+{
+    std::cerr << peer_ << " - " << std::string(a, b);
 }
 
 
@@ -82,5 +89,5 @@ void Client::feed()
  */
 bool Client::eof() const
 {
-    return reader_->eof();
+    return reader_.eof();
 }
