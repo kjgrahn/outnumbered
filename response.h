@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: response.h,v 1.2 2010-07-29 09:56:19 grahn Exp $
+ * $Id: response.h,v 1.3 2010-07-29 11:51:52 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -12,6 +12,9 @@
 #include <sstream>
 
 #include <string>
+
+struct CrLf {};
+static const CrLf CRLF();
 
 /**
  * An NNTP response, e.g.
@@ -39,21 +42,35 @@ class Response {
 public:
     explicit Response(unsigned code);
 
-    struct CRLF {};
-
     template <class T>
-    Response& operator<< (T&);
+    Response& operator<< (T val);
 
     ssize_t write(int fd, std::string& backlog);
+    std::string str() const;
 
 private:
     Response();
     Response(const Response&);
     Response& operator= (const Response&);
 
+    void finalize();
+
     std::ostringstream oss;
     unsigned crlf;
     unsigned col;
 };
+
+
+template <class T>
+Response& Response::operator<< (T val)
+{
+    if(col++) oss << ' ';
+    oss << val;
+    return *this;
+}
+
+template <>
+Response& Response::operator<< (const CrLf&);
+
 
 #endif

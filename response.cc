@@ -1,4 +1,4 @@
-/* $Id: response.cc,v 1.1 2010-07-25 20:20:35 grahn Exp $
+/* $Id: response.cc,v 1.2 2010-07-29 11:51:52 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -19,7 +19,7 @@ Response::Response(unsigned code)
 
 
 template <>
-Response& Response::operator<< (const CRLF&)
+Response& Response::operator<< (const CrLf&)
 {
     oss << "\r\n";
     ++crlf;
@@ -56,6 +56,17 @@ Response& Response::operator<< (const std::string& s)
 }
 
 
+void Response::finalize()
+{
+    if(crlf) {
+	oss << ".\r\n";
+    }
+    else {
+	oss << "\r\n";
+    }
+}
+
+
 /**
  * Like write(2) of the content (after finalizing it). Returns what
  * write(2) returns, and leaves its errno intact.
@@ -65,12 +76,7 @@ Response& Response::operator<< (const std::string& s)
  */
 ssize_t Response::write(const int fd, std::string& backlog)
 {
-    if(crlf) {
-	oss << ".\r\n";
-    }
-    else {
-	oss << "\r\n";
-    }
+    finalize();
     std::string s = oss.str();
     const ssize_t n = ::write(fd, s.data(), s.size());
     if((n==-1 && errno==EAGAIN) ||
@@ -79,4 +85,19 @@ ssize_t Response::write(const int fd, std::string& backlog)
 	std::swap(s, backlog);
     }
     return n;
+}
+
+
+Response::Response(const Response& other)
+    : oss(other.oss.str()),
+      crlf(other.crlf),
+      col(other.col)
+{}
+
+
+std::string Response::str() const
+{
+    Response copy(*this);
+    copy.finalize();
+    return copy.oss.str();
 }

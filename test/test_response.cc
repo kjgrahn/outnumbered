@@ -1,5 +1,5 @@
 /*
- * $Id: test_response.cc,v 1.2 2010-07-29 09:56:19 grahn Exp $
+ * $Id: test_response.cc,v 1.3 2010-07-29 11:51:52 grahn Exp $
  *
  * Copyright (C) 2007 Jörgen Grahn.
  * All rights reserved.
@@ -28,8 +28,24 @@ namespace {
 
     void assert_eq(const Response& resp, const char* s)
     {
+	testicle::assert_eq(resp.str(), s);
     }
 
+}
+
+namespace ostringstream {
+
+    void test()
+    {
+	std::ostringstream foo("foo");
+	testicle::assert_eq(foo.str(), "foo");
+	std::ostringstream bar(foo.str());
+	testicle::assert_eq(bar.str(), "foo");
+	std::ostringstream baz;
+	unsigned pi2 = 314;
+	baz << pi2;
+	testicle::assert_eq(baz.str(), "314");
+    }
 }
 
 namespace response {
@@ -37,7 +53,7 @@ namespace response {
     void test()
     {
 	const Response r(314);
-	assert_eq(r, "314\r\n");
+	testicle::assert_eq(Response(314).str(), "314\r\n");
     }
 
     void test_simple()
@@ -59,8 +75,8 @@ namespace response {
     void test_simple3()
     {
 	Response r(314);
-	r << 1 << 2 << Printable(16);
-	r << Printable(".foo");
+	r << 1 << 2 << Printable<int>(16);
+	r << Printable<const char*>(".foo");
 	assert_eq(r, "314 1 2 16 foo\r\n");
     }
 
@@ -73,7 +89,7 @@ namespace response {
 		  ".\r\n");
     }
 
-    void test_multiline1()
+    void test_multiline2()
     {
 	Response r(314);
 	r << 1 << 2 << ".foo" << CRLF;
@@ -86,7 +102,7 @@ namespace response {
 		  ".\r\n");
     }
 
-    void test_multiline2()
+    void test_multiline3()
     {
 	Response r(314);
 	r << 1 << 2 << ".foo" << CRLF;
