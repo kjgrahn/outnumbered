@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: response.h,v 1.1 2010-07-25 20:20:35 grahn Exp $
+ * $Id: response.h,v 1.2 2010-07-29 09:56:19 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -27,7 +27,7 @@
  * 
  * Takes care of inserting spaces, some CRLF and the final dot.
  * - for multi-line responses you must end each line manually with CRLF,
- *   but the final dot is added automatically.
+ *   but the final dot line is added automatically.
  * - for single-line responses you must not add the CRLF.
  *
  * Also takes care of dot-stuffing, but only when you << a char* or a
