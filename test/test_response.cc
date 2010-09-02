@@ -1,5 +1,5 @@
 /*
- * $Id: test_response.cc,v 1.3 2010-07-29 11:51:52 grahn Exp $
+ * $Id: test_response.cc,v 1.4 2010-09-02 20:30:21 grahn Exp $
  *
  * Copyright (C) 2007 Jörgen Grahn.
  * All rights reserved.
@@ -77,7 +77,7 @@ namespace response {
 	Response r(314);
 	r << 1 << 2 << Printable<int>(16);
 	r << Printable<const char*>(".foo");
-	assert_eq(r, "314 1 2 16 foo\r\n");
+	assert_eq(r, "314 1 2 16 .foo\r\n");
     }
 
     void test_multiline1()
@@ -102,7 +102,7 @@ namespace response {
 		  ".\r\n");
     }
 
-    void test_multiline3()
+    void test_dotstuff()
     {
 	Response r(314);
 	r << 1 << 2 << ".foo" << CRLF;

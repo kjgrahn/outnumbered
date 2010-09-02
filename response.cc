@@ -1,4 +1,4 @@
-/* $Id: response.cc,v 1.2 2010-07-29 11:51:52 grahn Exp $
+/* $Id: response.cc,v 1.3 2010-09-02 20:30:21 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -89,10 +89,11 @@ ssize_t Response::write(const int fd, std::string& backlog)
 
 
 Response::Response(const Response& other)
-    : oss(other.oss.str()),
-      crlf(other.crlf),
+    : crlf(other.crlf),
       col(other.col)
-{}
+{
+    oss << other.oss.str();
+}
 
 
 std::string Response::str() const
