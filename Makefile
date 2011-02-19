@@ -1,8 +1,8 @@
-# $Id: Makefile,v 1.8 2010-07-29 07:46:19 grahn Exp $
+# $Id: Makefile,v 1.9 2011-02-19 14:56:18 grahn Exp $
 #
 # Makefile
 #
-# Copyright (c) 2010 Jörgen Grahn
+# Copyright (c) 2010, 2011 Jörgen Grahn
 # All rights reserved.
 
 SHELL=/bin/sh
@@ -19,6 +19,7 @@ install: gresabladet
 install: gresabladet.1
 	install -m755 gresabladet $(INSTALLBASE)/bin/
 	install -m644 gresabladet.1 $(INSTALLBASE)/man/man1/
+	install -m644 gresabladet.5 $(INSTALLBASE)/man/man5/
 
 .PHONY: check checkv
 check: tests

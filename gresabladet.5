@@ -1,0 +1,74 @@
+.ig
+$Id: gresabladet.5,v 1.1 2011-02-19 14:56:18 grahn Exp $
+$Name:  $
+..
+.ss 12 0
+.de BP
+.IP \\fB\\$*
+..
+.
+.
+.TH gresabladet 5 "FEB 2011" "Gresabladet" "User Manuals"
+.
+.
+.SH "NAME"
+gresabladet \- local Netnews (NNTP) server file formats
+.
+.
+.SH "FILES"
+.
+.SS "newnews"
+.
+A text file with one line per article, newest article last:
+.PP
+.ft I
+group\~msgid\~date\~time\~n
+.ft P
+.
+.
+.SS "article.db"
+.
+A GNU gdbm database containing all articles.
+The key is
+.IR msgid ;
+the value the full article.
+.
+.
+.SS "overview.db"
+.
+Like
+.BR article.db ,
+but containing just the articles' headers.
+.
+.
+.SS "group/\fIname\fP"
+.
+One file for each group
+.IR name .
+A text file with one line per article:
+.PP
+.ft I
+n\~msgid
+.ft P
+.
+.
+.SH "AUTHOR"
+J\(:orgen Grahn \[fo]grahn+src@snipabacken.se\[fc]
+.
+.
+.SH "LICENSE"
+The GNU General Public License, version 2.
+.
+.
+.SH "SEE ALSO"
+.BR gresabladet (1).
+.BP RFC\~3977 10x
+Network News Transfer Protocol (NNTP)
+.BP RFC\~4643
+NNTP Extension for Authentication
+.BP RFC\~2980
+Common NNTP Extensions
+.BP RFC\~5536
+Netnews Article Format
+.BP RFC\~5537
+Netnews Architecture and Protocols
