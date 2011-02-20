@@ -1,5 +1,5 @@
 /*
- * $Id: test_dbfile.cc,v 1.4 2011-02-20 11:03:55 grahn Exp $
+ * $Id: test_dbfile.cc,v 1.5 2011-02-20 14:12:44 grahn Exp $
  *
  * Copyright (C) 2011 Jörgen Grahn.
  * All rights reserved.
@@ -17,15 +17,14 @@ namespace {
     std::string tmpname() { return tmpnam(0); }
 
     /**
-     * Maintains a temporary DbFile where the
-     * keys are "0", "1", ... size, and the data
-     * for key N is N+1 octets long.
+     * Maintains a temporary gdbm file where the keys are "0", "1",
+     * ... size, and the data for key N is N+1 octets long. Deletes
+     * the file when it goes out of scope.
      */
     struct Corpus {
 	explicit Corpus(int size);
 	~Corpus();
 	std::string filename;
-	DbFile db;
     };
 
     /**
@@ -52,9 +51,9 @@ namespace {
     }
 
     Corpus::Corpus(int size)
-	: filename(tmpname()),
-	  db(filename, 0600)
+	: filename(tmpname())
     {
+	DbFile db(filename, 0600);
 	if(db.bad()) throw "XXX";
 
 	for(int n=0; n<size; ++n) {
@@ -65,7 +64,6 @@ namespace {
 
     Corpus::~Corpus()
     {
-	db.close();
 	unlink(filename.c_str());
     }
 
@@ -107,7 +105,7 @@ namespace db {
 	{
 	    const int size = 10;
 	    Corpus corpus(size);
-	    DbFile& db = corpus.db;
+	    DbFile db(corpus.filename);
 
 	    testicle::assert_eq(db.get(key(size)), "");
 	    for(int i=0; i<size; ++i) {
@@ -118,7 +116,7 @@ namespace db {
 	void test_simple()
 	{
 	    Corpus corpus(10);
-	    DbFile& db = corpus.db;
+	    DbFile db(corpus.filename);
 
 	    testicle::assert_(db.insert("foo", "bar"));
 	    testicle::assert_eq(db.get("foo"), "bar");
@@ -128,7 +126,7 @@ namespace db {
 	void test_replace()
 	{
 	    Corpus corpus(10);
-	    DbFile& db = corpus.db;
+	    DbFile db(corpus.filename);
 
 	    const std::string val("Hello, world!");
 	    testicle::assert_(db.has("5"));
@@ -142,7 +140,7 @@ namespace db {
 	void test_noemptyval()
 	{
 	    Corpus corpus(10);
-	    DbFile& db = corpus.db;
+	    DbFile db(corpus.filename);
 
 	    testicle::assert_(!db.has("foo"));
 	    testicle::assert_(!db.insert("foo", ""));
@@ -153,7 +151,7 @@ namespace db {
 	void test_huge()
 	{
 	    Corpus corpus(10);
-	    DbFile& db = corpus.db;
+	    DbFile db(corpus.filename);
 
 	    const std::string key(1e3, 'k');
 	    const std::string val(20e3, 'x');
@@ -166,7 +164,7 @@ namespace db {
 	void test_nul()
 	{
 	    Corpus corpus(10);
-	    DbFile& db = corpus.db;
+	    DbFile db(corpus.filename);
 
 	    std::string key("key");
 	    std::string val("val");
