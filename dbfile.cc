@@ -1,4 +1,4 @@
-/* $Id: dbfile.cc,v 1.3 2011-02-20 11:03:55 grahn Exp $
+/* $Id: dbfile.cc,v 1.4 2011-02-20 19:55:00 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -6,6 +6,7 @@
  */
 #include "dbfile.h"
 
+#include <gdbm.h>
 #include <cstdlib>
 #include <cstring>
 #include <errno.h>
@@ -18,6 +19,17 @@ namespace {
 	d.dptr = const_cast<char*>(s.data());
 	d.dsize = s.size();
 	return d;
+    }
+
+    /**
+     * Because gdbm does that stupid mistake of not
+     * forward-declaring structs, it's either dealing
+     * with void* here or poisoning /our/ header file
+     * with /theirs/.
+     */
+    static GDBM_FILE dbf(void* p)
+    {
+	return static_cast<GDBM_FILE>(p);
     }
 }
 
@@ -45,7 +57,7 @@ void DbFile::close()
 	/* Funny that they don't report errors here ...
 	 * possibly one should sync to disk first.
 	 */
-	gdbm_close(db_);
+	gdbm_close(dbf(db_));
 	db_ = 0;
     }
 }
@@ -75,7 +87,7 @@ std::string DbFile::strerror() const
 bool DbFile::insert(const std::string& key, const std::string& val)
 {
     if(val.empty()) return false;
-    return gdbm_store(db_,
+    return gdbm_store(dbf(db_),
 		      datumstring(key), datumstring(val),
 		      GDBM_INSERT)==0;
 }
@@ -84,7 +96,7 @@ bool DbFile::insert(const std::string& key, const std::string& val)
 bool DbFile::replace(const std::string& key, const std::string& val)
 {
     if(val.empty()) return false;
-    return gdbm_store(db_,
+    return gdbm_store(dbf(db_),
 		      datumstring(key), datumstring(val),
 		      GDBM_REPLACE)==0;
 }
@@ -92,7 +104,7 @@ bool DbFile::replace(const std::string& key, const std::string& val)
 
 bool DbFile::has(const std::string& key)
 {
-    return gdbm_exists(db_, datumstring(key));
+    return gdbm_exists(dbf(db_), datumstring(key));
 }
 
 
@@ -105,7 +117,7 @@ std::string DbFile::get(const std::string& key)
      * to provide "write into a user-provided buffer, and complain
      * if it's too small?"
      */
-    const datum d = gdbm_fetch(db_, datumstring(key));
+    const datum d = gdbm_fetch(dbf(db_), datumstring(key));
     if(d.dptr) {
 	s.assign(d.dptr, d.dsize);
 	std::free(d.dptr);

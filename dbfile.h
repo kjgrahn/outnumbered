@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: dbfile.h,v 1.4 2011-02-20 10:53:45 grahn Exp $
+ * $Id: dbfile.h,v 1.5 2011-02-20 19:55:00 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -9,8 +9,6 @@
 #define GB_DBFILE_H_
 
 #include <string>
-
-#include <gdbm.h>
 
 
 /**
@@ -39,7 +37,7 @@ private:
     DbFile(const DbFile&);
     DbFile& operator= (const DbFile&);
 
-    GDBM_FILE db_;
+    void* db_;
 };
 
 #endif
