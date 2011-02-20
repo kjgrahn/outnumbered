@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: dbfile.h,v 1.3 2011-02-20 09:52:36 grahn Exp $
+ * $Id: dbfile.h,v 1.4 2011-02-20 10:53:45 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -9,6 +9,9 @@
 #define GB_DBFILE_H_
 
 #include <string>
+
+#include <gdbm.h>
+
 
 /**
  * A wrapping of gdbm, with only the features needed here.
@@ -23,7 +26,7 @@ public:
 
     void close();
 
-    bool bad() const;
+    bool bad() const { return !db_; }
     std::string strerror() const;
 
     bool insert(const std::string& key, const std::string& val);
@@ -35,6 +38,8 @@ private:
     DbFile();
     DbFile(const DbFile&);
     DbFile& operator= (const DbFile&);
+
+    GDBM_FILE db_;
 };
 
 #endif

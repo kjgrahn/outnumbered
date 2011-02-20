@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11 2011-02-20 09:54:22 grahn Exp $
+# $Id: Makefile,v 1.12 2011-02-20 10:53:45 grahn Exp $
 #
 # Makefile
 #
@@ -34,7 +34,7 @@ libgresabladet.a: dbfile.o
 	$(AR) -r $@ $^
 
 gresabladet: gresabladet.o libgresabladet.a
-	$(CXX) -o $@ gresabladet.o -L. -lgresabladet -L../sockutil -lsocket
+	$(CXX) -o $@ gresabladet.o -L. -lgresabladet -L../sockutil -lsocket -lgdbm
 
 libtest.a: test/test_response.o
 libtest.a: test/test_dbfile.o
@@ -44,7 +44,7 @@ test.cc: libtest.a
 	testicle -o$@ $^
 
 tests: test.o libgresabladet.a libtest.a
-	$(CXX) -o $@ test.o -L. -ltest -lgresabladet
+	$(CXX) -o $@ test.o -L. -ltest -lgresabladet -lgdbm
 
 test/%.o : test/%.cc
 	$(CXX) -I. $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<

@@ -1,5 +1,5 @@
 /*
- * $Id: test_dbfile.cc,v 1.2 2011-02-20 09:52:36 grahn Exp $
+ * $Id: test_dbfile.cc,v 1.3 2011-02-20 10:53:45 grahn Exp $
  *
  * Copyright (C) 2011 Jörgen Grahn.
  * All rights reserved.
@@ -61,6 +61,14 @@ namespace {
 	    if(!db.insert(key(n), val(n))) throw "XXX";
 	}
     }
+
+
+    Corpus::~Corpus()
+    {
+	db.close();
+	unlink(filename.c_str());
+    }
+
 }
 
 
