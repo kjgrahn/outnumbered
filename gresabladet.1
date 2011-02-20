@@ -1,5 +1,5 @@
 .ig
-$Id: gresabladet.1,v 1.4 2010-07-29 07:35:16 grahn Exp $
+$Id: gresabladet.1,v 1.5 2011-02-20 22:05:20 grahn Exp $
 $Name:  $
 ..
 .ss 12 0
@@ -223,8 +223,11 @@ Netnews Architecture and Protocols
 .
 .ig
 
-GROUP     group	      -> nr low high group ×
+GROUP     group	      -> nr low high group ×        RFC 3977 6.1.1
 
+LISTGROUP      	      -> nr low high group          RFC 3977 6.1.2
+			 n
+			 ...
 LISTGROUP group	      -> nr low high group ×
 			 n
 			 ...
@@ -232,50 +235,75 @@ LISTGROUP group range -> nr low high group ×
 			 n
 			 ...
 
-LAST cursor    -> n msgid  ×
-NEXT cursor    -> n msgid  ×
+LAST cursor    -> n msgid  ×            RFC 3977 6.1.3
+NEXT cursor    -> n msgid  ×		RFC 3977 6.1.4
 
-ARTICLE cursor -> n msgid *
+ARTICLE cursor -> n msgid *             RFC 3977 6.2.1
 ARTICLE n      -> n msgid *×
 ARTICLE msgid  -> 0 msgid *
 
-HEAD    cursor -> n msgid *
+HEAD    cursor -> n msgid *             RFC 3977 6.2.2
 HEAD    n      -> n msgid *×
 HEAD    msgid  -> 0 msgid *
 
-BODY    cursor -> n msgid *
+BODY    cursor -> n msgid *             RFC 3977 6.2.3
 BODY    n      -> n msgid *×
 BODY    msgid  -> 0 msgid *
 
-STAT    cursor -> n msgid
+STAT    cursor -> n msgid               RFC 3977 6.2.4
 STAT    n      -> n msgid  ×
 STAT    msgid  -> 0 msgid
 
-NEWNEWS pattern date time -> msgid
+NEWGROUPS	date time -> group low high ynm      RFC 3977 7.3
+			     ...
+NEWGROUPS   date time GMT -> group low high ynm
 			     ...
 
-NEWGROUPS	date time -> group low high ynm
+NEWNEWS pat date time     -> msgid                   RFC 3977 7.4
+			     ...
+NEWNEWS pat date time GMT -> msgid
 			     ...
 
-LIST ACTIVE pattern 	  -> group low high ynm
+LIST ACTIVE pat     	  -> group low high ynm      RFC 3977 7.6.3
 		    	     ...
 LIST ACTIVE         	  -> group low high ynm
 		    	     ...
 
-LIST NEWSGROUPS           -> group group-description
+LIST ACTIVE.TIMES            optional                RFC 3977 7.6.4
+LIST DISTRIB.PATS            optional                RFC 3977 7.6.5
+
+LIST NEWSGROUPS           -> group group-description RFC 3977 7.6.6
 			     ...
 
-OVER cursor  -> n subject from date msgid refs bytes lines ...
+OVER cursor  -> n subject from date msgid refs bytes lines ...  RFC 3977 8.3
 OVER range   -> n subject from date msgid refs bytes lines ...
 		...
 OVER msgid   -> 0 subject from date msgid refs bytes lines ...
 
-HDR header cursor  -> n content
+LIST OVERVIEW.FMT  -> header            RFC 3977 8.4
+		      ...
+
+HDR header cursor  -> n content         RFC 3977 8.5
 HDR header range   -> n content
 		      ...
 HDR header msgid   -> 0 content
 
+LIST HEADERS MSGID -> header            RFC 3977 8.6
+                      ...
+LIST HEADERS RANGE -> header
+		      ...
+
 (*) Response also includes article, headers or body.
 (×) Command modifies the currently selected article.
+
+
+CAPABILITIES				RFC 3977 5.2
+MODE READER				RFC 3977 5.3
+QUIT					RFC 3977 5.4
+
+POST  					RFC 3977 6.3.1
+IHAVE 					RFC 3977 6.3.2
+DATE  					RFC 3977 7.1
+HELP  					RFC 3977 7.2
 
 ..
