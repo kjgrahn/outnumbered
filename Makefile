@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.9 2011-02-19 14:56:18 grahn Exp $
+# $Id: Makefile,v 1.10 2011-02-20 08:47:31 grahn Exp $
 #
 # Makefile
 #
@@ -36,6 +36,7 @@ gresabladet: gresabladet.o libgresabladet.a
 	$(CXX) -o $@ gresabladet.o -L. -lgresabladet -L../sockutil -lsocket
 
 libtest.a: test/test_response.o
+libtest.a: test/test_dbfile.o
 	$(AR) -r $@ $^
 
 test.cc: libtest.a
@@ -78,4 +79,5 @@ client.o: client.h ../sockutil/textread.h response.h
 gresabladet.o: version.h client.h ../sockutil/textread.h
 response.o: response.h
 version.o: version.h
+test/test_dbfile.o: ./dbfile.h
 test/test_response.o: response.h
