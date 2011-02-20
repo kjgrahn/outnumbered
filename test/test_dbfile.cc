@@ -1,5 +1,5 @@
 /*
- * $Id: test_dbfile.cc,v 1.3 2011-02-20 10:53:45 grahn Exp $
+ * $Id: test_dbfile.cc,v 1.4 2011-02-20 11:03:55 grahn Exp $
  *
  * Copyright (C) 2011 Jörgen Grahn.
  * All rights reserved.
@@ -19,7 +19,7 @@ namespace {
     /**
      * Maintains a temporary DbFile where the
      * keys are "0", "1", ... size, and the data
-     * for key N is N octets long.
+     * for key N is N+1 octets long.
      */
     struct Corpus {
 	explicit Corpus(int size);
@@ -43,7 +43,7 @@ namespace {
      */
     std::string val(int n)
     {
-	std::string s;
+	std::string s("#");
 	while(n>0) {
 	    s.push_back(static_cast<char>(n));
 	    --n;
@@ -130,7 +130,7 @@ namespace db {
 	    Corpus corpus(10);
 	    DbFile& db = corpus.db;
 
-	    std::string val("Hello, world!");
+	    const std::string val("Hello, world!");
 	    testicle::assert_(db.has("5"));
 	    testicle::assert_(!db.has("x"));
 	    testicle::assert_(db.replace("5", val));
@@ -155,8 +155,8 @@ namespace db {
 	    Corpus corpus(10);
 	    DbFile& db = corpus.db;
 
-	    std::string key(1e3, 'k');
-	    std::string val(20e3, 'x');
+	    const std::string key(1e3, 'k');
+	    const std::string val(20e3, 'x');
 	    testicle::assert_(!db.has(key));
 	    testicle::assert_(db.insert(key, val));
 	    testicle::assert_eq(db.get(key), val);

@@ -1,4 +1,4 @@
-/* $Id: dbfile.cc,v 1.2 2011-02-20 10:53:45 grahn Exp $
+/* $Id: dbfile.cc,v 1.3 2011-02-20 11:03:55 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -24,11 +24,11 @@ namespace {
 
 /**
  * Open a db.
- * Uses gdbm_open(file, 0, READER | WRITER | NOLOCK, mode, NULL).
+ * Uses gdbm_open(file, 0, WRCREAT | NOLOCK, mode, NULL).
  */
 DbFile::DbFile(const std::string& file, int mode)
     : db_(gdbm_open(const_cast<char*>(file.c_str()), 0,
-		    GDBM_READER | GDBM_WRITER | GDBM_NOLOCK,
+		    GDBM_WRCREAT | GDBM_NOLOCK,
 		    mode, 0))
 {}
 
@@ -74,6 +74,7 @@ std::string DbFile::strerror() const
 
 bool DbFile::insert(const std::string& key, const std::string& val)
 {
+    if(val.empty()) return false;
     return gdbm_store(db_,
 		      datumstring(key), datumstring(val),
 		      GDBM_INSERT)==0;
@@ -82,6 +83,7 @@ bool DbFile::insert(const std::string& key, const std::string& val)
 
 bool DbFile::replace(const std::string& key, const std::string& val)
 {
+    if(val.empty()) return false;
     return gdbm_store(db_,
 		      datumstring(key), datumstring(val),
 		      GDBM_REPLACE)==0;
