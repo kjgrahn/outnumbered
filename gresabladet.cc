@@ -1,6 +1,6 @@
-/* $Id: gresabladet.cc,v 1.8 2010-07-25 20:20:35 grahn Exp $
+/* $Id: gresabladet.cc,v 1.9 2011-03-04 22:55:12 grahn Exp $
  *
- * Copyright (c) 2010 Jörgen Grahn
+ * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
  *
  */
@@ -21,7 +21,7 @@
 #include <fcntl.h>
 
 #include "version.h"
-#include "client.h"
+#include "session.h"
 
 namespace {
 
@@ -99,30 +99,30 @@ namespace {
     }
 
 
-    /* Clients are stored by pointer in a never-shrinking std::vector, and registered
+    /* Sessions are stored by pointer in a never-shrinking std::vector, and registered
      * by epoll using their vector index. Thus you can get holes in the vector, NULL
-     * Client pointers.
+     * Session pointers.
      */
 
-    typedef std::vector<Client*> Clients;
-    static Client* const nullclient = 0;
+    typedef std::vector<Session*> Sessions;
+    static Session* const nullsession = 0;
 
-    unsigned insert_client(Clients& clients, int fd, struct sockaddr_storage& sa)
+    unsigned insert_session(Sessions& sessions, int fd, struct sockaddr_storage& sa)
     {
-	Clients::iterator i = std::find(clients.begin(), clients.end(), nullclient);
-	if(i==clients.end()) {
-	    clients.push_back(0);
-	    i = clients.end() - 1;
+	Sessions::iterator i = std::find(sessions.begin(), sessions.end(), nullsession);
+	if(i==sessions.end()) {
+	    sessions.push_back(0);
+	    i = sessions.end() - 1;
 	}
-	*i = new Client(fd, sa);
-	return i - clients.begin();
+	*i = new Session(fd, sa);
+	return i - sessions.begin();
     }
 
 
-    void remove_client(Clients& clients, unsigned n)
+    void remove_session(Sessions& sessions, unsigned n)
     {
-	delete clients[n];
-	clients[n] = nullclient;
+	delete sessions[n];
+	sessions[n] = nullsession;
     }
 
 
@@ -144,7 +144,7 @@ namespace {
 	    }
 	}
 
-	Clients clients;
+	Sessions sessions;
 
 	while(1) {
 	    epoll_event events[10];
@@ -159,22 +159,22 @@ namespace {
 		    if(fd!=-1) {
 			nonblock(fd);
 
-			const unsigned n = insert_client(clients, fd, sa);
+			const unsigned n = insert_session(sessions, fd, sa);
 			epoll_event ev = {EPOLLIN, {0}};
 			// ev.events = EPOLLIN | EPOLLOUT;
 			ev.data.u32 = n;
 			if(epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev)==-1) {
-			    remove_client(clients, n);
+			    remove_session(sessions, n);
 			}
 		    }
 		    continue;
 		}
 
-		Client& client = *clients[ev.data.u32];
-		client.feed();
-		if(client.eof()) {
-		    epoll_ctl(epfd, EPOLL_CTL_DEL, client.fd(), 0);
-		    remove_client(clients, ev.data.u32);
+		Session& session = *sessions[ev.data.u32];
+		session.feed();
+		if(session.eof()) {
+		    epoll_ctl(epfd, EPOLL_CTL_DEL, session.fd(), 0);
+		    remove_session(sessions, ev.data.u32);
 		}
 	    }
 	}

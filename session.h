@@ -1,12 +1,12 @@
 /* -*- c++ -*-
- * $Id: session.h,v 1.4 2010-07-28 12:39:37 grahn Exp $
+ * $Id: session.h,v 1.5 2011-03-04 22:55:12 grahn Exp $
  *
- * Copyright (c) 2010 Jörgen Grahn
+ * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
  *
  */
-#ifndef GB_CLIENT_H_
-#define GB_CLIENT_H_
+#ifndef GB_SESSION_H_
+#define GB_SESSION_H_
 
 #include <cstdlib>
 #include <string>
@@ -17,13 +17,13 @@ class sockaddr_storage;
 
 
 /**
- * The NNTP client. Also the TCP client; event handling is done
+ * An NNTP session. Also the TCP client; event handling is done
  * higher up, but this one owns the fd, and does the reading/writing.
  */
-class Client {
+class Session {
 public:
-    Client(int fd, const sockaddr_storage& sa);
-    ~Client();
+    Session(int fd, const sockaddr_storage& sa);
+    ~Session();
 
     void feed();
     bool eof() const;
@@ -31,9 +31,9 @@ public:
     int fd() const { return fd_; }
 
 private:
-    Client();
-    Client(const Client&);
-    Client& operator= (const Client& other);
+    Session();
+    Session(const Session&);
+    Session& operator= (const Session& other);
 
     void read(const char* a, const char* b);
 

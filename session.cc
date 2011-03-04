@@ -1,10 +1,10 @@
-/* $Id: session.cc,v 1.2 2010-07-28 12:39:37 grahn Exp $
+/* $Id: session.cc,v 1.3 2011-03-04 22:55:12 grahn Exp $
  *
- * Copyright (c) 2010 Jörgen Grahn
+ * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
  *
  */
-#include "client.h"
+#include "session.h"
 
 #include "response.h"
 
@@ -46,7 +46,7 @@ namespace {
 }
 
 
-Client::Client(int fd, const sockaddr_storage& sa)
+Session::Session(int fd, const sockaddr_storage& sa)
     : fd_(fd),
       reader_(sockutil::TextReader(fd, "\r\n")),
       peer_(getnameinfo(sa))
@@ -57,7 +57,7 @@ Client::Client(int fd, const sockaddr_storage& sa)
 }
 
 
-Client::~Client()
+Session::~Session()
 {
     close(fd_);
 }
@@ -66,7 +66,7 @@ Client::~Client()
 /**
  * The TCP socket is readable; try to do some useful work.
  */
-void Client::feed()
+void Session::feed()
 {
     reader_.feed();
 
@@ -78,7 +78,7 @@ void Client::feed()
 }
 
 
-void Client::read(const char* a, const char* b)
+void Session::read(const char* a, const char* b)
 {
     std::cerr << peer_ << " - " << std::string(a, b);
 }
@@ -87,7 +87,7 @@ void Client::read(const char* a, const char* b)
 /**
  * To be called after feed().
  */
-bool Client::eof() const
+bool Session::eof() const
 {
     return reader_.eof();
 }
