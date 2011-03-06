@@ -1,4 +1,4 @@
-/* $Id: gresabladet.cc,v 1.9 2011-03-04 22:55:12 grahn Exp $
+/* $Id: gresabladet.cc,v 1.10 2011-03-06 19:06:06 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -150,38 +150,62 @@ namespace {
 	    epoll_event events[10];
 	    const int n = epoll_wait(epfd, events, 10, -1);
 	    for(int i=0; i<n; ++i) {
-		const epoll_event& ev = events[i];
+		epoll_event& ev = events[i];
+		const unsigned sn = ev.data.u32;
 
-		if(ev.data.u32==LFD) {
+		if(sn==LFD) {
 		    struct sockaddr_storage sa;
 		    socklen_t slen = sizeof sa;
 		    int fd = accept(lfd, reinterpret_cast<sockaddr*>(&sa), &slen);
 		    if(fd!=-1) {
 			nonblock(fd);
 
-			const unsigned n = insert_session(sessions, fd, sa);
-			epoll_event ev = {EPOLLIN, {0}};
-			// ev.events = EPOLLIN | EPOLLOUT;
-			ev.data.u32 = n;
+			const unsigned sn = insert_session(sessions, fd, sa);
+			ev.events = EPOLLIN;
+			ev.data.u32 = sn;
 			if(epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev)==-1) {
-			    remove_session(sessions, n);
+			    remove_session(sessions, sn);
 			}
 		    }
 		    continue;
 		}
+		else {
+		    Session& session = *sessions[sn];
+		    const int fd = session.fd();
 
-		Session& session = *sessions[ev.data.u32];
-		session.feed();
-		if(session.eof()) {
-		    epoll_ctl(epfd, EPOLL_CTL_DEL, session.fd(), 0);
-		    remove_session(sessions, ev.data.u32);
+		    switch(session.event()) {
+		    case Session::READING:
+			if(ev.events & EPOLLOUT) {
+			    ev.events = EPOLLIN;
+			    int rc = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
+			    if(rc==-1) {
+				(void)epoll_ctl(epfd, EPOLL_CTL_DEL, fd, 0);
+				remove_session(sessions, sn);
+			    }
+			}
+			break;
+		    case Session::WRITING:
+			if(ev.events & EPOLLIN) {
+			    ev.events = EPOLLOUT;
+			    int rc = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
+			    if(rc==-1) {
+				(void)epoll_ctl(epfd, EPOLL_CTL_DEL, fd, 0);
+				remove_session(sessions, sn);
+			    }
+			}
+			break;
+		    case Session::DEAD:
+		    default:
+			epoll_ctl(epfd, EPOLL_CTL_DEL, fd, 0);
+			remove_session(sessions, sn);
+			break;
+		    }
 		}
 	    }
 	}
 
 	return true;
     }
-
 }
 
 
@@ -230,7 +254,7 @@ int main(int argc, char ** argv)
 	    return 0;
 	case 'v':
 	    std::cout << "gresabladet " << version() << '\n'
-		      << "Copyright (c) 2010 Jörgen Grahn\n";
+		      << "Copyright (c) 2010, 2011 Jörgen Grahn\n";
 	    return 0;
 	    break;
 	case ':':

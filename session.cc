@@ -1,4 +1,4 @@
-/* $Id: session.cc,v 1.3 2011-03-04 22:55:12 grahn Exp $
+/* $Id: session.cc,v 1.4 2011-03-06 19:06:06 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cassert>
 
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -49,45 +50,116 @@ namespace {
 Session::Session(int fd, const sockaddr_storage& sa)
     : fd_(fd),
       reader_(sockutil::TextReader(fd, "\r\n")),
-      peer_(getnameinfo(sa))
+      peer_(getnameinfo(sa)),
+      dead_(false),
+      pending_(0),
+      posting_(0)
 {
-    const char* welcome = "welcome,";
-    Response r(200); r << welcome << peer_;
-    r.write(fd_, backlog_);
+    Command* const cmd = initial();
+    if(cmd->process()) {
+	delete cmd; 
+    }
+    else {
+	/* XXX bug: we stay in state READING */
+	pending_ = cmd;
+    }
 }
 
 
 Session::~Session()
 {
+    delete pending_;
+    delete posting_;
     close(fd_);
 }
 
 
 /**
- * The TCP socket is readable; try to do some useful work.
+ * We claimed to be READING, and the TCP socket is now readable.
+ * The result is that:
+ * - we've read all N complete lines
+ * - we've processed M of them (as commands or lines of a posting)
+ * and we may have moved to state WRITING, in which case:
+ * - one command is left pending because we're blocked writing
+ * - M lines ended up in the backlog
+ * or we moved to state DEAD.
+ *
+ * Returns true iff we don't leave the state.
  */
-void Session::feed()
+bool Session::readable()
 {
+    assert(!dead_);
+    assert(!pending_);
+    assert(backlog_.empty());
+
     reader_.feed();
 
     char* a;
     char* b;
     while(reader_.read(a, b)) {
-	read(a, b);
+	Command* const cmd = command(a, b);
+	if(cmd->process()) {
+	    delete cmd; 
+	}
+	else {
+	    pending_ = cmd;
+	    break;
+	}
     }
-}
 
+    if(pending_) {
+	while(reader_.read(a, b)) {
+	    backlog_.push(std::string(a, b));
+	}
+    }
 
-void Session::read(const char* a, const char* b)
-{
-    std::cerr << peer_ << " - " << std::string(a, b);
+    /* XXX maybe too strict; what if we have stuff to write? */
+    dead_ |= reader_.eof();
+
+    return !pending_ && !dead_;
 }
 
 
 /**
- * To be called after feed().
+ * We claimed to be WRITING, and the TCP socket is now writable.
+ * Continue trying to complete the pending command, and then
+ * move over to the the backlog.
+ *
+ * Returns true iff we don't leave the state.
  */
-bool Session::eof() const
+bool Session::writable()
 {
-    return reader_.eof();
+    assert(!dead_);
+    assert(pending_);
+
+    if(pending_->resume()) {
+	delete pending_;
+	pending_ = 0;
+
+	while(!dead_ && !backlog_.empty()) {
+	    const std::string s = backlog_.front();
+	    backlog_.pop();
+	    Command* const cmd = command(s);
+	    if(cmd->process()) {
+		delete cmd; 
+	    }
+	    else {
+		pending_ = cmd;
+		break;
+	    }
+	}
+    }
+
+    return pending_ && !dead_;
 }
+
+
+/**
+ * True iff the session is dead and may be deleted
+ * (and removed from the epoll loop).
+ */
+bool Session::dead() const
+{
+    return dead_;
+}
+

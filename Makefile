@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.13 2011-03-04 22:55:12 grahn Exp $
+# $Id: Makefile,v 1.14 2011-03-06 19:06:06 grahn Exp $
 #
 # Makefile
 #
@@ -79,7 +79,7 @@ love:
 dbfile.o: dbfile.h
 gresabladet.o: version.h session.h ../sockutil/textread.h
 response.o: response.h
-session.o: response.h
+session.o: session.h ../sockutil/textread.h response.h
 version.o: version.h
 test/test_dbfile.o: dbfile.h
 test/test_response.o: response.h
