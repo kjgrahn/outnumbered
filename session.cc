@@ -1,4 +1,4 @@
-/* $Id: session.cc,v 1.5 2011-03-06 19:56:47 grahn Exp $
+/* $Id: session.cc,v 1.6 2011-03-06 23:12:21 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -6,7 +6,7 @@
  */
 #include "session.h"
 
-#include "response.h"
+#include "command.h"
 
 #include <iostream>
 #include <sstream>
@@ -170,4 +170,22 @@ void Session::writable()
 	    }
 	}
     }
+}
+
+
+Command* Session::initial()
+{
+    return new Command(fd_, "Hello\r\n");
+}
+
+
+Command* Session::command(const char* a, const char* b)
+{
+    return new Command(fd_, std::string(a, b));
+}
+
+
+Command* Session::command(const std::string& s)
+{
+    return command(s.data(), s.data()+s.size());
 }

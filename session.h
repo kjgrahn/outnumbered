@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: session.h,v 1.7 2011-03-06 19:56:47 grahn Exp $
+ * $Id: session.h,v 1.8 2011-03-06 23:12:21 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -19,10 +19,6 @@ class sockaddr_storage;
 class Posting;
 class Command;
 
-struct Command {
-    bool process();
-    bool resume();
-};
 class Posting {};
 
 /**
