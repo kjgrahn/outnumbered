@@ -1,4 +1,4 @@
-/* $Id: session.cc,v 1.4 2011-03-06 19:06:06 grahn Exp $
+/* $Id: session.cc,v 1.5 2011-03-06 19:56:47 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -60,8 +60,12 @@ Session::Session(int fd, const sockaddr_storage& sa)
 	delete cmd; 
     }
     else {
-	/* XXX bug: we stay in state READING */
+	/* XXX bug: we have no way to communicating that our initial
+	 * state may be anything but READING. So, we have to hope
+	 * this initial short write does not block.
+	 */
 	pending_ = cmd;
+	dead_ = true;
     }
 }
 
@@ -75,7 +79,29 @@ Session::~Session()
 
 
 /**
+ * There's an event on the fd; process it. Since the caller only listens for
+ * readability *or* writability and it does it according to what it was told
+ * about our internal state, we know which event it was.
+ */
+Session::State Session::event()
+{
+    assert(!dead_);
+
+    if(pending_) {
+	writable();
+    }
+    else {
+	readable();
+    }
+
+    if(dead_) return DEAD;
+    return pending_? WRITING: READING;
+}
+
+
+/**
  * We claimed to be READING, and the TCP socket is now readable.
+ *
  * The result is that:
  * - we've read all N complete lines
  * - we've processed M of them (as commands or lines of a posting)
@@ -83,10 +109,8 @@ Session::~Session()
  * - one command is left pending because we're blocked writing
  * - M lines ended up in the backlog
  * or we moved to state DEAD.
- *
- * Returns true iff we don't leave the state.
  */
-bool Session::readable()
+void Session::readable()
 {
     assert(!dead_);
     assert(!pending_);
@@ -115,19 +139,16 @@ bool Session::readable()
 
     /* XXX maybe too strict; what if we have stuff to write? */
     dead_ |= reader_.eof();
-
-    return !pending_ && !dead_;
 }
 
 
 /**
  * We claimed to be WRITING, and the TCP socket is now writable.
+ *
  * Continue trying to complete the pending command, and then
  * move over to the the backlog.
- *
- * Returns true iff we don't leave the state.
  */
-bool Session::writable()
+void Session::writable()
 {
     assert(!dead_);
     assert(pending_);
@@ -149,17 +170,4 @@ bool Session::writable()
 	    }
 	}
     }
-
-    return pending_ && !dead_;
 }
-
-
-/**
- * True iff the session is dead and may be deleted
- * (and removed from the epoll loop).
- */
-bool Session::dead() const
-{
-    return dead_;
-}
-

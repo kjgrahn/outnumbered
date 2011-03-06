@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: session.h,v 1.6 2011-03-06 19:06:06 grahn Exp $
+ * $Id: session.h,v 1.7 2011-03-06 19:56:47 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -52,10 +52,8 @@ private:
     Session(const Session&);
     Session& operator= (const Session& other);
 
-    bool readable();
-    bool writable();
-
-    bool dead() const;
+    void readable();
+    void writable();
 
     Command* initial();
     Command* command(const char* a, const char* b);
