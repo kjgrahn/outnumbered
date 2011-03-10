@@ -1,5 +1,5 @@
 /*
- * $Id: test_dbfile.cc,v 1.5 2011-02-20 14:12:44 grahn Exp $
+ * $Id: test_dbfile.cc,v 1.6 2011-03-10 22:19:57 grahn Exp $
  *
  * Copyright (C) 2011 Jörgen Grahn.
  * All rights reserved.
@@ -7,7 +7,7 @@
 #include <dbfile.h>
 
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 
 #include <testicle.h>
