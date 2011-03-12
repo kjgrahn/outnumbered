@@ -1,70 +1,14 @@
-/* $Id: response.cc,v 1.3 2010-09-02 20:30:21 grahn Exp $
+/* $Id: response.cc,v 1.4 2011-03-12 23:51:55 grahn Exp $
  *
- * Copyright (c) 2010 Jörgen Grahn
+ * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
  *
  */
 #include "response.h"
 
+#if 0
 #include <unistd.h>
 #include <errno.h>
-
-
-Response::Response(unsigned code)
-    : crlf(0),
-      col(1)
-{
-    oss << code;
-}
-
-
-template <>
-Response& Response::operator<< (const CrLf&)
-{
-    oss << "\r\n";
-    ++crlf;
-    col = 0;
-    return *this;
-}
-
-
-template <>
-Response& Response::operator<< (const char*& s)
-{
-    if(col++) {
-	oss << ' ';
-    }
-    else if(crlf && s[0]=='.') {
-	oss << '.';
-    }
-    oss << s;
-    return *this;
-}
-
-
-template <>
-Response& Response::operator<< (const std::string& s)
-{
-    if(col++) {
-	oss << ' ';
-    }
-    else if(crlf && !s.empty() && s[0]=='.') {
-	oss << '.';
-    }
-    oss << s;
-    return *this;
-}
-
-
-void Response::finalize()
-{
-    if(crlf) {
-	oss << ".\r\n";
-    }
-    else {
-	oss << "\r\n";
-    }
-}
 
 
 /**
@@ -86,19 +30,4 @@ ssize_t Response::write(const int fd, std::string& backlog)
     }
     return n;
 }
-
-
-Response::Response(const Response& other)
-    : crlf(other.crlf),
-      col(other.col)
-{
-    oss << other.oss.str();
-}
-
-
-std::string Response::str() const
-{
-    Response copy(*this);
-    copy.finalize();
-    return copy.oss.str();
-}
+#endif

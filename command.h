@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: command.h,v 1.1 2011-03-10 22:04:05 grahn Exp $
+ * $Id: command.h,v 1.2 2011-03-12 23:51:55 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -10,17 +10,15 @@
 
 #include <string>
 
+class ResponseBuf;
+
 class Command {
 public:
-    Command(int fd, const std::string& s);
-    bool process();
-    bool resume();
+    Command(ResponseBuf& buf, const std::string& s);
 
 private:
     Command(const Command&);
     Command& operator= (const Command&);
-    int fd_;
-    std::string s_;
 };
 
 #endif

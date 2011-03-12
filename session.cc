@@ -1,4 +1,4 @@
-/* $Id: session.cc,v 1.6 2011-03-06 23:12:21 grahn Exp $
+/* $Id: session.cc,v 1.7 2011-03-12 23:51:55 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -49,22 +49,18 @@ namespace {
 
 Session::Session(int fd, const sockaddr_storage& sa)
     : fd_(fd),
-      reader_(sockutil::TextReader(fd, "\r\n")),
+      reader_(fd, "\r\n"),
+      writer_(fd),
       peer_(getnameinfo(sa)),
       dead_(false),
-      pending_(0),
       posting_(0)
 {
-    Command* const cmd = initial();
-    if(cmd->process()) {
-	delete cmd; 
-    }
-    else {
+    initial();
+    if(!writer_.empty()) {
 	/* XXX bug: we have no way to communicating that our initial
 	 * state may be anything but READING. So, we have to hope
 	 * this initial short write does not block.
 	 */
-	pending_ = cmd;
 	dead_ = true;
     }
 }
@@ -72,7 +68,6 @@ Session::Session(int fd, const sockaddr_storage& sa)
 
 Session::~Session()
 {
-    delete pending_;
     delete posting_;
     close(fd_);
 }
@@ -87,7 +82,7 @@ Session::State Session::event()
 {
     assert(!dead_);
 
-    if(pending_) {
+    if(!writer_.empty()) {
 	writable();
     }
     else {
@@ -95,7 +90,7 @@ Session::State Session::event()
     }
 
     if(dead_) return DEAD;
-    return pending_? WRITING: READING;
+    return writer_.empty() ? READING : WRITING;
 }
 
 
@@ -106,32 +101,30 @@ Session::State Session::event()
  * - we've read all N complete lines
  * - we've processed M of them (as commands or lines of a posting)
  * and we may have moved to state WRITING, in which case:
- * - one command is left pending because we're blocked writing
- * - M lines ended up in the backlog
+ * - the ResponseBuf isn't empty; it contains the tail of a response
+ *   because we'd block if we tried writing it
+ * - M input lines ended up in the backlog
  * or we moved to state DEAD.
  */
 void Session::readable()
 {
     assert(!dead_);
-    assert(!pending_);
+    assert(writer_.empty());
     assert(backlog_.empty());
 
     reader_.feed();
 
     char* a;
     char* b;
-    while(reader_.read(a, b)) {
-	Command* const cmd = command(a, b);
-	if(cmd->process()) {
-	    delete cmd; 
-	}
-	else {
-	    pending_ = cmd;
+    while(!dead_ && reader_.read(a, b)) {
+
+	command(a, b);
+	if(!writer_.empty()) {
 	    break;
 	}
     }
 
-    if(pending_) {
+    if(!writer_.empty()) {
 	while(reader_.read(a, b)) {
 	    backlog_.push(std::string(a, b));
 	}
@@ -151,21 +144,15 @@ void Session::readable()
 void Session::writable()
 {
     assert(!dead_);
-    assert(pending_);
+    assert(!writer_.empty());
 
-    if(pending_->resume()) {
-	delete pending_;
-	pending_ = 0;
+    if(writer_.flush()) {
 
 	while(!dead_ && !backlog_.empty()) {
 	    const std::string s = backlog_.front();
 	    backlog_.pop();
-	    Command* const cmd = command(s);
-	    if(cmd->process()) {
-		delete cmd; 
-	    }
-	    else {
-		pending_ = cmd;
+	    command(s);
+	    if(!writer_.empty()) {
 		break;
 	    }
 	}
@@ -173,19 +160,19 @@ void Session::writable()
 }
 
 
-Command* Session::initial()
+void Session::initial()
 {
-    return new Command(fd_, "Hello\r\n");
+    Command(writer_, "Hello\r\n");
 }
 
 
-Command* Session::command(const char* a, const char* b)
+void Session::command(const char* a, const char* b)
 {
-    return new Command(fd_, std::string(a, b));
+    Command(writer_, std::string(a, b));
 }
 
 
-Command* Session::command(const std::string& s)
+void Session::command(const std::string& s)
 {
-    return command(s.data(), s.data()+s.size());
+    command(s.data(), s.data()+s.size());
 }

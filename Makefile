@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.16 2011-03-12 10:58:19 grahn Exp $
+# $Id: Makefile,v 1.17 2011-03-12 23:51:55 grahn Exp $
 #
 # Makefile
 #
@@ -78,12 +78,12 @@ love:
 
 # DO NOT DELETE
 
-command.o: command.h
+command.o: command.h responsebuf.h
 dbfile.o: dbfile.h
-gresabladet.o: version.h session.h ../sockutil/textread.h
+gresabladet.o: version.h session.h ../sockutil/textread.h responsebuf.h
 response.o: response.h
 responsebuf.o: responsebuf.h
-session.o: session.h ../sockutil/textread.h command.h
+session.o: session.h ../sockutil/textread.h responsebuf.h command.h
 version.o: version.h
 test/test_dbfile.o: dbfile.h
-test/test_response.o: response.h
+test/test_response.o: response.h responsebuf.h

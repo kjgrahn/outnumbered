@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: response.h,v 1.3 2010-07-29 11:51:52 grahn Exp $
+ * $Id: response.h,v 1.4 2011-03-12 23:51:55 grahn Exp $
  *
  * Copyright (c) 2010 Jörgen Grahn
  * All rights reserved.
@@ -13,64 +13,92 @@
 
 #include <string>
 
-struct CrLf {};
-static const CrLf CRLF();
-
-/**
- * An NNTP response, e.g.
- *     211 1234 3000234 3002322 misc.test
- * or
- *     215 list of newsgroups follows
- *     misc.test 3002322 3000234 y
- *     comp.risks 442001 441099 m
- *     alt.rfc-writers.recovery 4 1 y
- *     tx.natives.recovery 89 56 y
- *     tx.natives.recovery.d 11 9 n
- *     .
- * 
- * Takes care of inserting spaces, some CRLF and the final dot.
- * - for multi-line responses you must end each line manually with CRLF,
- *   but the final dot line is added automatically.
- * - for single-line responses you must not add the CRLF.
- *
- * Also takes care of dot-stuffing, but only when you << a char* or a
- * std::string. These must not contain \n either -- you are supposed
- * to use this class for simple structured responses, not for sending
- * full articles.
- */
-class Response {
-public:
-    explicit Response(unsigned code);
-
-    template <class T>
-    Response& operator<< (T val);
-
-    ssize_t write(int fd, std::string& backlog);
-    std::string str() const;
-
-private:
-    Response();
-    Response(const Response&);
-    Response& operator= (const Response&);
-
-    void finalize();
-
-    std::ostringstream oss;
-    unsigned crlf;
-    unsigned col;
-};
+#include "number.h"
+#include "msgid.h"
 
 
-template <class T>
-Response& Response::operator<< (T val)
-{
-    if(col++) oss << ' ';
-    oss << val;
-    return *this;
+namespace response {
+
+    struct Help {
+	explicit Help();
+    };
+
+    struct Capabilities {
+	template<class Iter>
+	explicit Capabilities(Iter begin, Iter end);
+    };
+
+    struct Date {
+	explicit Date(time_t);
+    };
+
+    struct Mode {
+	Mode(bool posting_ok, const char* msg);
+    };
+
+    struct Quit {
+	Quit(const char* msg);
+    };
+
+    struct Group {
+	explicit Group(unsigned n,
+		       unsigned low, unsigned high,
+		       const char* group);
+    };
+
+    struct Listgroup {
+	explicit Listgroup(unsigned n,
+			   unsigned low, unsigned high,
+			   const char* group);
+    };
+
+    struct List {
+	explicit List();
+    };
+
+    struct Article {
+	explicit Article(Number n, const MsgId& msgid);
+    };
+
+    struct Head {
+	explicit Head(Number n, const MsgId& msgid);
+    };
+
+    struct Body {
+	explicit Body(Number n, const MsgId& msgid);
+    };
+
+    struct Last {
+	explicit Last();
+    };
+
+    struct Next {
+	Next(Number n, const MsgId& msgid);
+    };
+
+    struct Stat {
+	explicit Stat();
+    };
+
+    struct Over {
+	explicit Over();
+    };
+
+    struct Hdr {
+	explicit Hdr();
+    };
+
+    struct Newnews {
+	explicit Newnews();
+    };
+
+    struct Post1 {
+	explicit Post1();
+    };
+
+    struct Post2 {
+	explicit Post2();
+    };
 }
-
-template <>
-Response& Response::operator<< (const CrLf&);
-
 
 #endif

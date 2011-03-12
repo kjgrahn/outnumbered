@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: responsebuf.h,v 1.2 2011-03-12 10:58:19 grahn Exp $
+ * $Id: responsebuf.h,v 1.3 2011-03-12 23:51:55 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -7,6 +7,8 @@
  */
 #ifndef GB_RESPONSEBUF_H_
 #define GB_RESPONSEBUF_H_
+
+#include <string>
 
 namespace response {
 
@@ -91,7 +93,9 @@ public:
     void write_block();
     void write_block_end();
 
-    void flush();
+    bool flush();
+
+    const std::string& str() const;
 
     int error() const;
     const char* strerror() const;

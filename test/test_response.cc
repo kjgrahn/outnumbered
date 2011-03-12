@@ -1,118 +1,143 @@
 /*
- * $Id: test_response.cc,v 1.4 2010-09-02 20:30:21 grahn Exp $
+ * $Id: test_response.cc,v 1.5 2011-03-12 23:51:55 grahn Exp $
  *
- * Copyright (C) 2007 Jörgen Grahn.
+ * Copyright (C) 2010, 2011 Jörgen Grahn.
  * All rights reserved.
  */
 #include <response.h>
+#include <responsebuf.h>
 
-#include <string>
-#include <sstream>
 #include <testicle.h>
+
 
 namespace {
 
     template<class T>
-    struct Printable {
-	explicit Printable(const T& val)
-	    : val_(val)
-	{}
-	T val_;
-    };
+    std::string fmt(const T& resp)
+    {
+	ResponseBuf buf(-1);
+	buf.write(resp);
+	testicle::assert_eq(buf.empty(), false);
+	return buf.str();
+    }
 
+    /**
+     * Assert that 'resp' formats to exactly 's'.
+     */
     template<class T>
-    std::ostream& operator<< (std::ostream& os, const Printable<T>& val)
+    void assert_fmt(const T& resp, const std::string& s)
     {
-	return os << val.val_;
+	const std::string r = fmt(resp);
+	testicle::assert_eq(r, s);
     }
-
-    void assert_eq(const Response& resp, const char* s)
+    
+    /**
+     * Assert that 'resp' formats to something that
+     * begins with 'a' and ends with 'b'.
+     */
+    template<class T>
+    void assert_fmt(const T& resp,
+		    const std::string& a,
+		    const std::string& b)
     {
-	testicle::assert_eq(resp.str(), s);
+	std::ostringstream message;
+	const std::string r = fmt(resp);
+	if(r.find(a)!=0) {
+	    message << '\'' << a << '\''
+		    << " is not a prefix of "
+		    << '\'' << r << '\'';
+	    throw testicle::Failure(message);
+	}
+	if(r.rfind(b) != r.size() - a.size()) {
+	    message << '\'' << b << '\''
+		    << " is not a suffix of "
+		    << '\'' << r << '\'';
+	    throw testicle::Failure(message);
+	}
     }
 
 }
 
-namespace ostringstream {
 
-    void test()
-    {
-	std::ostringstream foo("foo");
-	testicle::assert_eq(foo.str(), "foo");
-	std::ostringstream bar(foo.str());
-	testicle::assert_eq(bar.str(), "foo");
-	std::ostringstream baz;
-	unsigned pi2 = 314;
-	baz << pi2;
-	testicle::assert_eq(baz.str(), "314");
-    }
-}
 
 namespace response {
 
-    void test()
-    {
-	const Response r(314);
-	testicle::assert_eq(Response(314).str(), "314\r\n");
+    namespace single {
+
+	void test111()
+	{
+	    assert_fmt(Date(3600),
+		       "111 19700101010000\r\n");
+	}
+
+	void test200()
+	{
+	    assert_fmt(Mode(true, "service available, posting allowed"),
+		       "200 ", "\r\n");
+	}
+
+	void test201()
+	{
+	    assert_fmt(Mode(false, "service available, posting prohibited"),
+		       "201 ", "\r\n");
+	}
+
+	void test205()
+	{
+	    assert_fmt(Quit("goodbye!"),
+		       "205 goodbye!\r\n");
+	}
+
+	void test211()
+	{
+	    assert_fmt(Group(42, 100, 200, "misc.test"),
+		       "211 42 100 200 misc.test selected\r\n");	    
+	}
+
+	void test223()
+	{
+	    assert_fmt(Next(Number(421), MsgId("foo@example.org")),
+		       "223 421 <foo@example.org>\r\n");	    
+	}
+
+	void test240();
+	void test340();
     }
 
-    void test_simple()
-    {
-	Response r(314);
-	r << 1 << 2 << 16;
-	r << ".foo";
-	assert_eq(r, "314 1 2 16 .foo\r\n");
+    namespace multi {
+
+	void test100();
+	void test101();
+	void test211();
+	void test215();
+	void test220();
+	void test221();
+	void test222();
+	void test224();
+	void test225();
+	void test230();
+	void test231();
     }
 
-    void test_simple2()
-    {
-	Response r(314);
-	r << 1 << 2 << 16;
-	r << std::string(".foo");
-	assert_eq(r, "314 1 2 16 .foo\r\n");
-    }
+    namespace error {
 
-    void test_simple3()
-    {
-	Response r(314);
-	r << 1 << 2 << Printable<int>(16);
-	r << Printable<const char*>(".foo");
-	assert_eq(r, "314 1 2 16 .foo\r\n");
+	void test400();
+	void test401();
+	void test403();
+	void test411();
+	void test412();
+	void test420();
+	void test421();
+	void test422();
+	void test423();
+	void test430();
+	void test440();
+	void test441();
+	void test480();
+	void test483();
+	void test500();
+	void test501();
+	void test502();
+	void test503();
     }
-
-    void test_multiline1()
-    {
-	Response r(314);
-	r << 1 << 2 << ".foo" << CRLF;
-	assert_eq(r,
-		  "314 1 2 .foo\r\n"
-		  ".\r\n");
-    }
-
-    void test_multiline2()
-    {
-	Response r(314);
-	r << 1 << 2 << ".foo" << CRLF;
-	r << "bar" << CRLF
-	  << 42 << "baz" << CRLF;
-	assert_eq(r,
-		  "314 1 2 .foo\r\n"
-		  "bar\r\n"
-		  "42 baz\r\n"
-		  ".\r\n");
-    }
-
-    void test_dotstuff()
-    {
-	Response r(314);
-	r << 1 << 2 << ".foo" << CRLF;
-	r << "bar" << CRLF
-	  << ".fred" << "baz" << CRLF;
-	assert_eq(r,
-		  "314 1 2 .foo\r\n"
-		  "bar\r\n"
-		  "..fred baz\r\n"
-		  ".\r\n");
-    }
-
 }

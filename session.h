@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: session.h,v 1.8 2011-03-06 23:12:21 grahn Exp $
+ * $Id: session.h,v 1.9 2011-03-12 23:51:55 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -14,10 +14,11 @@
 #include <ctime>
 
 #include <sockutil/textread.h>
+#include "responsebuf.h"
+
 
 class sockaddr_storage;
 class Posting;
-class Command;
 
 class Posting {};
 
@@ -51,16 +52,16 @@ private:
     void readable();
     void writable();
 
-    Command* initial();
-    Command* command(const char* a, const char* b);
-    Command* command(const std::string& s);
+    void initial();
+    void command(const char* a, const char* b);
+    void command(const std::string& s);
 
     const int fd_;
     sockutil::TextReader reader_;
+    ResponseBuf writer_;
     const std::string peer_;
     bool dead_;
 
-    Command* pending_;
     std::queue<std::string> backlog_;
 
     Posting* posting_;
