@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: responsebuf.h,v 1.1 2011-03-12 09:43:29 grahn Exp $
+ * $Id: responsebuf.h,v 1.2 2011-03-12 10:58:19 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -7,6 +7,36 @@
  */
 #ifndef GB_RESPONSEBUF_H_
 #define GB_RESPONSEBUF_H_
+
+namespace response {
+
+    class Help;
+    class Capabilities;
+    class Date;
+    class Mode;
+    class Quit;
+
+    class Group;
+    class Listgroup;
+    class List;
+
+    class Article;
+    class Head;
+    class Body;
+
+    class Last;
+    class Next;
+    class Stat;
+
+    class Over;
+    class Hdr;
+    class Newnews;
+    class Post1;
+    class Post2;
+
+    class Error;
+}
+
 
 /**
  * Writing NNTP responses to a non-blocking stream socket,
@@ -31,6 +61,37 @@ class ResponseBuf {
 public:
     explicit ResponseBuf(int fd);
     bool empty() const;
+
+    void write(const response::Help& resp);
+    void write(const response::Capabilities& resp);
+    void write(const response::Date& resp);
+    void write(const response::Mode& resp);
+    void write(const response::Quit& resp);
+
+    void write(const response::Group& resp);
+    void write(const response::Listgroup& resp);
+    void write(const response::List& resp);
+
+    void write(const response::Article& resp);
+    void write(const response::Head& resp);
+    void write(const response::Body& resp);
+
+    void write(const response::Last& resp);
+    void write(const response::Next& resp);
+    void write(const response::Stat& resp);
+
+    void write(const response::Over& resp);
+    void write(const response::Hdr& resp);
+    void write(const response::Newnews& resp);
+    void write(const response::Post1& resp);
+    void write(const response::Post2& resp);
+
+    void write(const response::Error& resp);
+
+    void write_block();
+    void write_block_end();
+
+    void flush();
 
     int error() const;
     const char* strerror() const;
