@@ -1,15 +1,14 @@
 /* -*- c++ -*-
- * $Id: response.h,v 1.4 2011-03-12 23:51:55 grahn Exp $
+ * $Id: response.h,v 1.5 2011-03-15 22:03:48 grahn Exp $
  *
- * Copyright (c) 2010 Jörgen Grahn
+ * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
  *
  */
 #ifndef GB_RESPONSE_H_
 #define GB_RESPONSE_H_
 
-#include <iostream>
-#include <sstream>
+#include <iosfwd>
 
 #include <string>
 
@@ -20,37 +19,79 @@
 namespace response {
 
     struct Help {
-	explicit Help();
+	Help() {}
+	void put(std::ostream& os) const;
     };
 
     struct Capabilities {
 	template<class Iter>
 	explicit Capabilities(Iter begin, Iter end);
+	void put(std::ostream& os) const;
     };
 
     struct Date {
-	explicit Date(time_t);
+	explicit Date(time_t t)
+	    : t(t)
+	{}
+	void put(std::ostream& os) const;
+	const time_t t;
     };
+    inline std::ostream& operator<< (std::ostream& os, const Date& val) {
+	val.put(os); return os;
+    }
 
     struct Mode {
-	Mode(bool posting_ok, const char* msg);
+	Mode(bool posting_ok, const char* msg)
+	    : posting_ok(posting_ok),
+	      msg(msg)
+	{}
+	void put(std::ostream& os) const;
+	bool posting_ok;
+	const char* msg;
     };
+    inline std::ostream& operator<< (std::ostream& os, const Mode& val) {
+	val.put(os); return os;
+    }
 
     struct Quit {
-	Quit(const char* msg);
+	Quit(const char* msg)
+	    : msg(msg)
+	{}
+	void put(std::ostream& os) const;
+	const char* msg;
     };
+    inline std::ostream& operator<< (std::ostream& os, const Quit& val) {
+	val.put(os); return os;
+    }
 
     struct Group {
 	explicit Group(unsigned n,
 		       unsigned low, unsigned high,
-		       const char* group);
+		       const char* group)
+	    : n(n),
+	      low(low),
+	      high(high),
+	      group(group)
+	{}
+	void put(std::ostream& os) const;
+	unsigned n;
+	unsigned low;
+	unsigned high;
+	const char* group;
     };
+    inline std::ostream& operator<< (std::ostream& os, const Group& val) {
+	val.put(os); return os;
+    }
 
     struct Listgroup {
 	explicit Listgroup(unsigned n,
 			   unsigned low, unsigned high,
 			   const char* group);
+	void put(std::ostream& os) const;
     };
+    inline std::ostream& operator<< (std::ostream& os, const Listgroup& val) {
+	val.put(os); return os;
+    }
 
     struct List {
 	explicit List();
@@ -73,8 +114,14 @@ namespace response {
     };
 
     struct Next {
-	Next(Number n, const MsgId& msgid);
+	Next(Number n, const MsgId& msgid) : n(n), msgid(msgid) {}
+	void put(std::ostream& os) const;
+	const Number n;
+	const MsgId& msgid;
     };
+    inline std::ostream& operator<< (std::ostream& os, const Next& val) {
+	val.put(os); return os;
+    }
 
     struct Stat {
 	explicit Stat();

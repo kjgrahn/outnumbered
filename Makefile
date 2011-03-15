@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.17 2011-03-12 23:51:55 grahn Exp $
+# $Id: Makefile,v 1.18 2011-03-15 22:03:48 grahn Exp $
 #
 # Makefile
 #
@@ -81,9 +81,9 @@ love:
 command.o: command.h responsebuf.h
 dbfile.o: dbfile.h
 gresabladet.o: version.h session.h ../sockutil/textread.h responsebuf.h
-response.o: response.h
-responsebuf.o: responsebuf.h
+response.o: response.h number.h msgid.h
+responsebuf.o: responsebuf.h response.h number.h msgid.h
 session.o: session.h ../sockutil/textread.h responsebuf.h command.h
 version.o: version.h
 test/test_dbfile.o: dbfile.h
-test/test_response.o: response.h responsebuf.h
+test/test_response.o: response.h number.h msgid.h responsebuf.h
