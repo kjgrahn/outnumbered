@@ -1,5 +1,5 @@
 /*
- * $Id: test_response.cc,v 1.5 2011-03-12 23:51:55 grahn Exp $
+ * $Id: test_response.cc,v 1.6 2011-03-16 21:23:19 grahn Exp $
  *
  * Copyright (C) 2010, 2011 Jörgen Grahn.
  * All rights reserved.
@@ -21,6 +21,31 @@ namespace {
 	return buf.str();
     }
 
+    void assert_startswith(const std::string& haystack,
+			   const std::string& needle)
+    {
+	std::ostringstream message;
+	if(haystack.find(needle)!=0) {
+	    message << '\'' << needle << '\''
+		    << " is not a prefix of "
+		    << '\'' << haystack << '\'';
+	    throw testicle::Failure(message);
+	}
+    }
+
+    void assert_endswith(const std::string& haystack,
+			 const std::string& needle)
+    {
+	std::ostringstream message;
+	if(haystack.size() < needle.size()
+	   || haystack.rfind(needle) != haystack.size() - needle.size()) {
+	    message << '\'' << needle << '\''
+		    << " is not a suffix of "
+		    << '\'' << haystack << '\'';
+	    throw testicle::Failure(message);
+	}
+    }
+
     /**
      * Assert that 'resp' formats to exactly 's'.
      */
@@ -30,7 +55,7 @@ namespace {
 	const std::string r = fmt(resp);
 	testicle::assert_eq(r, s);
     }
-    
+
     /**
      * Assert that 'resp' formats to something that
      * begins with 'a' and ends with 'b'.
@@ -42,22 +67,28 @@ namespace {
     {
 	std::ostringstream message;
 	const std::string r = fmt(resp);
-	if(r.find(a)!=0) {
-	    message << '\'' << a << '\''
-		    << " is not a prefix of "
-		    << '\'' << r << '\'';
-	    throw testicle::Failure(message);
-	}
-	if(r.rfind(b) != r.size() - a.size()) {
-	    message << '\'' << b << '\''
-		    << " is not a suffix of "
-		    << '\'' << r << '\'';
-	    throw testicle::Failure(message);
-	}
+	assert_startswith(r, a);
+	assert_endswith(r, b);
     }
-
 }
 
+
+namespace starts_endswith {
+
+    void test_start()
+    {
+	assert_startswith("foo", "foo");
+	assert_startswith("foo", "f");
+	assert_startswith("foo", "");
+    }
+
+    void test_end()
+    {
+	assert_endswith("foo", "");
+	assert_endswith("foo", "o");
+	assert_endswith("foo", "foo");
+    }
+}
 
 
 namespace response {

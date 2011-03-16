@@ -1,4 +1,4 @@
-/* $Id: responsebuf.cc,v 1.2 2011-03-15 22:03:48 grahn Exp $
+/* $Id: responsebuf.cc,v 1.3 2011-03-16 21:23:19 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -16,7 +16,7 @@ ResponseBuf::ResponseBuf(int fd)
 
 bool ResponseBuf::empty() const
 {
-    return true;
+    return str().empty();
 }
 
 
