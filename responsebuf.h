@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: responsebuf.h,v 1.4 2011-03-15 22:03:48 grahn Exp $
+ * $Id: responsebuf.h,v 1.5 2011-03-27 13:15:17 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -9,7 +9,6 @@
 #define GB_RESPONSEBUF_H_
 
 #include <string>
-#include <sstream>
 
 /**
  * Writing NNTP responses to a non-blocking stream socket,
@@ -42,7 +41,7 @@ public:
 
     bool flush();
 
-    std::string str() const;
+    const std::string& str() const;
 
     int error() const;
     const char* strerror() const;
@@ -51,7 +50,6 @@ private:
     ResponseBuf(const ResponseBuf&);
     ResponseBuf& operator=(const ResponseBuf&);
     int fd_;
-    std::ostringstream oss_;
     std::string str_;
 };
 
