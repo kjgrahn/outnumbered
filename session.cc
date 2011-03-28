@@ -1,4 +1,4 @@
-/* $Id: session.cc,v 1.7 2011-03-12 23:51:55 grahn Exp $
+/* $Id: session.cc,v 1.8 2011-03-28 22:04:38 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -162,7 +162,7 @@ void Session::writable()
 
 void Session::initial()
 {
-    Command(writer_, "Hello\r\n");
+    Command(writer_, "");
 }
 
 

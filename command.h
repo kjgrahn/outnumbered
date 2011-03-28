@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: command.h,v 1.2 2011-03-12 23:51:55 grahn Exp $
+ * $Id: command.h,v 1.3 2011-03-28 22:04:38 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -14,7 +14,7 @@ class ResponseBuf;
 
 class Command {
 public:
-    Command(ResponseBuf& buf, const std::string& s);
+    explicit Command(ResponseBuf& buf, const std::string& s);
 
 private:
     Command(const Command&);
