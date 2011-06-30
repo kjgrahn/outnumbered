@@ -1,4 +1,4 @@
-/* $Id: responsebuf.cc,v 1.5 2011-06-30 09:15:29 grahn Exp $
+/* $Id: responsebuf.cc,v 1.6 2011-06-30 21:37:49 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -6,8 +6,10 @@
  */
 #include "responsebuf.h"
 
+#include <iostream>
 #include <streambuf>
 #include <vector>
+#include <algorithm>
 #include <cassert>
 
 #include <unistd.h>
@@ -18,8 +20,8 @@
  * The actual streambuf. Owns an infinitely growing vector<char> where the buffering
  * takes place:
  *
- * pbase             z            pptr         epptr,size     capacity 
- * |:::::::::::::::::|::::::::::::|............|..............|
+ * pbase             z            pptr         epptr,size
+ * |:::::::::::::::::|::::::::::::|............|
  *
  * When queueing, 'z' marks the end of dot-stuffed data; [z, pptr) contains no
  * complete multi-line responses.
@@ -37,6 +39,11 @@ public:
     void write_termination();
 
 private:
+    StreamBuf(const StreamBuf&);
+    StreamBuf& operator= (const StreamBuf&);
+
+    void grow();
+
     Vec vec_;
     char_type* z_;
 };
@@ -51,14 +58,81 @@ ResponseBuf::StreamBuf::StreamBuf()
 }
 
 
+namespace {
+
+    static const char dot[] = ".\r\n";
+    static const char* const dotend = dot + sizeof(dot)-1;
+    static const char crlf[] = "\r\n";
+    static const char* const crlfend = crlf + sizeof(crlf)-1;
+
+    /**
+     * The number of occurences of 'dot' in [a, b).
+     */
+    int count_dots(const char* a, const char* b)
+    {
+	int n = 0;
+	while((a = std::search(a, b, dot, dotend)) != b) {
+	    a += dotend-dot;
+	    ++n;
+	}
+	return n;
+    }
+
+    /**
+     * True if [a, b) is CRLF-terminated.
+     */
+    bool is_crlf_terminated(const char* a, const char* b)
+    {
+	return (b-a >= crlfend - crlf) &&
+	    std::equal(b-(crlfend - crlf), b, crlf);
+    }
+
+}
+
+
+/**
+ * Write the multi-line response terminator ".\r\n".
+ * Also terminates the line before it, if necessary.
+ * Also, performs dot-stuffing of the buffer between
+ * this point and the previous terminator, and advances z_.
+ *
+ * May have to grow() the buffer either because of the terminator
+ * itself or the dot-stuffing. Fortunately, a single grow() is always
+ * enough; dot-stuffing forces worst-case 33% growth.
+ */
 void ResponseBuf::StreamBuf::write_termination()
 {
-#if 0
-    assert(size()>2);
-    char_type* p = pend()-2;
-    if(p[0]!='\r' || p[1]!='\n') {
+    const bool add_extra_crlf = !is_crlf_terminated(pbase(), pptr());
+    size_t growth = count_dots(z_, pptr());
+    growth += add_extra_crlf? 2+3: 3;
+
+    if(pptr()+growth > epptr()) grow();
+    assert(!(pptr()+growth > epptr()));
+
+    char_type* p = pptr();
+    if(add_extra_crlf) {
+	std::copy(crlf, crlfend, p);
+	p += crlfend - crlf;
     }
-#endif
+    std::copy(dot, dotend, p);
+    p += dotend - dot;
+    pbump(p - pptr());
+}
+
+
+/**
+ * Grow the buffer with 50% or so, i.e. with at least 2K.
+ */
+void ResponseBuf::StreamBuf::grow()
+{
+    const size_t dz = z_ - pbase();
+    const size_t dp = pptr() - pbase();
+
+    vec_.resize(vec_.size()*3/2);
+    char_type* const p = &vec_[0];
+    setp(p, p + vec_.size());
+    z_ = p + dz;
+    pbump(dp);
 }
 
 
