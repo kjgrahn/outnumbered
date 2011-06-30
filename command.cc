@@ -1,4 +1,4 @@
-/* $Id: command.cc,v 1.3 2011-03-28 22:04:38 grahn Exp $
+/* $Id: command.cc,v 1.4 2011-06-30 09:15:29 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -15,9 +15,9 @@
 Command::Command(ResponseBuf& buf, const std::string& s)
 {
     if(s.empty()) {
-	buf.write(response::Mode(true, "Hello, world"));
+	buf.ostream() << response::Mode(true, "Hello, world");
     }
     else {
-	buf.write(response::Mode(true, "World, hello"));
+	buf.ostream() << response::Mode(true, "World, hello");
     }
 }
