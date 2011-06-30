@@ -1,4 +1,4 @@
-/* $Id: responsebuf.cc,v 1.6 2011-06-30 21:37:49 grahn Exp $
+/* $Id: responsebuf.cc,v 1.7 2011-06-30 23:26:12 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -60,8 +60,10 @@ ResponseBuf::StreamBuf::StreamBuf()
 
 namespace {
 
-    static const char dot[] = ".\r\n";
+    static const char dot[] = "\r\n.";
     static const char* const dotend = dot + sizeof(dot)-1;
+    static const char term[] = ".\r\n";
+    static const char* const termend = term + sizeof(term)-1;
     static const char crlf[] = "\r\n";
     static const char* const crlfend = crlf + sizeof(crlf)-1;
 
@@ -79,6 +81,17 @@ namespace {
     }
 
     /**
+     * Find 'dot' backwards in [a, p) and returns a pointer
+     * immediately *after* the 'dot', which is assumed to exist.
+     */
+    char* find_dot(char* a, char* b)
+    {
+	char* p = std::find_end(a, b, dot, dotend);
+	assert(p!=b);
+	return p + (dotend-dot);
+    }
+
+    /**
      * True if [a, b) is CRLF-terminated.
      */
     bool is_crlf_terminated(const char* a, const char* b)
@@ -87,6 +100,13 @@ namespace {
 	    std::equal(b-(crlfend - crlf), b, crlf);
     }
 
+    /**
+     * Move [a, b) right by n positions.
+     */
+    void move_right(char* a, char* b, size_t n)
+    {
+	std::copy_backward(a, b, b+n);
+    }
 }
 
 
@@ -103,20 +123,31 @@ namespace {
 void ResponseBuf::StreamBuf::write_termination()
 {
     const bool add_extra_crlf = !is_crlf_terminated(pbase(), pptr());
-    size_t growth = count_dots(z_, pptr());
-    growth += add_extra_crlf? 2+3: 3;
+    size_t dots = count_dots(z_, pptr());
+    const size_t growth = dots + add_extra_crlf? 2+3: 3;
 
     if(pptr()+growth > epptr()) grow();
     assert(!(pptr()+growth > epptr()));
 
     char_type* p = pptr();
+    pbump(dots);
+    while(dots) {
+	char_type* q = find_dot(z_, p);
+	move_right(q, p, dots);
+	*q = '.';
+	p = q+1;
+	dots--;
+    }
+
+    p = pptr();
     if(add_extra_crlf) {
 	std::copy(crlf, crlfend, p);
 	p += crlfend - crlf;
     }
-    std::copy(dot, dotend, p);
-    p += dotend - dot;
+    std::copy(term, termend, p);
+    p += termend - term;
     pbump(p - pptr());
+    z_ = pptr();
 }
 
 
