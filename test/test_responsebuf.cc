@@ -1,5 +1,5 @@
 /*
- * $Id: test_responsebuf.cc,v 1.2 2011-06-30 21:37:50 grahn Exp $
+ * $Id: test_responsebuf.cc,v 1.3 2011-07-01 07:41:56 grahn Exp $
  *
  * Copyright (C) 2011 Jörgen Grahn.
  * All rights reserved.
@@ -89,14 +89,18 @@ namespace responsebuf {
 	{
 	    ResponseBuf buf(-1);
 	    buf << 200 << " hello.\r\n"
-		<< "..world\r\n"
-		<< ".world\r\n";
+		<< ".foo\r\n"
+		<< ".bar\r\n"
+		<< ".baz\r\n"
+		<< ".bat\r\n";
 	    buf.write_termination();
 	    assert_eq(buf.empty(), false);
 	    assert_eq(buf.str(),
 		      "200 hello.\r\n"
-		      "...world\r\n"
-		      "..world\r\n"
+		      "..foo\r\n"
+		      "..bar\r\n"
+		      "..baz\r\n"
+		      "..bat\r\n"
 		      ".\r\n");
 	}
     }

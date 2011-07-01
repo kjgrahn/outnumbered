@@ -1,4 +1,4 @@
-/* $Id: responsebuf.cc,v 1.7 2011-06-30 23:26:12 grahn Exp $
+/* $Id: responsebuf.cc,v 1.8 2011-07-01 07:41:56 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -82,13 +82,13 @@ namespace {
 
     /**
      * Find 'dot' backwards in [a, p) and returns a pointer
-     * immediately *after* the 'dot', which is assumed to exist.
+     * to the start of 'dot', which is assumed to exist.
      */
     char* find_dot(char* a, char* b)
     {
 	char* p = std::find_end(a, b, dot, dotend);
 	assert(p!=b);
-	return p + (dotend-dot);
+	return p;
     }
 
     /**
@@ -133,10 +133,11 @@ void ResponseBuf::StreamBuf::write_termination()
     pbump(dots);
     while(dots) {
 	char_type* q = find_dot(z_, p);
-	move_right(q, p, dots);
-	*q = '.';
-	p = q+1;
+	move_right(q+3, p, dots);
+	*(q+3) = '.';
 	dots--;
+	move_right(q, q+4, dots);
+	p = q;
     }
 
     p = pptr();
