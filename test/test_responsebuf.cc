@@ -1,5 +1,5 @@
 /*
- * $Id: test_responsebuf.cc,v 1.3 2011-07-01 07:41:56 grahn Exp $
+ * $Id: test_responsebuf.cc,v 1.4 2011-07-01 08:10:59 grahn Exp $
  *
  * Copyright (C) 2011 Jörgen Grahn.
  * All rights reserved.
@@ -10,6 +10,11 @@
 
 using namespace testicle;
 
+
+/**
+ * XXX These all use ResponseBuf::str() which is a pure debug
+ * interface, instead of actually writing to a socket.
+ */
 namespace responsebuf {
 
     void test_construct()
@@ -103,5 +108,23 @@ namespace responsebuf {
 		      "..bat\r\n"
 		      ".\r\n");
 	}
+    }
+
+    namespace huge {
+
+	void test(size_t n)
+	{
+	    ResponseBuf buf(-1);
+	    std::ostringstream oss;
+	    for(size_t i=0; i<n; ++i) {
+		buf << "Foo bar baz " << i << "\r\n";
+		oss << "Foo bar baz " << i << "\r\n";
+	    }
+
+	    assert_eq(buf.size(), oss.str().size());
+	    assert_eq(buf.str(), oss.str());
+	}
+
+	void test() { test(50e3); }
     }
 }
