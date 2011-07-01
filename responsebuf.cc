@@ -1,4 +1,4 @@
-/* $Id: responsebuf.cc,v 1.8 2011-07-01 07:41:56 grahn Exp $
+/* $Id: responsebuf.cc,v 1.9 2011-07-01 08:39:01 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -37,6 +37,9 @@ public:
     std::string str() const { return std::string(pbase(), pptr()); }
 
     void write_termination();
+
+protected:
+    virtual int_type overflow(int_type c = traits_type::eof());
 
 private:
     StreamBuf(const StreamBuf&);
@@ -149,6 +152,15 @@ void ResponseBuf::StreamBuf::write_termination()
     p += termend - term;
     pbump(p - pptr());
     z_ = pptr();
+}
+
+
+ResponseBuf::StreamBuf::int_type
+ResponseBuf::StreamBuf::overflow(ResponseBuf::StreamBuf::int_type c)
+{
+    grow();
+    sputc(c);
+    return '!';
 }
 
 
