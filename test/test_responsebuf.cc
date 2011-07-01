@@ -1,5 +1,5 @@
 /*
- * $Id: test_responsebuf.cc,v 1.4 2011-07-01 08:10:59 grahn Exp $
+ * $Id: test_responsebuf.cc,v 1.5 2011-07-01 09:03:25 grahn Exp $
  *
  * Copyright (C) 2011 Jörgen Grahn.
  * All rights reserved.
@@ -57,7 +57,7 @@ namespace responsebuf {
 	{
 	    ResponseBuf buf(-1);
 	    buf << "200 hello.\r\n";
-	    buf.write_termination();
+	    buf.put_terminator();
 	    assert_eq(buf.empty(), false);
 	    assert_eq(buf.str(),
 		      "200 hello.\r\n"
@@ -69,7 +69,7 @@ namespace responsebuf {
 	    ResponseBuf buf(-1);
 	    buf << "200 hello.\r\n"
 		<< ".world\r\n";
-	    buf.write_termination();
+	    buf.put_terminator();
 	    assert_eq(buf.empty(), false);
 	    assert_eq(buf.str(),
 		      "200 hello.\r\n"
@@ -82,7 +82,7 @@ namespace responsebuf {
 	    ResponseBuf buf(-1);
 	    buf << "200 hello.\r\n"
 		<< ".world";
-	    buf.write_termination();
+	    buf.put_terminator();
 	    assert_eq(buf.empty(), false);
 	    assert_eq(buf.str(),
 		      "200 hello.\r\n"
@@ -98,7 +98,7 @@ namespace responsebuf {
 		<< ".bar\r\n"
 		<< ".baz\r\n"
 		<< ".bat\r\n";
-	    buf.write_termination();
+	    buf.put_terminator();
 	    assert_eq(buf.empty(), false);
 	    assert_eq(buf.str(),
 		      "200 hello.\r\n"

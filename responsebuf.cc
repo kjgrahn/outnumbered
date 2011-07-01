@@ -1,4 +1,4 @@
-/* $Id: responsebuf.cc,v 1.9 2011-07-01 08:39:01 grahn Exp $
+/* $Id: responsebuf.cc,v 1.10 2011-07-01 09:03:25 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -36,7 +36,7 @@ public:
     bool empty() const { return size()==0; }
     std::string str() const { return std::string(pbase(), pptr()); }
 
-    void write_termination();
+    void put_terminator();
 
 protected:
     virtual int_type overflow(int_type c = traits_type::eof());
@@ -123,7 +123,7 @@ namespace {
  * itself or the dot-stuffing. Fortunately, a single grow() is always
  * enough; dot-stuffing forces worst-case 33% growth.
  */
-void ResponseBuf::StreamBuf::write_termination()
+void ResponseBuf::StreamBuf::put_terminator()
 {
     const bool add_extra_crlf = !is_crlf_terminated(pbase(), pptr());
     size_t dots = count_dots(z_, pptr());
@@ -199,9 +199,9 @@ bool ResponseBuf::empty() const
 }
 
 
-void ResponseBuf::write_termination()
+void ResponseBuf::put_terminator()
 {
-    buf_->write_termination();
+    buf_->put_terminator();
 }
 
 

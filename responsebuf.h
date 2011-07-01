@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: responsebuf.h,v 1.6 2011-06-30 09:15:29 grahn Exp $
+ * $Id: responsebuf.h,v 1.7 2011-07-01 09:03:25 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -20,7 +20,7 @@
  *   (ResponseBuf does no automatic conversion from '\n' to CRLF) but
  *   must not do dot-stuffing (ResponseBuf /does/ handle that).
  *
- * - write_termination() writes the termination line of a multi-line
+ * - put_termination() writes the termination line of a multi-line
  *   response; the line with just a '.'. That can't be done via the
  *   ostream, since that interface is subject to dot-stuffing.
  *
@@ -28,6 +28,13 @@
  *   there are no half-complete responses in the queue, and must be
  *   repeated until the queue is empty. The ostream meanwhile must not
  *   be used.
+ *
+ * So, the usage can be e.g.
+ * - put a few single-line responses
+ * - put a number of multi-line responses, and add terminators
+ * - put a few more single-line responses
+ * - flush() to the socket repeatedly until it's all gone
+ * - go back to writing responses
  *
  * This way of handling writes assumes that there's an upper bound on
  * the amount of data to write; it wouldn't be suitable for streaming
@@ -47,7 +54,7 @@ public:
     size_t size() const;
 
     std::ostream& ostream() { return os_; }
-    void write_termination();
+    void put_terminator();
 
     bool flush();
     int error() const;
