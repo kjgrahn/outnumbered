@@ -1,11 +1,11 @@
 /*
- * $Id: test_response.cc,v 1.6 2011-03-16 21:23:19 grahn Exp $
+ * $Id: test_response.cc,v 1.7 2011-07-02 10:19:44 grahn Exp $
  *
  * Copyright (C) 2010, 2011 Jörgen Grahn.
  * All rights reserved.
  */
 #include <response.h>
-#include <responsebuf.h>
+#include <sstream>
 
 #include <testicle.h>
 
@@ -15,10 +15,11 @@ namespace {
     template<class T>
     std::string fmt(const T& resp)
     {
-	ResponseBuf buf(-1);
-	buf.write(resp);
-	testicle::assert_eq(buf.empty(), false);
-	return buf.str();
+	std::ostringstream oss;
+	oss << resp;
+	const std::string s = oss.str();
+	testicle::assert_eq(s.empty(), false);
+	return s;
     }
 
     void assert_startswith(const std::string& haystack,
