@@ -1,4 +1,4 @@
-/* $Id: responsebuf.cc,v 1.12 2011-07-02 09:08:44 grahn Exp $
+/* $Id: responsebuf.cc,v 1.13 2011-07-02 10:07:32 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -11,6 +11,7 @@
 
 #include <unistd.h>
 #include <errno.h>
+#include <string.h>
 
 
 /**
@@ -23,17 +24,19 @@
  *
  * When queueing, 'z' marks the end of dot-stuffed data; [z, pptr) contains no
  * complete multi-line responses.
+ *
+ * When flushing, [pbase .. pptr) is the area which remains
+ * to write.
  */
 
 
 ResponseBuf::ResponseBuf(int fd)
     : vec_(4096),
       fd_(fd),
+      errno_(0),
       os_(this)
 {
-    char_type* p = &vec_[0];
-    setp(p, p + vec_.size());
-    z_ = p;
+    clear_buf();
 }
 
 
@@ -109,7 +112,7 @@ void ResponseBuf::put_terminator()
     size_t dots = count_dots(z_, pptr());
     const size_t growth = dots + add_extra_crlf? 2+3: 3;
 
-    if(pptr()+growth > epptr()) grow();
+    if(pptr()+growth > epptr()) grow_buf();
     assert(!(pptr()+growth > epptr()));
 
     char_type* p = pptr();
@@ -135,9 +138,21 @@ void ResponseBuf::put_terminator()
 }
 
 
+/**
+ * Reset the StreamBuf, so it's fully usable for queuing again.
+ * The vector is not resized.
+ */
+void ResponseBuf::clear_buf()
+{
+    char_type* p = &vec_[0];
+    setp(p, p + vec_.size());
+    z_ = p;
+}
+
+
 ResponseBuf::int_type ResponseBuf::overflow(ResponseBuf::int_type c)
 {
-    grow();
+    grow_buf();
     sputc(c);
     return '!';
 }
@@ -146,7 +161,7 @@ ResponseBuf::int_type ResponseBuf::overflow(ResponseBuf::int_type c)
 /**
  * Grow the buffer with 50% or so, i.e. with at least 2K.
  */
-void ResponseBuf::grow()
+void ResponseBuf::grow_buf()
 {
     const size_t dz = z_ - pbase();
     const size_t dp = pptr() - pbase();
@@ -169,23 +184,47 @@ std::string ResponseBuf::str() const
 }
 
 
-#if 0
 /**
- * Try to flush the buffer into the socket. Return true iff everything
- * is flushed, otherwise keep the rest for further flushing later.
+ * Try to flush the buffer into the socket, by performing exactly one
+ * write(2). Follows standard write(2) conventions for return code and
+ * setting of errno, except:
+ * - the return code says how many bytes remain /unwritten/
+ * - errno also ends up in error().
+ *
+ * Thus you stop writing when it returns 0, or it returns -1 and errno
+ * says something fatal happened.
+ *
+ * When the buffer is completely flushed, it's automatically available
+ * for writing responses into again.
  */
-bool ResponseBuf::flush()
+int ResponseBuf::flush()
 {
-    const size_t len = str_.size();
-    ssize_t n = ::write(fd_, str_.data(), len);
+    /* a-----a'------b·····c
+     *    n
+     */
+    char_type* a = pbase();
+    char_type* b = pptr();
+    char_type* c = epptr();
+
+    ssize_t n = ::write(fd_, a, b-a);
     if(n<0) {
-	return false;
+	errno_ = errno;
+	return n;
     }
-    if(size_t(n)==len) {
-	str_.clear();
-	return true;
+
+    a += n;
+    if(a==b) {
+	clear_buf();
+	return 0;
     }
-    str_.erase(0, n);
-    return false;
+    setp(a, c);
+    pbump(b-a);
+
+    return b - a;
 }
-#endif
+
+
+const char* ResponseBuf::strerror() const
+{
+    return ::strerror(error());
+}

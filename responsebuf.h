@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: responsebuf.h,v 1.8 2011-07-02 09:08:44 grahn Exp $
+ * $Id: responsebuf.h,v 1.9 2011-07-02 10:07:32 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -58,8 +58,8 @@ public:
     std::ostream& ostream() { return os_; }
     void put_terminator();
 
-    bool flush();
-    int error() const;
+    int flush();
+    int error() const { return errno_; }
     const char* strerror() const;
 
     std::string str() const;
@@ -72,12 +72,13 @@ private:
     ResponseBuf(const ResponseBuf&);
     ResponseBuf& operator=(const ResponseBuf&);
 
-    void grow();
-    void clear();
+    void grow_buf();
+    void clear_buf();
 
     virtual int_type overflow(int_type c = traits_type::eof());
 
     int fd_;
+    int errno_;
     std::ostream os_;
 };
 
