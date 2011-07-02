@@ -1,4 +1,4 @@
-/* $Id: responsebuf.cc,v 1.10 2011-07-01 09:03:25 grahn Exp $
+/* $Id: responsebuf.cc,v 1.11 2011-07-02 08:42:59 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -211,6 +211,10 @@ size_t ResponseBuf::size() const
 }
 
 
+/**
+ * Pull out the contents of the buffer as a string.
+ * For test purposes only.
+ */
 std::string ResponseBuf::str() const
 {
     return buf_->str();
@@ -218,17 +222,6 @@ std::string ResponseBuf::str() const
 
 
 #if 0
-template<class Resp>
-void ResponseBuf::write(const Resp& resp)
-{
-    assert(empty());
-    std::ostringstream oss;
-    oss << resp;
-    str_ = oss.str();
-    flush();
-}
-
-
 /**
  * Try to flush the buffer into the socket. Return true iff everything
  * is flushed, otherwise keep the rest for further flushing later.
