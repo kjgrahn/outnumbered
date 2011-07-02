@@ -1,4 +1,4 @@
-/* $Id: responsebuf.cc,v 1.11 2011-07-02 08:42:59 grahn Exp $
+/* $Id: responsebuf.cc,v 1.12 2011-07-02 09:08:44 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -6,9 +6,6 @@
  */
 #include "responsebuf.h"
 
-#include <iostream>
-#include <streambuf>
-#include <vector>
 #include <algorithm>
 #include <cassert>
 
@@ -17,48 +14,31 @@
 
 
 /**
- * The actual streambuf. Owns an infinitely growing vector<char> where the buffering
- * takes place:
+ * The actual streambuf is implemented in an infinitely growing
+ * vector<char> where the buffering takes place:
  *
- * pbase             z            pptr         epptr,size
+ * v.begin()                                   v.end()
+ * pbase             z            pptr         epptr
  * |:::::::::::::::::|::::::::::::|............|
  *
  * When queueing, 'z' marks the end of dot-stuffed data; [z, pptr) contains no
  * complete multi-line responses.
  */
-class ResponseBuf::StreamBuf : public std::basic_streambuf<char> {
-public:
-    typedef std::vector<char_type> Vec;
-
-    StreamBuf();
-
-    size_t size() const { return pptr() - pbase(); }
-    bool empty() const { return size()==0; }
-    std::string str() const { return std::string(pbase(), pptr()); }
-
-    void put_terminator();
-
-protected:
-    virtual int_type overflow(int_type c = traits_type::eof());
-
-private:
-    StreamBuf(const StreamBuf&);
-    StreamBuf& operator= (const StreamBuf&);
-
-    void grow();
-
-    Vec vec_;
-    char_type* z_;
-};
 
 
-ResponseBuf::StreamBuf::StreamBuf()
-    : vec_(4096)
+ResponseBuf::ResponseBuf(int fd)
+    : vec_(4096),
+      fd_(fd),
+      os_(this)
 {
     char_type* p = &vec_[0];
     setp(p, p + vec_.size());
     z_ = p;
 }
+
+
+ResponseBuf::~ResponseBuf()
+{}
 
 
 namespace {
@@ -123,7 +103,7 @@ namespace {
  * itself or the dot-stuffing. Fortunately, a single grow() is always
  * enough; dot-stuffing forces worst-case 33% growth.
  */
-void ResponseBuf::StreamBuf::put_terminator()
+void ResponseBuf::put_terminator()
 {
     const bool add_extra_crlf = !is_crlf_terminated(pbase(), pptr());
     size_t dots = count_dots(z_, pptr());
@@ -155,8 +135,7 @@ void ResponseBuf::StreamBuf::put_terminator()
 }
 
 
-ResponseBuf::StreamBuf::int_type
-ResponseBuf::StreamBuf::overflow(ResponseBuf::StreamBuf::int_type c)
+ResponseBuf::int_type ResponseBuf::overflow(ResponseBuf::int_type c)
 {
     grow();
     sputc(c);
@@ -167,7 +146,7 @@ ResponseBuf::StreamBuf::overflow(ResponseBuf::StreamBuf::int_type c)
 /**
  * Grow the buffer with 50% or so, i.e. with at least 2K.
  */
-void ResponseBuf::StreamBuf::grow()
+void ResponseBuf::grow()
 {
     const size_t dz = z_ - pbase();
     const size_t dp = pptr() - pbase();
@@ -180,44 +159,13 @@ void ResponseBuf::StreamBuf::grow()
 }
 
 
-ResponseBuf::ResponseBuf(int fd)
-    : fd_(fd),
-      buf_(new ResponseBuf::StreamBuf),
-      os_(buf_)
-{}
-
-
-ResponseBuf::~ResponseBuf()
-{
-    delete buf_;
-}
-
-
-bool ResponseBuf::empty() const
-{
-    return buf_->empty();
-}
-
-
-void ResponseBuf::put_terminator()
-{
-    buf_->put_terminator();
-}
-
-
-size_t ResponseBuf::size() const
-{
-    return buf_->size();
-}
-
-
 /**
  * Pull out the contents of the buffer as a string.
  * For test purposes only.
  */
 std::string ResponseBuf::str() const
 {
-    return buf_->str();
+    return std::string(pbase(), pptr());
 }
 
 

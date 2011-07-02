@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: responsebuf.h,v 1.7 2011-07-01 09:03:25 grahn Exp $
+ * $Id: responsebuf.h,v 1.8 2011-07-02 09:08:44 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -9,7 +9,9 @@
 #define GB_RESPONSEBUF_H_
 
 #include <string>
-#include <ostream>
+#include <iostream>
+#include <streambuf>
+#include <vector>
 
 /**
  * Writing NNTP responses to a non-blocking stream socket,
@@ -45,13 +47,13 @@
  * atomically, i.e. without involving the main select loop. When the full
  * response has hit the ResponseBuf, the command is done.
  */
-class ResponseBuf {
+class ResponseBuf : private std::basic_streambuf<char> {
 public:
     explicit ResponseBuf(int fd);
     ~ResponseBuf();
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const { return size()==0; }
+    size_t size() const { return pptr() - pbase(); }
 
     std::ostream& ostream() { return os_; }
     void put_terminator();
@@ -63,12 +65,19 @@ public:
     std::string str() const;
 
 private:
+    typedef std::vector<char_type> Vec;
+    Vec vec_;
+    char_type* z_;
+
     ResponseBuf(const ResponseBuf&);
     ResponseBuf& operator=(const ResponseBuf&);
-    int fd_;
 
-    class StreamBuf;
-    StreamBuf* const buf_;
+    void grow();
+    void clear();
+
+    virtual int_type overflow(int_type c = traits_type::eof());
+
+    int fd_;
     std::ostream os_;
 };
 
