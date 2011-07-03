@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: command.h,v 1.4 2011-07-03 11:58:56 grahn Exp $
+ * $Id: command.h,v 1.5 2011-07-03 12:21:21 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -32,6 +32,8 @@ public:
 	MODE_READER, NEWGROUPS, NEWNEWS, NEXT,
 	OVER, POST, QUIT, STAT
     };
+
+    static Type parse(const char* a, const char* b);
 
 private:
     Command(const Command&);

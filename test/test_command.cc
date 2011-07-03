@@ -1,5 +1,5 @@
 /*
- * $Id: test_command.cc,v 1.2 2011-07-03 11:58:56 grahn Exp $
+ * $Id: test_command.cc,v 1.3 2011-07-03 12:21:21 grahn Exp $
  *
  * Copyright (C) 2011 Jörgen Grahn.
  * All rights reserved.
@@ -11,9 +11,15 @@
 namespace {
 
     void assert_parses(const std::string& s,
-		       Command::Type type,
-		       unsigned nargs)
-    {}
+		       const Command::Type type,
+		       const unsigned nargs)
+    {
+	const char* p = s.data();
+	const char* q = p + s.size();
+	Command::Type t = Command::parse(p, q);
+	testicle::assert_eq(t, type);
+	testicle::assert_eq(0, nargs);
+    }
 }
 
 
