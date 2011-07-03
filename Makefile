@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.20 2011-07-02 10:19:44 grahn Exp $
+# $Id: Makefile,v 1.21 2011-07-03 10:12:37 grahn Exp $
 #
 # Makefile
 #
@@ -13,6 +13,7 @@ CPPFLAGS=-I..
 .PHONY: all
 all: libgresabladet.a
 all: gresabladet
+all: tests
 
 .PHONY: install
 install: gresabladet

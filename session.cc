@@ -1,4 +1,4 @@
-/* $Id: session.cc,v 1.8 2011-03-28 22:04:38 grahn Exp $
+/* $Id: session.cc,v 1.9 2011-07-03 10:12:37 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -50,12 +50,12 @@ namespace {
 Session::Session(int fd, const sockaddr_storage& sa)
     : fd_(fd),
       reader_(fd, "\r\n"),
-      writer_(fd),
       peer_(getnameinfo(sa)),
       dead_(false),
       posting_(0)
 {
     initial();
+    flush();
     if(!writer_.empty()) {
 	/* XXX bug: we have no way to communicating that our initial
 	 * state may be anything but READING. So, we have to hope
@@ -119,6 +119,7 @@ void Session::readable()
     while(!dead_ && reader_.read(a, b)) {
 
 	command(a, b);
+	flush();
 	if(!writer_.empty()) {
 	    break;
 	}
@@ -130,7 +131,7 @@ void Session::readable()
 	}
     }
 
-    /* XXX maybe too strict; what if we have stuff to write? */
+    /* XXX Too strict; what if we have stuff to write? */
     dead_ |= reader_.eof();
 }
 
@@ -146,15 +147,49 @@ void Session::writable()
     assert(!dead_);
     assert(!writer_.empty());
 
-    if(writer_.flush()) {
+    flush();
 
+    if(writer_.empty()) {
+	/* Ok, so the flushing of pending responses is complete, but
+	 * we may have a backlog of commands, and need to handle them
+	 * before reading.
+	 */
 	while(!dead_ && !backlog_.empty()) {
 	    const std::string s = backlog_.front();
 	    backlog_.pop();
 	    command(s);
+	    flush();
 	    if(!writer_.empty()) {
 		break;
 	    }
+	}
+    }
+}
+
+
+/**
+ * Try to empty the ResponseBuf to the socket by making one
+ * flush() attempt. Doesn't change state, except it may set dead_
+ * in case of a fatal I/O error.
+ */
+void Session::flush()
+{
+    assert(!dead_);
+    if(writer_.empty()) return;
+
+    const int n = writer_.flush(fd_);
+    if(n==-1) {
+	switch(errno) {
+	case EAGAIN:
+	case EINTR:
+	    break;
+	default:
+	    std::cerr << peer_ << ": write failed: " << strerror(errno) << '\n';
+	case ECONNRESET:
+	case EPIPE:
+	    std::cerr << peer_ << ": closing\n";
+	    dead_ = true;
+	    break;
 	}
     }
 }

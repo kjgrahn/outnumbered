@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: session.h,v 1.9 2011-03-12 23:51:55 grahn Exp $
+ * $Id: session.h,v 1.10 2011-07-03 10:12:37 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -51,6 +51,7 @@ private:
 
     void readable();
     void writable();
+    void flush();
 
     void initial();
     void command(const char* a, const char* b);
