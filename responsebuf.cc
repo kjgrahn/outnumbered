@@ -1,4 +1,4 @@
-/* $Id: responsebuf.cc,v 1.13 2011-07-02 10:07:32 grahn Exp $
+/* $Id: responsebuf.cc,v 1.14 2011-07-03 08:27:21 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -11,7 +11,6 @@
 
 #include <unistd.h>
 #include <errno.h>
-#include <string.h>
 
 
 /**
@@ -30,10 +29,8 @@
  */
 
 
-ResponseBuf::ResponseBuf(int fd)
+ResponseBuf::ResponseBuf()
     : vec_(4096),
-      fd_(fd),
-      errno_(0),
       os_(this)
 {
     clear_buf();
@@ -185,11 +182,14 @@ std::string ResponseBuf::str() const
 
 
 /**
- * Try to flush the buffer into the socket, by performing exactly one
+ * Try to flush the buffer into 'fd', by performing exactly one
  * write(2). Follows standard write(2) conventions for return code and
- * setting of errno, except:
- * - the return code says how many bytes remain /unwritten/
- * - errno also ends up in error().
+ * setting of errno, except the return code says how many bytes remain
+ * /unwritten/:
+ *
+ * -1 : nothing written; check errno
+ *  0 : wrote ok; buffer is now empty
+ *  N : wrote ok, but N octets remain
  *
  * Thus you stop writing when it returns 0, or it returns -1 and errno
  * says something fatal happened.
@@ -197,7 +197,7 @@ std::string ResponseBuf::str() const
  * When the buffer is completely flushed, it's automatically available
  * for writing responses into again.
  */
-int ResponseBuf::flush()
+int ResponseBuf::flush(int fd)
 {
     /* a-----a'------b·····c
      *    n
@@ -206,9 +206,8 @@ int ResponseBuf::flush()
     char_type* b = pptr();
     char_type* c = epptr();
 
-    ssize_t n = ::write(fd_, a, b-a);
+    ssize_t n = ::write(fd, a, b-a);
     if(n<0) {
-	errno_ = errno;
 	return n;
     }
 
@@ -221,10 +220,4 @@ int ResponseBuf::flush()
     pbump(b-a);
 
     return b - a;
-}
-
-
-const char* ResponseBuf::strerror() const
-{
-    return ::strerror(error());
 }
