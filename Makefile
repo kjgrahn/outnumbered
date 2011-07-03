@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.22 2011-07-03 11:58:56 grahn Exp $
+# $Id: Makefile,v 1.23 2011-07-03 19:17:25 grahn Exp $
 #
 # Makefile
 #
@@ -31,7 +31,7 @@ checkv: tests
 libgresabladet.a: version.o
 libgresabladet.a: session.o
 libgresabladet.a: command.o
-libgresabladet.a: response.o
+#libgresabladet.a: response.o
 libgresabladet.a: responsebuf.o
 libgresabladet.a: dbfile.o
 	$(AR) -r $@ $^
@@ -39,7 +39,7 @@ libgresabladet.a: dbfile.o
 gresabladet: gresabladet.o libgresabladet.a
 	$(CXX) -o $@ gresabladet.o -L. -lgresabladet -L../sockutil -lsocket -lgdbm
 
-libtest.a: test/test_response.o
+#libtest.a: test/test_response.o
 libtest.a: test/test_command.o
 libtest.a: test/test_responsebuf.o
 libtest.a: test/test_dbfile.o
@@ -81,7 +81,7 @@ love:
 
 # DO NOT DELETE
 
-command.o: command.h responsebuf.h response.h number.h msgid.h
+command.o: command.h
 dbfile.o: dbfile.h
 gresabladet.o: version.h session.h ../sockutil/textread.h responsebuf.h
 response.o: response.h number.h msgid.h

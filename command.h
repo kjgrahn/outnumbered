@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: command.h,v 1.5 2011-07-03 12:21:21 grahn Exp $
+ * $Id: command.h,v 1.6 2011-07-03 19:17:25 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -8,13 +8,10 @@
 #ifndef GB_COMMAND_H_
 #define GB_COMMAND_H_
 
-#include <string>
-
+class Session;
 class ResponseBuf;
 
-class Command {
-public:
-    explicit Command(ResponseBuf& buf, const std::string& s);
+namespace Command {
 
     enum Type {
 	UNKNOWN = 0,
@@ -33,11 +30,11 @@ public:
 	OVER, POST, QUIT, STAT
     };
 
-    static Type parse(const char* a, const char* b);
+    Type parse(const char* a, const char* b);
 
-private:
-    Command(const Command&);
-    Command& operator= (const Command&);
-};
+    void initial(ResponseBuf& resp, Session& session);
+    void unknown(ResponseBuf& resp, Session& session);
+    void not_implemented(ResponseBuf& resp, Session& session);
+}
 
 #endif

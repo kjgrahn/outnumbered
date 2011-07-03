@@ -1,4 +1,4 @@
-/* $Id: command.cc,v 1.5 2011-07-03 12:59:09 grahn Exp $
+/* $Id: command.cc,v 1.6 2011-07-03 19:17:25 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -6,10 +6,10 @@
  */
 #include "command.h"
 #include "responsebuf.h"
-#include "response.h"
+#include "session.h"
 
 #include <cassert>
-#include <unistd.h>
+#include <cctype>
 #include <string.h>
 
 
@@ -23,6 +23,8 @@ namespace {
     {
 	return strncasecmp(a, s, b-a)==0;
     }
+
+    static const char crlf[] = "\r\n";
 }
 
 
@@ -102,12 +104,19 @@ Command::Type Command::parse(const char* a, const char* b)
 }
 
 
-Command::Command(ResponseBuf& buf, const std::string& s)
+void Command::initial(ResponseBuf& resp, Session&)
 {
-    if(s.empty()) {
-	buf.ostream() << response::Mode(true, "Hello, world");
-    }
-    else {
-	buf.ostream() << response::Mode(true, "World, hello");
-    }
+    resp << 200 << " Service available, posting allowed" << crlf;
+}
+
+
+void Command::unknown(ResponseBuf& resp, Session&)
+{
+    resp << 500 << " Unknown command" << crlf;
+}
+
+
+void Command::not_implemented(ResponseBuf& resp, Session&)
+{
+    resp << 503 << " Feature not supported" << crlf;
 }

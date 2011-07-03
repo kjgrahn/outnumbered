@@ -1,4 +1,4 @@
-/* $Id: session.cc,v 1.10 2011-07-03 16:13:11 grahn Exp $
+/* $Id: session.cc,v 1.11 2011-07-03 19:17:25 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -198,11 +198,46 @@ void Session::flush()
 
 void Session::initial()
 {
-    Command(writer_, "");
+    Command::initial(writer_, *this);
 }
 
 
 void Session::command(const char* a, const char* b)
 {
-    Command(writer_, std::string(a, b));
+    switch(Command::parse(a, b)) {
+
+    case Command::UNKNOWN:
+	Command::unknown(writer_, *this);
+	break;
+
+    case Command::ARTICLE:
+    case Command::BODY:
+    case Command::CAPABILITIES:
+    case Command::DATE:
+    case Command::GROUP:
+    case Command::HDR:
+    case Command::HEAD:
+    case Command::HELP:
+    case Command::IHAVE:
+    case Command::LAST:
+    case Command::LIST:
+    case Command::LIST_ACTIVE:
+    case Command::LIST_ACTIVE_TIMES:
+    case Command::LIST_DISTRIB_PATS:
+    case Command::LIST_HEADERS:
+    case Command::LIST_NEWSGROUPS:
+    case Command::LIST_OVERVIEW_FMT:
+    case Command::LISTGROUP:
+    case Command::MODE_READER:
+    case Command::NEWGROUPS:
+    case Command::NEWNEWS:
+    case Command::NEXT:
+    case Command::OVER:
+    case Command::POST:
+    case Command::QUIT:
+    case Command::STAT:
+    default:
+	Command::not_implemented(writer_, *this);
+	break;
+    }
 }
