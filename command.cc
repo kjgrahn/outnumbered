@@ -1,4 +1,4 @@
-/* $Id: command.cc,v 1.6 2011-07-03 19:17:25 grahn Exp $
+/* $Id: command.cc,v 1.7 2011-07-03 19:40:17 grahn Exp $
  *
  * Copyright (c) 2011 Jörgen Grahn
  * All rights reserved.
@@ -29,76 +29,80 @@ namespace {
 
 
 /**
- * Initial parsing of a line of text as an NNTP command.
+ * Initial parsing of a line of text [a, b) as an NNTP command.
+ * Returns the command type (or variant really, since LIST is broken
+ * down here) and advances 'a' past the command to the next token.
  */
-Command::Type Command::parse(const char* a, const char* b)
+Command::Type Command::parse(const char** a, const char* b)
 {
     Type t = UNKNOWN;
 
-    const char* p = a;
-    while(p!=b && !isspace(*p)) p++;
+    const char* p = *a;
+    const char* q = p;
+    while(q!=b && !isspace(*q)) q++;
 
     /* This is probably micro-optimization, but what the hell ...
      * One day I'll implement one of those fancy algorithms
      * with precalculation.
      */
-    switch(p-a) {
+    switch(q-p) {
     case 3:
-	if(eq(a, p, "HDR")) t = HDR;
+	if(eq(p, q, "HDR")) t = HDR;
 	break;
     case 4:
-	if(eq(a, p, "BODY")) t = BODY;
-	else if(eq(a, p, "DATE")) t = DATE;
-	else if(eq(a, p, "HEAD")) t = HEAD;
-	else if(eq(a, p, "HELP")) t = HELP;
-	else if(eq(a, p, "LAST")) t = LAST;
-	else if(eq(a, p, "LIST")) t = LIST;
-	else if(eq(a, p, "MODE")) t = MODE_READER;
-	else if(eq(a, p, "NEXT")) t = NEXT;
-	else if(eq(a, p, "OVER")) t = OVER;
-	else if(eq(a, p, "POST")) t = POST;
-	else if(eq(a, p, "QUIT")) t = QUIT;
-	else if(eq(a, p, "STAT")) t = STAT;
+	if(eq(p, q, "BODY")) t = BODY;
+	else if(eq(p, q, "DATE")) t = DATE;
+	else if(eq(p, q, "HEAD")) t = HEAD;
+	else if(eq(p, q, "HELP")) t = HELP;
+	else if(eq(p, q, "LAST")) t = LAST;
+	else if(eq(p, q, "LIST")) t = LIST;
+	else if(eq(p, q, "MODE")) t = MODE_READER;
+	else if(eq(p, q, "NEXT")) t = NEXT;
+	else if(eq(p, q, "OVER")) t = OVER;
+	else if(eq(p, q, "POST")) t = POST;
+	else if(eq(p, q, "QUIT")) t = QUIT;
+	else if(eq(p, q, "STAT")) t = STAT;
 	break;
     case 5:
-	if(eq(a, p, "GROUP")) t = GROUP;
-	else if(eq(a, p, "IHAVE")) t = IHAVE;
+	if(eq(p, q, "GROUP")) t = GROUP;
+	else if(eq(p, q, "IHAVE")) t = IHAVE;
 	break;
     case 7:
-	if(eq(a, p, "ARTICLE")) t = ARTICLE;
-	else if(eq(a, p, "NEWNEWS")) t = NEWNEWS;
+	if(eq(p, q, "ARTICLE")) t = ARTICLE;
+	else if(eq(p, q, "NEWNEWS")) t = NEWNEWS;
 	break;
     case 9:
-	if(eq(a, p, "LISTGROUP")) t = LISTGROUP;
-	else if(eq(a, p, "NEWGROUPS")) t = NEWGROUPS;
+	if(eq(p, q, "LISTGROUP")) t = LISTGROUP;
+	else if(eq(p, q, "NEWGROUPS")) t = NEWGROUPS;
 	break;
     case 12:
-	if(eq(a, p, "CAPABILITIES")) t = CAPABILITIES;
+	if(eq(p, q, "CAPABILITIES")) t = CAPABILITIES;
 	break;
     default:
 	break;
     }
 
-    if(t==MODE_READER) {
-	while(p!=b && isspace(*p)) p++;
-	a = p;
-	while(p!=b && !isspace(*p)) p++;
-	if(!eq(a, p, "READER")) t = UNKNOWN;
-    }
+    while(q!=b && isspace(*q)) q++;
+    p = q;
 
+    if(t==MODE_READER) {
+	while(q!=b && !isspace(*q)) q++;
+	if(!eq(p, q, "READER")) t = UNKNOWN;
+    }
     else if(t==LIST) {
-	while(p!=b && isspace(*p)) p++;
-	a = p;
-	while(p!=b && !isspace(*p)) p++;
-	if(eq(a, p, "")) t = LIST;
-	else if(eq(a, p, "ACTIVE")) t = LIST_ACTIVE;
-	else if(eq(a, p, "ACTIVE.TIMES")) t = LIST_ACTIVE_TIMES;
-	else if(eq(a, p, "DISTRIB.PATS")) t = LIST_DISTRIB_PATS;
-	else if(eq(a, p, "HEADERS")) t = LIST_HEADERS;
-	else if(eq(a, p, "NEWSGROUPS")) t = LIST_NEWSGROUPS;
-	else if(eq(a, p, "OVERVIEW.FMT")) t = LIST_OVERVIEW_FMT;
+	while(q!=b && !isspace(*q)) q++;
+	if(eq(p, q, "")) t = LIST;
+	else if(eq(p, q, "ACTIVE")) t = LIST_ACTIVE;
+	else if(eq(p, q, "ACTIVE.TIMES")) t = LIST_ACTIVE_TIMES;
+	else if(eq(p, q, "DISTRIB.PATS")) t = LIST_DISTRIB_PATS;
+	else if(eq(p, q, "HEADERS")) t = LIST_HEADERS;
+	else if(eq(p, q, "NEWSGROUPS")) t = LIST_NEWSGROUPS;
+	else if(eq(p, q, "OVERVIEW.FMT")) t = LIST_OVERVIEW_FMT;
 	else t = UNKNOWN;
     }
+
+    while(q!=b && isspace(*q)) q++;
+    *a = q;
 
     return t;
 }

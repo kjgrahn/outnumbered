@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: command.h,v 1.6 2011-07-03 19:17:25 grahn Exp $
+ * $Id: command.h,v 1.7 2011-07-03 19:40:17 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -30,7 +30,7 @@ namespace Command {
 	OVER, POST, QUIT, STAT
     };
 
-    Type parse(const char* a, const char* b);
+    Type parse(const char** a, const char* b);
 
     void initial(ResponseBuf& resp, Session& session);
     void unknown(ResponseBuf& resp, Session& session);

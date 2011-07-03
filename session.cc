@@ -1,4 +1,4 @@
-/* $Id: session.cc,v 1.11 2011-07-03 19:17:25 grahn Exp $
+/* $Id: session.cc,v 1.12 2011-07-03 19:40:17 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -204,7 +204,7 @@ void Session::initial()
 
 void Session::command(const char* a, const char* b)
 {
-    switch(Command::parse(a, b)) {
+    switch(Command::parse(&a, b)) {
 
     case Command::UNKNOWN:
 	Command::unknown(writer_, *this);
