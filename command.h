@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: command.h,v 1.3 2011-03-28 22:04:38 grahn Exp $
+ * $Id: command.h,v 1.4 2011-07-03 11:58:56 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -15,6 +15,23 @@ class ResponseBuf;
 class Command {
 public:
     explicit Command(ResponseBuf& buf, const std::string& s);
+
+    enum Type {
+	UNKNOWN = 0,
+	ARTICLE, BODY, CAPABILITIES, DATE,
+	GROUP, HDR, HEAD, HELP,
+	IHAVE, LAST,
+	LIST,
+	LIST_ACTIVE,
+	LIST_ACTIVE_TIMES,
+	LIST_DISTRIB_PATS,
+	LIST_HEADERS,
+	LIST_NEWSGROUPS,
+	LIST_OVERVIEW_FMT,
+	LISTGROUP,
+	MODE_READER, NEWGROUPS, NEWNEWS, NEXT,
+	OVER, POST, QUIT, STAT
+    };
 
 private:
     Command(const Command&);
