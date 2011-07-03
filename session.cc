@@ -1,4 +1,4 @@
-/* $Id: session.cc,v 1.9 2011-07-03 10:12:37 grahn Exp $
+/* $Id: session.cc,v 1.10 2011-07-03 16:13:11 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -156,8 +156,9 @@ void Session::writable()
 	 */
 	while(!dead_ && !backlog_.empty()) {
 	    const std::string s = backlog_.front();
+	    const char* const p = s.data();
 	    backlog_.pop();
-	    command(s);
+	    command(p, p+s.size());
 	    flush();
 	    if(!writer_.empty()) {
 		break;
@@ -204,10 +205,4 @@ void Session::initial()
 void Session::command(const char* a, const char* b)
 {
     Command(writer_, std::string(a, b));
-}
-
-
-void Session::command(const std::string& s)
-{
-    command(s.data(), s.data()+s.size());
 }

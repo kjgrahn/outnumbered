@@ -1,5 +1,5 @@
 /* -*- c++ -*-
- * $Id: session.h,v 1.10 2011-07-03 10:12:37 grahn Exp $
+ * $Id: session.h,v 1.11 2011-07-03 16:13:11 grahn Exp $
  *
  * Copyright (c) 2010, 2011 Jörgen Grahn
  * All rights reserved.
@@ -55,7 +55,6 @@ private:
 
     void initial();
     void command(const char* a, const char* b);
-    void command(const std::string& s);
 
     const int fd_;
     sockutil::TextReader reader_;
