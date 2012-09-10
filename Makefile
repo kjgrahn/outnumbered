@@ -51,8 +51,7 @@ test.cc: libtest.a
 tests: test.o libgresabladet.a libtest.a
 	$(CXX) -o $@ test.o -L. -ltest -lgresabladet -lgdbm
 
-test/%.o : test/%.cc
-	$(CXX) -I. $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
+test/%.o: CPPFLAGS+=-I.
 
 %.1.ps : %.1
 	groff -man $< >$@
@@ -81,7 +80,7 @@ love:
 
 # DO NOT DELETE
 
-command.o: command.h
+command.o: command.h responsebuf.h session.h ../sockutil/textread.h
 dbfile.o: dbfile.h
 gresabladet.o: version.h session.h ../sockutil/textread.h responsebuf.h
 response.o: response.h number.h msgid.h

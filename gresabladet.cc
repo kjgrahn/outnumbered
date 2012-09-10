@@ -49,7 +49,7 @@ namespace {
 
     /* Create a listening socket on host:port (the wildcard address if
      * host is empty). Does everything including listen(), and prints
-     * relevant error messages on std::error.
+     * relevant error messages on stderr.
      */
     int listening_socket(const std::string& host,
 			 const std::string& port)
@@ -254,7 +254,7 @@ int main(int argc, char ** argv)
 	    return 0;
 	case 'v':
 	    std::cout << "gresabladet " << version() << '\n'
-		      << "Copyright (c) 2010, 2011 Jörgen Grahn\n";
+		      << "Copyright (c) 2010, 2011, 2012 Jörgen Grahn\n";
 	    return 0;
 	    break;
 	case ':':
