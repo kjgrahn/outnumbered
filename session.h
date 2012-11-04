@@ -22,6 +22,52 @@ class Posting;
 
 class Posting {};
 
+/*
+ * A HTTP session, or more generally a pipelined request-response TCP
+ * session using nonblocking I/O.
+ *
+ * The logical view is two possibly infinite sequences of requests and
+ * responses. A read may give use 0--N complete requests. A write may
+ * complete a response.
+ *
+ *     +--------           +--------
+ *     | req               | resp
+ *     +--------           |
+ *     | req               |
+ *     |                   |
+ *     +--------           |
+ *     | req               +--------
+ *     +--------           | resp
+ *     | req               +--------
+ *     ········ <== read   | resp
+ *     |                   |
+ *     |         write ==> ········
+ *     +--------           |
+ *     | req               |
+ *     |                   |
+ *     +--------           |
+ *     | req               |
+ *     +--------           |
+ *     | req               |
+ *     |                   +--------
+ *     |                   | resp
+ *     |                   |
+ *     | ...               |
+ *                         |
+ *                         | ...
+ *
+ * At any moment there's a queue of 0--N complete Requests, the oldest of
+ * which is associated with a Response, the goal of which is to empty
+ * itself into the fd.
+ *
+ * The interface is simply three functions:
+ * - the fd is readable
+ * - the fd is writable
+ * - have you had no success lately?
+ *
+ */
+
+
 /**
  * An NNTP session. Also the TCP client; event handling is done
  * higher up, but this one owns the fd, and does the reading/writing.
