@@ -1,0 +1,15 @@
+
+- Implement non-blocking accept() and close().
+
+- Fairness. Don't let one client starve the others.  Favor writing
+  before reading.  -- How to schedule when N Sessions are writable?
+
+- Can we deadlock a client by writing and not immediately read()
+  when there's something to read?
+
+- Should Sessions to the same endpoint be punished? Rewarded? Should
+  we care?
+
+- How to balance accept() vs servicing existing Sessions?
+
+- Exceptions in the Response handling; architecture.
