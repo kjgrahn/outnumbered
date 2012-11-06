@@ -1,0 +1,63 @@
+
+General Header Fields 4.5
+
+Cache-Control         14.9
+Connection            14.10
+Date                  14.18
+Pragma                14.32
+Trailer               14.40
+Transfer-Encoding     14.41
+Upgrade               14.42
+Via                   14.45
+Warning               14.46
+
+
+Request Header Fields 5.3
+
+Accept                14.1	I only want these media types
+Accept-Charset        14.2	I only want these character sets
+Accept-Encoding       14.3	I only want these content-codings
+Accept-Language       14.4	I only want these languages
+Authorization         14.8	these are my credentials
+Expect                14.20	two-phase request
+From                  14.22	[pointless]
+Host                  14.23	site name [more or less]
+If-Match              14.24	don't bother unless one of these checksums match	
+If-Modified-Since     14.25
+If-None-Match         14.26
+If-Range              14.27
+If-Unmodified-Since   14.28
+Max-Forwards          14.31
+Proxy-Authorization   14.34
+Range                 14.35	[optional]
+Referer               14.36	[pointless]
+TE                    14.39
+User-Agent            14.43	[pointless]
+
+
+Response Header Field 6.2
+
+Accept-Ranges         14.5
+Age                   14.6
+ETag                  14.19
+Location              14.30
+Proxy-Authenticate    14.33
+Retry-After           14.37
+Server                14.38
+Vary                  14.44
+WWW-Authenticate      14.47
+
+
+Entity Header Fields  7.2
+
+Allow                 14.7
+Content-Encoding      14.11
+Content-Language      14.12
+Content-Length        14.13
+Content-Location      14.14
+Content-MD5           14.15
+Content-Range         14.16
+Content-Type          14.17
+Expires               14.21
+Last-Modified         14.29
+
