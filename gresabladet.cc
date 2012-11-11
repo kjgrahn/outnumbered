@@ -21,7 +21,9 @@
 #include <fcntl.h>
 
 #include "version.h"
+#include "events.h"
 #include "session.h"
+
 
 namespace {
 
@@ -99,33 +101,6 @@ namespace {
     }
 
 
-    /* Sessions are stored by pointer in a never-shrinking std::vector, and registered
-     * by epoll using their vector index. Thus you can get holes in the vector, NULL
-     * Session pointers.
-     */
-
-    typedef std::vector<Session*> Sessions;
-    static Session* const nullsession = 0;
-
-    unsigned insert_session(Sessions& sessions, int fd, struct sockaddr_storage& sa)
-    {
-	Sessions::iterator i = std::find(sessions.begin(), sessions.end(), nullsession);
-	if(i==sessions.end()) {
-	    sessions.push_back(0);
-	    i = sessions.end() - 1;
-	}
-	*i = new Session(fd, sa);
-	return i - sessions.begin();
-    }
-
-
-    void remove_session(Sessions& sessions, unsigned n)
-    {
-	delete sessions[n];
-	sessions[n] = nullsession;
-    }
-
-
     /**
      * The main event loop. It is epoll(7)-based not only because it's
      * more scalable than select(2), but because it's a much better
@@ -144,7 +119,7 @@ namespace {
 	    }
 	}
 
-	Sessions sessions;
+	Events sessions;
 
 	while(1) {
 	    epoll_event events[10];
@@ -160,18 +135,18 @@ namespace {
 		    if(fd!=-1) {
 			nonblock(fd);
 
-			const unsigned sn = insert_session(sessions, fd, sa);
+			const unsigned sn = sessions.insert(fd, sa);
 			ev.events = EPOLLIN;
 			ev.data.u32 = sn;
 			if(epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev)==-1) {
-			    remove_session(sessions, sn);
+			    sessions.remove(sn);
 			}
 		    }
 		    continue;
 		}
 		else {
-		    Session& session = *sessions[sn];
-		    const int fd = session.fd();
+		    Session& session = sessions.session(sn);
+		    const int fd = sessions.fd(sn);
 
 		    switch(session.event()) {
 		    case Session::READING:
@@ -180,7 +155,7 @@ namespace {
 			    int rc = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
 			    if(rc==-1) {
 				(void)epoll_ctl(epfd, EPOLL_CTL_DEL, fd, 0);
-				remove_session(sessions, sn);
+				sessions.remove(sn);
 			    }
 			}
 			break;
@@ -190,14 +165,14 @@ namespace {
 			    int rc = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
 			    if(rc==-1) {
 				(void)epoll_ctl(epfd, EPOLL_CTL_DEL, fd, 0);
-				remove_session(sessions, sn);
+				sessions.remove(sn);
 			    }
 			}
 			break;
 		    case Session::DEAD:
 		    default:
 			epoll_ctl(epfd, EPOLL_CTL_DEL, fd, 0);
-			remove_session(sessions, sn);
+			sessions.remove(sn);
 			break;
 		    }
 		}

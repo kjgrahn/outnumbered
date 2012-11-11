@@ -2,7 +2,7 @@
 #
 # Makefile
 #
-# Copyright (c) 2010, 2011 Jörgen Grahn
+# Copyright (c) 2010, 2011, 2012 Jörgen Grahn
 # All rights reserved.
 
 SHELL=/bin/sh
@@ -29,11 +29,11 @@ checkv: tests
 	valgrind -q ./tests
 
 libgresabladet.a: version.o
+libgresabladet.a: events.o
 libgresabladet.a: session.o
 libgresabladet.a: command.o
 #libgresabladet.a: response.o
 libgresabladet.a: responsebuf.o
-libgresabladet.a: dbfile.o
 	$(AR) -r $@ $^
 
 gresabladet: gresabladet.o libgresabladet.a
@@ -80,14 +80,14 @@ love:
 
 # DO NOT DELETE
 
-command.o: command.h responsebuf.h session.h ../sockutil/textread.h
-dbfile.o: dbfile.h
-gresabladet.o: version.h session.h ../sockutil/textread.h responsebuf.h
-response.o: response.h number.h msgid.h
+command.o: command.h responsebuf.h session.h textread.h requestqueue.h
+command.o: response.h
+events.o: events.h session.h textread.h requestqueue.h response.h
+gresabladet.o: version.h session.h textread.h requestqueue.h response.h
 responsebuf.o: responsebuf.h
-session.o: session.h ../sockutil/textread.h responsebuf.h command.h
+session.o: session.h textread.h requestqueue.h response.h command.h
+textread.o: textread.h
 version.o: version.h
 test/test_command.o: command.h
-test/test_dbfile.o: dbfile.h
-test/test_response.o: response.h number.h msgid.h
+test/test_response.o: response.h
 test/test_responsebuf.o: responsebuf.h
