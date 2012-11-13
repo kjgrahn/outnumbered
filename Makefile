@@ -11,15 +11,14 @@ CXXFLAGS=-Wall -Wextra -pedantic -std=c++98 -g -O3
 CPPFLAGS=-I..
 
 .PHONY: all
-all: libgresabladet.a
-all: gresabladet
+all: libhttpd.a
+all: httpd
 
 .PHONY: install
-install: gresabladet
-install: gresabladet.1
-	install -m755 gresabladet $(INSTALLBASE)/bin/
-	install -m644 gresabladet.1 $(INSTALLBASE)/man/man1/
-	install -m644 gresabladet.5 $(INSTALLBASE)/man/man5/
+install: httpd
+install: httpd.1
+	install -m755 httpd $(INSTALLBASE)/bin/
+	install -m644 httpd.1 $(INSTALLBASE)/man/man1/
 
 .PHONY: check checkv
 check: tests
@@ -27,16 +26,16 @@ check: tests
 checkv: tests
 	valgrind -q ./tests
 
-libgresabladet.a: version.o
-libgresabladet.a: events.o
-libgresabladet.a: session.o
-libgresabladet.a: command.o
-#libgresabladet.a: response.o
-libgresabladet.a: responsebuf.o
+libhttpd.a: version.o
+libhttpd.a: events.o
+libhttpd.a: session.o
+libhttpd.a: command.o
+#libhttpd.a: response.o
+libhttpd.a: responsebuf.o
 	$(AR) -r $@ $^
 
-gresabladet: gresabladet.o libgresabladet.a
-	$(CXX) -o $@ gresabladet.o -L. -lgresabladet -L../sockutil -lsocket -lgdbm
+httpd: httpd.o libhttpd.a
+	$(CXX) -o $@ httpd.o -L. -lhttpd -L../sockutil -lsocket -lgdbm
 
 #libtest.a: test/test_response.o
 libtest.a: test/test_command.o
@@ -47,8 +46,8 @@ libtest.a: test/test_dbfile.o
 test.cc: libtest.a
 	testicle -o$@ $^
 
-tests: test.o libgresabladet.a libtest.a
-	$(CXX) -o $@ test.o -L. -ltest -lgresabladet -lgdbm
+tests: test.o libhttpd.a libtest.a
+	$(CXX) -o $@ test.o -L. -ltest -lhttpd -lgdbm
 
 test/%.o: CPPFLAGS+=-I.
 
@@ -65,10 +64,10 @@ depend:
 
 .PHONY: clean
 clean:
-	$(RM) gresabladet
+	$(RM) httpd
 	$(RM) *.o
 	$(RM) *.ps
-	$(RM) libgresabladet.a
+	$(RM) libhttpd.a
 	$(RM) libtest.a
 	$(RM) test/*.o
 	$(RM) test.cc tests
@@ -82,8 +81,8 @@ love:
 command.o: command.h responsebuf.h session.h time.h textread.h requestqueue.h
 command.o: response.h
 events.o: events.h session.h time.h textread.h requestqueue.h response.h
-gresabladet.o: version.h events.h session.h time.h textread.h requestqueue.h
-gresabladet.o: response.h
+httpd.o: version.h events.h session.h time.h textread.h requestqueue.h
+httpd.o: response.h
 responsebuf.o: responsebuf.h
 session.o: session.h time.h textread.h requestqueue.h response.h command.h
 textread.o: textread.h

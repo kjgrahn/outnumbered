@@ -1,6 +1,5 @@
-/* $Id: gresabladet.cc,v 1.10 2011-03-06 19:06:06 grahn Exp $
- *
- * Copyright (c) 2010, 2011 Jörgen Grahn
+/*
+ * Copyright (c) 2010, 2011, 2012 Jörgen Grahn
  * All rights reserved.
  *
  */
@@ -229,7 +228,7 @@ int main(int argc, char ** argv)
 	    std::cout << usage << '\n';
 	    return 0;
 	case 'v':
-	    std::cout << "gresabladet " << version() << '\n'
+	    std::cout << "XXX " << version() << '\n'
 		      << "Copyright (c) 2010, 2011, 2012 Jörgen Grahn\n";
 	    return 0;
 	    break;
