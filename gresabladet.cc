@@ -124,6 +124,8 @@ namespace {
 	while(1) {
 	    epoll_event events[10];
 	    const int n = epoll_wait(epfd, events, 10, -1);
+	    const timespec ts = now();
+
 	    for(int i=0; i<n; ++i) {
 		epoll_event& ev = events[i];
 		const unsigned sn = ev.data.u32;
@@ -147,33 +149,32 @@ namespace {
 		else {
 		    Session& session = sessions.session(sn);
 		    const int fd = sessions.fd(sn);
+		    Session::State state = Session::DIE;
 
-		    switch(session.event()) {
-		    case Session::READING:
-			if(ev.events & EPOLLOUT) {
-			    ev.events = EPOLLIN;
-			    int rc = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
-			    if(rc==-1) {
-				(void)epoll_ctl(epfd, EPOLL_CTL_DEL, fd, 0);
-				sessions.remove(sn);
-			    }
-			}
-			break;
-		    case Session::WRITING:
-			if(ev.events & EPOLLIN) {
-			    ev.events = EPOLLOUT;
-			    int rc = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
-			    if(rc==-1) {
-				(void)epoll_ctl(epfd, EPOLL_CTL_DEL, fd, 0);
-				sessions.remove(sn);
-			    }
-			}
-			break;
-		    case Session::DEAD:
-		    default:
-			epoll_ctl(epfd, EPOLL_CTL_DEL, fd, 0);
+		    if(ev.events & EPOLLOUT) {
+			state = session.write(fd, ts);
+		    }
+		    else if(ev.events & EPOLLIN) {
+			state = session.read(fd, ts);
+		    }
+
+		    if(state==Session::DIE) {
 			sessions.remove(sn);
-			break;
+			close(fd);
+			continue;
+		    }
+
+		    /* XXX inefficient to always change the event */
+		    switch(state) {
+		    case Session::READING: ev.events = EPOLLIN; break;
+		    case Session::WRITING: ev.events = EPOLLOUT; break;
+		    }
+
+		    int rc = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
+		    if(rc==-1) {
+			sessions.remove(sn);
+			close(fd);
+			continue;
 		    }
 		}
 	    }

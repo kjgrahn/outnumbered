@@ -1,7 +1,6 @@
 /* -*- c++ -*-
- * $Id: textread.h,v 1.5 2010-02-27 08:03:59 grahn Exp $
  *
- * Copyright (c) 2010 Jörgen Grahn
+ * Copyright (c) 2010, 2012 Jörgen Grahn
  * All rights reserved.
  *
  */
@@ -44,11 +43,11 @@ namespace sockutil {
      */
     class TextReader {
     public:
-	TextReader(int fd, const std::string& endline);
+	explicit TextReader(const std::string& endline);
 	TextReader(const TextReader&);
 	TextReader& operator= (const TextReader&);
 
-	void feed();
+	void feed(int fd);
 
 	size_t read(char*& begin, char*& end);
 	std::string read();
@@ -60,7 +59,6 @@ namespace sockutil {
     private:
 	TextReader();
 
-	int fd_;
 	std::string endline_;
 	char buf[8000];
 	char* const p_;

@@ -9,9 +9,9 @@
 #define GB_SESSION_H_
 
 #include <iosfwd>
-#include <time.h>
 #include <netinet/in.h>
 
+#include "time.h"
 #include "textread.h"
 #include "requestqueue.h"
 #include "response.h"
@@ -79,10 +79,10 @@ private:
     Session(const Session&);
     Session& operator= (const Session& other);
 
-    sockaddr_storage peer_;
-    sockutil::TextReader reader_;
-    RequestQueue queue_;
-    Response resp_;
+    sockaddr_storage peer;
+    sockutil::TextReader reader;
+    RequestQueue queue;
+    Response* response;
 };
 
 

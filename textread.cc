@@ -1,6 +1,5 @@
-/* $Id: textread.cc,v 1.6 2010-02-27 08:29:13 grahn Exp $
- *
- * Copyright (c) 2010 Jörgen Grahn
+/*
+ * Copyright (c) 2010, 2012 Jörgen Grahn
  * All rights reserved.
  *
  */
@@ -17,9 +16,8 @@
 using namespace sockutil;
 
 
-TextReader::TextReader(int fd, const std::string& endline)
-    : fd_(fd),
-      endline_(endline),
+TextReader::TextReader(const std::string& endline)
+    : endline_(endline),
       p_(buf),
       q_(p_+sizeof buf),
       a_(p_),
@@ -30,8 +28,7 @@ TextReader::TextReader(int fd, const std::string& endline)
 
 
 TextReader::TextReader(const TextReader& other)
-    : fd_(other.fd_),
-      endline_(other.endline_),
+    : endline_(other.endline_),
       p_(buf),
       q_(p_+sizeof buf),
       a_(p_),
@@ -45,7 +42,6 @@ TextReader::TextReader(const TextReader& other)
 
 TextReader& TextReader::operator= (const TextReader& other)
 {
-    fd_ = other.fd_;
     endline_ = other.endline_;
     a_ = p_;
     b_ = p_ + (other.b_-other.a_);
@@ -56,7 +52,7 @@ TextReader& TextReader::operator= (const TextReader& other)
 }
 
 
-void TextReader::feed()
+void TextReader::feed(int fd)
 {
     if(a_!=b_ && a_!=p_) {
 	std::copy(a_, b_, p_);
@@ -64,7 +60,7 @@ void TextReader::feed()
     b_ -= (a_-p_);
     a_ = p_;
 
-    const ssize_t n = recv(fd_, b_, q_-b_, 0);
+    const ssize_t n = recv(fd, b_, q_-b_, 0);
     if(n==-1) {
 	switch(errno) {
 	case EAGAIN:

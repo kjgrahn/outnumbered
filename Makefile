@@ -13,7 +13,6 @@ CPPFLAGS=-I..
 .PHONY: all
 all: libgresabladet.a
 all: gresabladet
-all: tests
 
 .PHONY: install
 install: gresabladet
@@ -80,12 +79,13 @@ love:
 
 # DO NOT DELETE
 
-command.o: command.h responsebuf.h session.h textread.h requestqueue.h
+command.o: command.h responsebuf.h session.h time.h textread.h requestqueue.h
 command.o: response.h
-events.o: events.h session.h textread.h requestqueue.h response.h
-gresabladet.o: version.h session.h textread.h requestqueue.h response.h
+events.o: events.h session.h time.h textread.h requestqueue.h response.h
+gresabladet.o: version.h events.h session.h time.h textread.h requestqueue.h
+gresabladet.o: response.h
 responsebuf.o: responsebuf.h
-session.o: session.h textread.h requestqueue.h response.h command.h
+session.o: session.h time.h textread.h requestqueue.h response.h command.h
 textread.o: textread.h
 version.o: version.h
 test/test_command.o: command.h
