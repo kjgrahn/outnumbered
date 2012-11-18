@@ -1,9 +1,3 @@
-
-
-
-
-
-
 Network Working Group                                      R. Fielding
 Request for Comments: 2616                                   UC Irvine
 Obsoletes: 2068                                              J. Gettys
@@ -50,14 +44,6 @@ Abstract
    initiative since 1990. This specification defines the protocol
    referred to as "HTTP/1.1", and is an update to RFC 2068 [33].
 
-
-
-
-
-
-Fielding, et al.            Standards Track                     [Page 1]
-
-RFC 2616                        HTTP/1.1                       June 1999
 
 
 Table of Contents
@@ -108,14 +94,6 @@ Table of Contents
    6.1   Status-Line .................................................39
    6.1.1    Status Code and Reason Phrase ............................39
    6.2   Response Header Fields ......................................41
-
-
-
-Fielding, et al.            Standards Track                     [Page 2]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    7   Entity ........................................................42
    7.1   Entity Header Fields ........................................42
    7.2   Entity Body .................................................43
@@ -164,14 +142,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    10.3.5   304 Not Modified .........................................63
    10.3.6   305 Use Proxy ............................................64
    10.3.7   306 (Unused) .............................................64
-
-
-
-Fielding, et al.            Standards Track                     [Page 3]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    10.3.8   307 Temporary Redirect ...................................65
    10.4  Client Error 4xx ............................................65
    10.4.1    400 Bad Request .........................................65
@@ -220,14 +190,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    13.2.6   Disambiguating Multiple Responses ........................84
    13.3  Validation Model ............................................85
    13.3.1   Last-Modified Dates ......................................86
-
-
-
-Fielding, et al.            Standards Track                     [Page 4]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    13.3.2   Entity Tag Cache Validators ..............................86
    13.3.3   Weak and Strong Validators ...............................86
    13.3.4   Rules for When to Use Entity Tags and Last-Modified Dates.89
@@ -276,14 +238,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    14.20   Expect ...................................................126
    14.21   Expires ..................................................127
    14.22   From .....................................................128
-
-
-
-Fielding, et al.            Standards Track                     [Page 5]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    14.23   Host .....................................................128
    14.24   If-Match .................................................129
    14.25   If-Modified-Since ........................................130
@@ -332,14 +286,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    19.2  Internet Media Type multipart/byteranges ...................165
    19.3  Tolerant Applications ......................................166
    19.4  Differences Between HTTP Entities and RFC 2045 Entities ....167
-
-
-
-Fielding, et al.            Standards Track                     [Page 6]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    19.4.1   MIME-Version ............................................167
    19.4.2   Conversion to Canonical Form ............................167
    19.4.3   Conversion of Date Formats ..............................168
@@ -386,16 +332,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    purpose of a request [47]. It builds on the discipline of reference
    provided by the Uniform Resource Identifier (URI) [3], as a location
    (URL) [4] or name (URN) [20], for indicating the resource to which a
-
-
-
-
-
-Fielding, et al.            Standards Track                     [Page 7]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    method is to be applied. Messages are passed in a format similar to
    that used by Internet mail [9] as defined by the Multipurpose
    Internet Mail Extensions (MIME) [7].
@@ -439,18 +375,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    response
       An HTTP response message, as defined in section 6.
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                     [Page 8]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    resource
       A network data object or service that can be identified by a URI,
@@ -500,14 +424,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       proxy, gateway, or tunnel, switching behavior based on the nature
       of each request.
 
-
-
-
-Fielding, et al.            Standards Track                     [Page 9]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    origin server
       The server on which a given resource resides or is to be created.
 
@@ -556,14 +472,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       be additional constraints on whether a cache can use the cached
       copy for a particular request.
 
-
-
-
-Fielding, et al.            Standards Track                    [Page 10]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    first-hand
       A response is first-hand if it comes directly and without
       unnecessary delay from the origin server, perhaps via one or more
@@ -610,15 +518,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    upstream/downstream
       Upstream and downstream describe the flow of a message: all
       messages flow from upstream to downstream.
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 11]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    inbound/outbound
       Inbound and outbound refer to the request and response paths for
@@ -668,14 +567,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    user agent and origin server. A request or response message that
    travels the whole chain will pass through four separate connections.
    This distinction is important because some HTTP communication options
-
-
-
-Fielding, et al.            Standards Track                    [Page 12]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    may apply only to the connection with the nearest, non-tunnel
    neighbor, only to the end-points of the chain, or to all connections
    along the chain. Although the diagram is linear, each participant may
@@ -723,14 +614,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    the mapping of the HTTP/1.1 request and response structures onto the
    transport data units of the protocol in question is outside the scope
    of this specification.
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 13]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    In HTTP/1.0, most implementations used a new connection for each
    request/response exchange. In HTTP/1.1, a connection may be used for
@@ -781,13 +664,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       Square brackets enclose optional elements; "[foo bar]" is
       equivalent to "*1(foo bar)".
 
-
-
-Fielding, et al.            Standards Track                    [Page 14]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    N rule
       Specific repetition: "<n>(element)" is equivalent to
       "<n>*<n>(element)"; that is, exactly <n> occurrences of (element).
@@ -835,15 +711,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    describe basic parsing constructs. The US-ASCII coded character set
    is defined by ANSI X3.4-1986 [21].
 
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 15]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
        OCTET          = <any 8-bit sequence of data>
        CHAR           = <any US-ASCII character (octets 0 - 127)>
        UPALPHA        = <any US-ASCII uppercase letter "A".."Z">
@@ -890,15 +757,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
        HEX            = "A" | "B" | "C" | "D" | "E" | "F"
                       | "a" | "b" | "c" | "d" | "e" | "f" | DIGIT
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 16]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    Many HTTP/1.1 header field values consist of words separated by LWS
    or special characters. These special characters MUST be in a quoted
@@ -949,13 +807,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    incremented when the format of a message within the protocol is
    changed. See RFC 2145 [36] for a fuller explanation.
 
-
-
-Fielding, et al.            Standards Track                    [Page 17]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    The version of an HTTP message is indicated by an HTTP-Version field
    in the first line of the message.
 
@@ -1005,13 +856,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    simply formatted strings which identify--via name, location, or any
    other characteristic--a resource.
 
-
-
-Fielding, et al.            Standards Track                    [Page 18]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 3.2.1 General Syntax
 
    URIs in HTTP can be represented in absolute form or relative to some
@@ -1055,18 +899,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    MAY add its domain to the host name it received. If a proxy receives
    a fully qualified domain name, the proxy MUST NOT change the host
    name.
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 19]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 3.2.3 URI Comparison
 
@@ -1116,14 +948,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       accepting date values that may have been sent by non-HTTP
       applications, as is sometimes the case when retrieving or posting
       messages via proxies/gateways to SMTP or NNTP.
-
-
-
-Fielding, et al.            Standards Track                    [Page 20]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    All HTTP date/time stamps MUST be represented in Greenwich Mean Time
    (GMT), without exception. For the purposes of HTTP, GMT is exactly
    equal to UTC (Coordinated Universal Time). This is indicated in the
@@ -1171,15 +995,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    HTTP uses the same definition of the term "character set" as that
    described for MIME:
 
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 21]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    The term "character set" is used in this document to refer to a
    method used with one or more tables to convert a sequence of octets
    into a sequence of characters. Note that unconditional conversion in
@@ -1226,16 +1041,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    an explicit charset parameter. HTTP/1.1 recipients MUST respect the
    charset label provided by the sender; and those user agents that have
    a provision to "guess" a charset MUST use the charset from the
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 22]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    content-type field if they support that charset, rather than the
    recipient's preference, when initially displaying a document. See
    section 3.7.1.
@@ -1281,16 +1086,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    deflate
         The "zlib" format defined in RFC 1950 [31] in combination with
         the "deflate" compression mechanism described in RFC 1951 [29].
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 23]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    identity
         The default (identity) encoding; the use of no transformation
@@ -1340,14 +1135,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    the only unsafe characteristic of message-bodies is the difficulty in
    determining the exact body length (section 7.2.2), or the desire to
    encrypt data over a shared transport.
-
-
-
-Fielding, et al.            Standards Track                    [Page 24]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    The Internet Assigned Numbers Authority (IANA) acts as a registry for
    transfer-coding value tokens. Initially, the registry contains the
    following tokens: "chunked" (section 3.6.1), "identity" (section
@@ -1395,14 +1182,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    fields at the end of the message. The Trailer header field can be
    used to indicate which header fields are included in a trailer (see
    section 14.40).
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 25]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    A server using chunked transfer-coding in a response MUST NOT use the
    trailer for any header fields unless at least one of the following is
@@ -1452,14 +1231,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    attribute and its value. The presence or absence of a parameter might
    be significant to the processing of a media-type, depending on its
    definition within the media type registry.
-
-
-
-Fielding, et al.            Standards Track                    [Page 26]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    Note that some older HTTP applications do not recognize media type
    parameters. When sending data to older HTTP applications,
    implementations SHOULD only use media type parameters when they are
@@ -1508,14 +1279,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    MIME provides for a number of "multipart" types -- encapsulations of
    one or more entities within a single message-body. All multipart
    types share a common syntax, as defined in section 5.1.1 of RFC 2046
-
-
-
-Fielding, et al.            Standards Track                    [Page 27]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    [40], and MUST include a boundary parameter as part of the media type
    value. The message body is itself a protocol element and MUST
    therefore use only CRLF to represent line breaks between body-parts.
@@ -1562,15 +1325,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
        User-Agent: CERN-LineMode/2.15 libwww/2.17b3
        Server: Apache/0.8.4
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 28]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    Product tokens SHOULD be short and to the point. They MUST NOT be
    used for advertising or other non-essential information. Although any
@@ -1620,14 +1374,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
        en, en-US, en-cockney, i-cherokee, x-pig-latin
 
-
-
-
-Fielding, et al.            Standards Track                    [Page 29]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    where any two-letter primary-tag is an ISO-639 language abbreviation
    and any two-letter initial subtag is an ISO-3166 country code. (The
    last three tags above are not registered tags; all but the last are
@@ -1676,14 +1422,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    The only range unit defined by HTTP/1.1 is "bytes". HTTP/1.1
    implementations MAY ignore ranges specified using other units.
-
-
-
-Fielding, et al.            Standards Track                    [Page 30]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    HTTP/1.1 has been designed to allow implementations of applications
    that do not depend on knowledge of ranges.
 
@@ -1732,14 +1470,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    least one SP or HT. Applications ought to follow "common form", where
    one is known or indicated, when generating HTTP constructs, since
    there might exist some implementations that fail to accept anything
-
-
-
-Fielding, et al.            Standards Track                    [Page 31]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    beyond the common forms.
 
        message-header = field-name ":" [ field-value ]
@@ -1788,14 +1518,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Transfer-Encoding MUST be used to indicate any transfer-codings
    applied by an application to ensure safe and proper transfer of the
    message. Transfer-Encoding is a property of the message, not of the
-
-
-
-Fielding, et al.            Standards Track                    [Page 32]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    entity, and thus MAY be added or removed by any application along the
    request/response chain. (However, section 3.6 places restrictions on
    when certain transfer-codings may be used.)
@@ -1844,14 +1566,6 @@ RFC 2616                        HTTP/1.1                       June 1999
      decimal value in OCTETs represents both the entity-length and the
      transfer-length. The Content-Length header field MUST NOT be sent
      if these two lengths are different (i.e., if a Transfer-Encoding
-
-
-
-Fielding, et al.            Standards Track                    [Page 33]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
      header field is present). If a message is received with both a
      Transfer-Encoding header field and a Content-Length header field,
      the latter MUST be ignored.
@@ -1900,14 +1614,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    There are a few header fields which have general applicability for
    both request and response messages, but which do not apply to the
    entity being transferred. These header fields apply only to the
-
-
-
-Fielding, et al.            Standards Track                    [Page 34]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    message being transmitted.
 
        general-header = Cache-Control            ; Section 14.9
@@ -1948,21 +1654,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    except in the final CRLF sequence.
 
         Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
-
-
-
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 35]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 5.1.1 Method
 
@@ -2012,14 +1703,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    proxy. The proxy is requested to forward the request or service it
    from a valid cache, and return the response. Note that the proxy MAY
    forward the request on to another proxy or directly to the server
-
-
-
-Fielding, et al.            Standards Track                    [Page 36]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    specified by the absoluteURI. In order to avoid request loops, a
    proxy MUST be able to recognize all of its server names, including
    any aliases, local variations, and the numeric IP address. An example
@@ -2065,16 +1748,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       a non-reserved URI character for a reserved purpose.  Implementors
       should be aware that some pre-HTTP/1.1 proxies have been known to
       rewrite the Request-URI.
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 37]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 5.2 The Resource Identified by a Request
 
@@ -2124,14 +1797,6 @@ RFC 2616                        HTTP/1.1                       June 1999
                       | From                     ; Section 14.22
                       | Host                     ; Section 14.23
                       | If-Match                 ; Section 14.24
-
-
-
-Fielding, et al.            Standards Track                    [Page 38]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
                       | If-Modified-Since        ; Section 14.25
                       | If-None-Match            ; Section 14.26
                       | If-Range                 ; Section 14.27
@@ -2180,14 +1845,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    for use by automata and the Reason-Phrase is intended for the human
    user. The client is not required to examine or display the Reason-
    Phrase.
-
-
-
-Fielding, et al.            Standards Track                    [Page 39]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    The first digit of the Status-Code defines the class of response. The
    last two digits do not have any categorization role. There are 5
    values for the first digit:
@@ -2236,14 +1893,6 @@ RFC 2616                        HTTP/1.1                       June 1999
           | "404"  ; Section 10.4.5: Not Found
           | "405"  ; Section 10.4.6: Method Not Allowed
           | "406"  ; Section 10.4.7: Not Acceptable
-
-
-
-Fielding, et al.            Standards Track                    [Page 40]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
           | "407"  ; Section 10.4.8: Proxy Authentication Required
           | "408"  ; Section 10.4.9: Request Time-out
           | "409"  ; Section 10.4.10: Conflict
@@ -2292,14 +1941,6 @@ RFC 2616                        HTTP/1.1                       June 1999
                        | ETag                    ; Section 14.19
                        | Location                ; Section 14.30
                        | Proxy-Authenticate      ; Section 14.33
-
-
-
-Fielding, et al.            Standards Track                    [Page 41]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
                        | Retry-After             ; Section 14.37
                        | Server                  ; Section 14.38
                        | Vary                    ; Section 14.44
@@ -2349,13 +1990,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    fields SHOULD be ignored by the recipient and MUST be forwarded by
    transparent proxies.
 
-
-
-Fielding, et al.            Standards Track                    [Page 42]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 7.2 Entity Body
 
    The entity-body (if any) sent with an HTTP request or response is in
@@ -2395,22 +2029,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    The entity-length of a message is the length of the message-body
    before any transfer-codings have been applied. Section 4.4 defines
    how the transfer-length of a message-body is determined.
-
-
-
-
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 43]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 8 Connections
 
@@ -2456,18 +2074,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    HTTP implementations SHOULD implement persistent connections.
 
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 44]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 8.1.2 Overall Operation
 
    A significant difference between HTTP/1.1 and earlier versions of
@@ -2510,19 +2116,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    In order to remain persistent, all messages on the connection MUST
    have a self-defined message length (i.e., one not defined by closure
    of the connection), as described in section 4.4.
-
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 45]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 8.1.2.2 Pipelining
 
@@ -2571,15 +2164,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    connections places no requirements on the length (or existence) of
    this time-out for either the client or the server.
 
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 46]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    When a client or server wishes to time-out it SHOULD issue a graceful
    close on the transport connection. Clients and servers SHOULD both
    constantly watch for the other side of the transport close, and
@@ -2626,15 +2210,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    flow control mechanisms to resolve temporary overloads, rather than
    terminating connections with the expectation that clients will retry.
    The latter technique can exacerbate network congestion.
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 47]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 8.2.2 Monitoring Connections for Error Status Messages
 
@@ -2684,14 +2259,6 @@ RFC 2616                        HTTP/1.1                       June 1999
         origin server MUST NOT wait for the request body before sending
         the 100 (Continue) response. If it responds with a final status
         code, it MAY close the transport connection or it MAY continue
-
-
-
-Fielding, et al.            Standards Track                    [Page 48]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
         to read and discard the rest of the request.  It MUST NOT
         perform the requested method if it returns a final status code.
 
@@ -2738,15 +2305,6 @@ RFC 2616                        HTTP/1.1                       June 1999
         higher, or does not know the HTTP version of the next-hop
         server, it MUST forward the request, including the Expect header
         field.
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 49]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
       - If the proxy knows that the version of the next-hop server is
         HTTP/1.0 or lower, it MUST NOT forward the request, and it MUST
@@ -2795,15 +2353,6 @@ RFC 2616                        HTTP/1.1                       June 1999
          response is received, or the user becomes impatient and
          terminates the retry process.
 
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 50]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    If at any point an error status is received, the client
 
       - SHOULD NOT continue and
@@ -2849,16 +2398,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    requests is the same as for a single request. The methods GET, HEAD,
    PUT and DELETE share this property. Also, the methods OPTIONS and
    TRACE SHOULD NOT have side effects, and so are inherently idempotent.
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 51]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    However, it is possible that a sequence of several requests is non-
    idempotent, even if all of the methods executed in that sequence are
@@ -2908,14 +2447,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    resource (e.g., Allow), possibly including extensions not defined by
    this specification. The response body, if any, SHOULD also include
    information about the communication options. The format for such a
-
-
-
-Fielding, et al.            Standards Track                    [Page 52]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    body is not defined by this specification, but might be defined by
    future extensions to HTTP. Content negotiation MAY be used to select
    the appropriate response format. If no response body is included, the
@@ -2961,16 +2492,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    the requirements for HTTP caching described in section 13.
 
    See section 15.1.3 for security considerations when used for forms.
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 53]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 9.4 HEAD
 
@@ -3020,14 +2541,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    (OK) or 204 (No Content) is the appropriate response status,
    depending on whether or not the response includes an entity that
    describes the result.
-
-
-
-Fielding, et al.            Standards Track                    [Page 54]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    If a resource has been created on the origin server, the response
    SHOULD be 201 (Created) and contain an entity which describes the
    status of the request and refers to the new resource, and a Location
@@ -3075,14 +2588,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    with the request -- the user agent knows what URI is intended and the
    server MUST NOT attempt to apply the request to some other resource.
    If the server desires that the request be applied to a different URI,
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 55]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    it MUST send a 301 (Moved Permanently) response; the user agent MAY
    then make its own decision regarding whether or not to redirect the
@@ -3132,14 +2637,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    SHOULD reflect the message received back to the client as the
    entity-body of a 200 (OK) response. The final recipient is either the
 
-
-
-
-Fielding, et al.            Standards Track                    [Page 56]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    origin server or the first proxy or gateway to receive a Max-Forwards
    value of zero (0) in the request (see section 14.31). A TRACE request
    MUST NOT include an entity.
@@ -3185,17 +2682,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Proxies MUST forward 1xx responses, unless the connection between the
    proxy and its client has been closed, or unless the proxy itself
    requested the generation of the 1xx response. (For example, if a
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 57]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    proxy adds a "Expect: 100-continue" field when it forwards a request,
    then it need not forward the corresponding 100 (Continue)
    response(s).)
@@ -3243,14 +2729,6 @@ RFC 2616                        HTTP/1.1                       June 1999
           resource are sent in the response without any message-body;
 
    POST   an entity describing or containing the result of the action;
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 58]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    TRACE  an entity containing the request message as received by the
           end server.
@@ -3300,14 +2778,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    of the metainformation known by the origin server. Use of this
    response code is not required and is only appropriate when the
    response would otherwise be 200 (OK).
-
-
-
-Fielding, et al.            Standards Track                    [Page 59]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 10.2.5 204 No Content
 
    The server has fulfilled the request but does not need to return an
@@ -3355,14 +2825,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
       - ETag and/or Content-Location, if the header would have been sent
         in a 200 response to the same request
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 60]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
       - Expires, Cache-Control, and/or Vary, if the field-value might
         differ from that sent in any previous response for the same
@@ -3412,14 +2874,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    entity format is specified by the media type given in the Content-
    Type header field. Depending upon the format and the capabilities of
 
-
-
-
-Fielding, et al.            Standards Track                    [Page 61]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    the user agent, selection of the most appropriate choice MAY be
    performed automatically. However, this specification does not define
    any standard for such automatic selection.
@@ -3464,17 +2918,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    response. Unless the request method was HEAD, the entity of the
    response SHOULD contain a short hypertext note with a hyperlink to
    the new URI(s).
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 62]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    If the 302 status code is received in response to a request other
    than GET or HEAD, the user agent MUST NOT automatically redirect the
@@ -3521,17 +2964,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
       - Date, unless its omission is required by section 14.18.1
 
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 63]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    If a clockless origin server obeys these rules, and proxies and
    clients add their own Date to any response received without one (as
    already specified by [RFC 2068], section 14.19), caches will operate
@@ -3573,20 +3005,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    The 306 status code was used in a previous version of the
    specification, is no longer used, and the code is reserved.
-
-
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 64]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 10.3.8 307 Temporary Redirect
 
@@ -3631,18 +3049,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    The request could not be understood by the server due to malformed
    syntax. The client SHOULD NOT repeat the request without
    modifications.
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 65]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 10.4.2 401 Unauthorized
 
@@ -3692,14 +3098,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Allow header containing a list of valid methods for the requested
    resource.
 
-
-
-
-Fielding, et al.            Standards Track                    [Page 66]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 10.4.7 406 Not Acceptable
 
    The resource identified by the request is only capable of generating
@@ -3748,14 +3146,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    state of the resource. This code is only allowed in situations where
    it is expected that the user might be able to resolve the conflict
    and resubmit the request. The response body SHOULD include enough
-
-
-
-Fielding, et al.            Standards Track                    [Page 67]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    information for the user to recognize the source of the conflict.
    Ideally, the response entity would include enough information for the
    user or user agent to fix the problem; however, that might not be
@@ -3804,14 +3194,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    code allows the client to place preconditions on the current resource
    metainformation (header field data) and thus prevent the requested
    method from being applied to a resource other than the one intended.
-
-
-
-Fielding, et al.            Standards Track                    [Page 68]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 10.4.14 413 Request Entity Too Large
 
    The server is refusing to process a request because the request
@@ -3856,17 +3238,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    specifying the current length of the selected resource (see section
    14.16). This response MUST NOT use the multipart/byteranges content-
    type.
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 69]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 10.4.18 417 Expectation Failed
 
@@ -3916,14 +3287,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       server must use it when becoming overloaded. Some servers may wish
       to simply refuse the connection.
 
-
-
-
-Fielding, et al.            Standards Track                    [Page 70]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 10.5.5 504 Gateway Timeout
 
    The server, while acting as a gateway or proxy, did not receive a
@@ -3972,14 +3335,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       different capabilities of that type, be in different languages,
       etc.
 
-
-
-
-Fielding, et al.            Standards Track                    [Page 71]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    Any response containing an entity-body MAY be subject to negotiation,
    including error responses.
 
@@ -4027,15 +3382,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       3. It complicates the implementation of an origin server and the
          algorithms for generating responses to a request.
 
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 72]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       4. It may limit a public cache's ability to use the same response
          for multiple user's requests.
 
@@ -4080,17 +3426,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    automatic selection, though it also does not prevent any such
    mechanism from being developed as an extension and used within
    HTTP/1.1.
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 73]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    HTTP/1.1 defines the 300 (Multiple Choices) and 406 (Not Acceptable)
    status codes for enabling agent-driven negotiation when the server is
@@ -4140,14 +3475,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Requirements for performance, availability, and disconnected
    operation require us to be able to relax the goal of semantic
    transparency. The HTTP/1.1 protocol allows origin servers, caches,
-
-
-
-Fielding, et al.            Standards Track                    [Page 74]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    and clients to explicitly reduce transparency when necessary.
    However, because non-transparent operation may confuse non-expert
    users, and might be incompatible with certain server applications
@@ -4192,17 +3519,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       1. It has been checked for equivalence with what the origin server
          would have returned by revalidating the response with the
          origin server (section 13.3);
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 75]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
       2. It is "fresh enough" (see section 13.2). In the default case,
          this means it meets the least restrictive freshness requirement
@@ -4252,14 +3568,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Warnings are assigned three digit warn-codes. The first digit
    indicates whether the Warning MUST or MUST NOT be deleted from a
    stored cache entry after a successful revalidation:
-
-
-
-Fielding, et al.            Standards Track                    [Page 76]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    1xx  Warnings that describe the freshness or revalidation status of
      the response, and so MUST be deleted after a successful
      revalidation. 1XX warn-codes MAY be generated by a cache only when
@@ -4308,14 +3616,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    values, the most restrictive interpretation is applied (that is, the
    one that is most likely to preserve semantic transparency). However,
 
-
-
-
-Fielding, et al.            Standards Track                    [Page 77]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    in some cases, cache-control directives are explicitly specified as
    weakening the approximation of semantic transparency (for example,
    "max-stale" or "public").
@@ -4360,17 +3660,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    response, it MUST mark it as such (using a Warning header) enabling
    the client software to alert the user that there might be a potential
    problem.
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 78]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    It also allows the user agent to take steps to obtain a first-hand or
    fresh response. For this reason, a cache SHOULD NOT return a stale
@@ -4417,16 +3706,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    expiration time is reached. This normally preserves semantic
    transparency, as long as the server's expiration times are carefully
    chosen.
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 79]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    The expiration mechanism applies only to responses taken from a cache
    and not to first-hand responses forwarded immediately to the
@@ -4476,14 +3755,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    HTTP, but especially hosts running origin servers and caches, SHOULD
    use NTP [28] or some similar protocol to synchronize their clocks to
    a globally accurate time standard.
-
-
-
-Fielding, et al.            Standards Track                    [Page 80]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    HTTP/1.1 requires origin servers to send a Date header, if possible,
    with every response, giving the time at which the response was
    generated (see section 14.18). We use the term "date_value" to denote
@@ -4530,16 +3801,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    for delays imposed by the network by recording the time at which the
    request was initiated. Then, when an Age value is received, it MUST
    be interpreted relative to the time the request was initiated, not
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 81]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    the time that the response was received. This algorithm results in
    conservative behavior no matter how much delay is experienced. So, we
    compute:
@@ -4586,16 +3847,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    The presence of an Age header field in a response implies that a
    response is not first-hand. However, the converse is not true, since
    the lack of an Age header field in a response does not imply that the
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 82]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    response is first-hand unless all caches along the request path are
    compliant with HTTP/1.1 (i.e., older HTTP caches did not implement
    the Age header field).
@@ -4641,16 +3892,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    simple:
 
       response_is_fresh = (freshness_lifetime > current_age)
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 83]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 13.2.5 Disambiguating Expiration Values
 
@@ -4700,14 +3941,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    to force any intermediate caches to obtain a new copy from the origin
    server.
-
-
-
-Fielding, et al.            Standards Track                    [Page 84]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    If the Date values are equal, then the client MAY use either response
    (or MAY, if it is being extremely prudent, request a new response).
    Servers MUST NOT depend on clients being able to choose
@@ -4751,18 +3984,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    validating conditions. That is, it is possible to request either that
    a method be performed if and only if a validator matches or if and
    only if no validators match.
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 85]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
       Note: a response that lacks a validator may still be cached, and
       served from cache until it expires, unless this is explicitly
@@ -4812,14 +4033,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
       Note: One example of a strong validator is an integer that is
       incremented in stable storage every time an entity is changed.
-
-
-
-Fielding, et al.            Standards Track                    [Page 86]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       An entity's modification time, if represented with one-second
       resolution, could be a weak validator, since it is possible that
       the resource might be modified twice during a single second.
@@ -4868,14 +4081,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
       - The validator is being compared by an origin server to the
         actual current validator for the entity and,
-
-
-
-Fielding, et al.            Standards Track                    [Page 87]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       - That origin server reliably knows that the associated entity did
         not change twice during the second covered by the presented
         validator.
@@ -4924,14 +4129,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    These rules allow HTTP/1.1 caches and clients to safely perform sub-
    range retrievals on values that have been obtained from HTTP/1.0
-
-
-
-Fielding, et al.            Standards Track                    [Page 88]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    servers.
 
 13.3.4 Rules for When to Use Entity Tags and Last-Modified Dates
@@ -4980,14 +4177,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       - If only a Last-Modified value has been provided by the origin
         server, SHOULD use that value in non-subrange cache-conditional
         requests (using If-Modified-Since).
-
-
-
-Fielding, et al.            Standards Track                    [Page 89]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       - If only a Last-Modified value has been provided by an HTTP/1.0
         origin server, MAY use that value in subrange cache-conditional
         requests (using If-Unmodified-Since:). The user agent SHOULD
@@ -5036,14 +4225,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    (except Last-Modified, for compatibility with HTTP/1.0) are never
    used for purposes of validating a cache entry.
 
-
-
-
-Fielding, et al.            Standards Track                    [Page 90]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 13.4 Response Cacheability
 
    Unless specifically constrained by a cache-control (section 14.9)
@@ -5087,18 +4268,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Expires header (section 14.21); a "max-age", "s-maxage",  "must-
    revalidate", "proxy-revalidate", "public" or "private" cache-control
    directive (section 14.9).
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 91]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 13.5 Constructing Responses From Caches
 
@@ -5146,16 +4315,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    transparent proxy SHOULD NOT modify an end-to-end header unless the
    definition of that header requires or specifically allows that.
 
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 92]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    A transparent proxy MUST NOT modify any of the following fields in a
    request or response, and it MUST NOT add any of these fields if not
    already present:
@@ -5202,15 +4361,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    according to the rules in section 4.4. A transparent proxy MUST
    preserve the entity-length (section 7.2.2) of the entity-body,
    although it MAY change the transfer-length (section 4.4).
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 93]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 13.5.3 Combining Headers
 
@@ -5260,14 +4410,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       a 304 (Not Modified) or a 206 (Partial Content) response to
       entirely delete a header that it had provided with a previous
       response.
-
-
-
-Fielding, et al.            Standards Track                    [Page 94]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 13.5.4 Combining Byte Ranges
 
    A response might transfer only a subrange of the bytes of an entity-
@@ -5316,14 +4458,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    The selecting request-headers from two requests are defined to match
    if and only if the selecting request-headers in the first request can
    be transformed to the selecting request-headers in the second request
-
-
-
-Fielding, et al.            Standards Track                    [Page 95]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    by adding or removing linear white space (LWS) at places where this
    is allowed by the corresponding BNF, and/or combining multiple
    message-header fields with the same field name following the rules
@@ -5370,16 +4504,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    cache is one that is accessible only to a single user. Accessibility
    in this case SHOULD be enforced by appropriate security mechanisms.
    All other caches are considered to be "shared." Other sections of
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 96]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    this specification place certain constraints on the operation of
    shared caches in order to prevent loss of privacy or failure of
    access controls.
@@ -5428,14 +4552,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    transparently invalid. That is, although they might continue to be
    "fresh," they do not accurately reflect what the origin server would
    return for a new request on that resource.
-
-
-
-Fielding, et al.            Standards Track                    [Page 97]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    There is no way for the HTTP protocol to guarantee that all such
    cache entries are marked invalid. For example, the request that
    caused the change at the origin server might not have gone through
@@ -5481,16 +4597,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    allowed in HTTP/1.1, due to the difficulty of providing consistent
    updates and the problems arising from server, cache, or network
    failure prior to write-back.
-
-
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 98]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 13.12 Cache Replacement
 
@@ -5539,15 +4645,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       not to suffer the effects of improperly functioning history
       mechanisms.
 
-
-
-
-
-Fielding, et al.            Standards Track                    [Page 99]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 14 Header Field Definitions
 
    This section defines the syntax and semantics of all standard
@@ -5594,15 +4691,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       media type registry and the rare usage of any media type
       parameters in Accept. Future media types are discouraged from
       registering any parameter named "q".
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 100]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    The example
 
@@ -5652,14 +4740,6 @@ RFC 2616                        HTTP/1.1                       June 1999
        text/html;level=1         = 1
        text/html                 = 0.7
        text/plain                = 0.3
-
-
-
-Fielding, et al.            Standards Track                   [Page 101]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
        image/jpeg                = 0.5
        text/html;level=2         = 0.4
        text/html;level=3         = 0.7
@@ -5679,7 +4759,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
       Accept-Charset = "Accept-Charset" ":"
               1#( ( charset | "*" )[ ";" "q" "=" qvalue ] )
-
 
    Character set values are described in section 3.4. Each charset MAY
    be given an associated quality value which represents the user's
@@ -5708,14 +4787,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    the response.
 
        Accept-Encoding  = "Accept-Encoding" ":"
-
-
-
-Fielding, et al.            Standards Track                   [Page 102]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
                           1#( codings [ ";" "q" "=" qvalue ] )
        codings          = ( content-coding | "*" )
 
@@ -5764,14 +4835,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       Note: If the request does not include an Accept-Encoding field,
       and if the "identity" content-coding is unavailable, then
       content-codings commonly understood by HTTP/1.0 clients (i.e.,
-
-
-
-Fielding, et al.            Standards Track                   [Page 103]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       "gzip" and "compress") are preferred; some older clients
       improperly display messages sent with other content-codings.  The
       server might also make this decision based on information about
@@ -5820,14 +4883,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    assigned is 0. If no Accept-Language header is present in the
    request, the server
 
-
-
-
-Fielding, et al.            Standards Track                   [Page 104]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    SHOULD assume that all languages are equally acceptable. If an
    Accept-Language header is present, then all languages which are
    assigned a quality factor greater than 0 are acceptable.
@@ -5875,15 +4930,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
       to advise the client not to attempt a range request.
 
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 105]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 14.6 Age
 
       The Age response-header field conveys the sender's estimate of the
@@ -5930,15 +4976,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       resource. The server is not required to support these methods and
       SHOULD include an Allow header in the response giving the actual
       supported methods.
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 106]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
       A proxy MUST NOT modify the Allow header field even if it does not
       understand all the methods specified, since the user agent might
@@ -5988,14 +5025,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       3. If the response includes the "public" cache-control directive,
          it MAY be returned in reply to any subsequent request.
 
-
-
-
-Fielding, et al.            Standards Track                   [Page 107]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 14.9 Cache-Control
 
    The Cache-Control general-header field is used to specify directives
@@ -6044,14 +5073,6 @@ RFC 2616                        HTTP/1.1                       June 1999
          | cache-extension                        ; Section 14.9.6
 
     cache-extension = token [ "=" ( token | quoted-string ) ]
-
-
-
-Fielding, et al.            Standards Track                   [Page 108]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    When a directive appears without any 1#field-name parameter, the
    directive applies to the entire request or response. When such a
    directive appears with a 1#field-name parameter, it applies only to
@@ -6098,16 +5119,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       Indicates that all or part of the response message is intended for
       a single user and MUST NOT be cached by a shared cache. This
       allows an origin server to state that the specified parts of the
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 109]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       response are intended for only one user and are not a valid
       response for requests by other users. A private (non-shared) cache
       MAY cache the response.
@@ -6156,14 +5167,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       might explicitly store such a response outside of the caching
       system (e.g., with a "Save As" dialog). History buffers MAY store
       such responses as part of their normal operation.
-
-
-
-Fielding, et al.            Standards Track                   [Page 110]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       The purpose of this directive is to meet the stated requirements
       of certain users and service authors who are concerned about
       accidental releases of information via unanticipated accesses to
@@ -6208,17 +5211,6 @@ RFC 2616                        HTTP/1.1                       June 1999
        with an Expires field whose value is less than or equal to the
        Date value. This will prevent older caches from improperly
        caching the response.
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 111]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    s-maxage
        If a response includes an s-maxage directive, then for a shared
@@ -6268,14 +5260,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    override the expiration time of a response, the cache MUST attach a
    Warning header to the stale response, using Warning 110 (Response is
    stale).
-
-
-
-Fielding, et al.            Standards Track                   [Page 112]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    A cache MAY be configured to return stale responses without
    validation, but only if this does not conflict with any "MUST"-level
    requirements concerning cache validation (e.g., a "must-revalidate"
@@ -6323,14 +5307,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       forces each cache along the path to the origin server to
       revalidate its own entry, if any, with the next cache or server.
       The initial request does not include a cache-validating
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 113]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
       conditional; the first cache along the path (if any) that holds a
       cache entry for this resource includes a cache-validating
@@ -6380,14 +5356,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       of a cache entry on any subsequent use. When the must-revalidate
       directive is present in a response received by a cache, that cache
       MUST NOT use the entry after it becomes stale to respond to a
-
-
-
-Fielding, et al.            Standards Track                   [Page 114]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       subsequent request without first revalidating it with the origin
       server. (I.e., the cache MUST do an end-to-end revalidation every
       time, if, based solely on the origin server's Expires or max-age
@@ -6436,14 +5404,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       Serious operational problems occur, however, when these
       transformations are applied to entity bodies intended for certain
       kinds of applications. For example, applications for medical
-
-
-
-Fielding, et al.            Standards Track                   [Page 115]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       imaging, scientific data analysis and those using end-to-end
       authentication, all depend on receiving an entity body that is bit
       for bit identical to the original entity-body.
@@ -6490,15 +5450,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    does not understand the community cache-extension, since it will also
    see and understand the private directive and thus default to the safe
    behavior.
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 116]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    Unrecognized cache-directives MUST be ignored; it is assumed that any
    cache-directive likely to be unrecognized by an HTTP/1.1 cache will
@@ -6549,13 +5500,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    forwarding of such header fields by pre-HTTP/1.1 proxies. See section
    19.6.2.
 
-
-
-Fielding, et al.            Standards Track                   [Page 117]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 14.11 Content-Encoding
 
    The Content-Encoding entity-header field is used as a modifier to the
@@ -6600,17 +5544,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    the entity-body.
 
        Content-Language  = "Content-Language" ":" 1#language-tag
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 118]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    Language tags are defined in section 3.10. The primary purpose of
    Content-Language is to allow a user to identify and differentiate
@@ -6658,15 +5591,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Applications SHOULD use this field to indicate the transfer-length of
    the message-body, unless this is prohibited by the rules in section
    4.4.
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 119]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    Any Content-Length greater than or equal to zero is a valid value.
    Section 4.4 describes how to determine the length of a message-body
@@ -6717,13 +5641,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    The meaning of the Content-Location header in PUT or POST requests is
    undefined; servers are free to ignore it in those cases.
 
-
-
-Fielding, et al.            Standards Track                   [Page 120]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 14.15 Content-MD5
 
    The Content-MD5 entity-header field, as defined in RFC 1864 [23], is
@@ -6772,14 +5689,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    computing or checking the digest: the line break convention used in
    the text actually transmitted MUST be left unaltered when computing
    the digest.
-
-
-
-Fielding, et al.            Standards Track                   [Page 121]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       Note: while the definition of Content-MD5 is exactly the same for
       HTTP as in RFC 1864 for MIME entity-bodies, there are several ways
       in which the application of Content-MD5 to HTTP entity-bodies
@@ -6828,14 +5737,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    A server sending a response with status code 416 (Requested range not
    satisfiable) SHOULD include a Content-Range field with a byte-range-
    resp-spec of "*". The instance-length specifies the current length of
-
-
-
-Fielding, et al.            Standards Track                   [Page 122]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    the selected resource. A response with status code 206 (Partial
    Content) MUST NOT include a Content-Range field with a byte-range-
    resp-spec of "*".
@@ -6884,14 +5785,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    When a client requests multiple byte-ranges in one request, the
    server SHOULD return them in the order that they appeared in the
    request.
-
-
-
-Fielding, et al.            Standards Track                   [Page 123]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    If the server ignores a byte-range-spec because it is syntactically
    invalid, the server SHOULD treat the request as if the invalid Range
    header field did not exist. (Normally, this means return a 200
@@ -6940,14 +5833,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Origin servers MUST include a Date header field in all responses,
    except in these cases:
 
-
-
-
-Fielding, et al.            Standards Track                   [Page 124]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       1. If the response status code is 100 (Continue) or 101 (Switching
          Protocols), the response MAY include a Date header field, at
          the server's option.
@@ -6994,16 +5879,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    of responses without storing separate Expires values for each
    resource).
 
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 125]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 14.19 ETag
 
    The ETag response-header field provides the current value of the
@@ -7032,7 +5907,6 @@ RFC 2616                        HTTP/1.1                       June 1999
                                *expect-params ]
       expect-params =  ";" token [ "=" ( token | quoted-string ) ]
 
-
    A server that does not understand or is unable to comply with any of
    the expectation values in the Expect field of a request MUST respond
    with appropriate error status. The server MUST respond with a 417
@@ -7048,17 +5922,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Comparison of expectation values is case-insensitive for unquoted
    tokens (including the 100-continue token), and is case-sensitive for
    quoted-string expectation-extensions.
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 126]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    The Expect mechanism is hop-by-hop: that is, an HTTP/1.1 proxy MUST
    return a 417 (Expectation Failed) status if it receives a request
@@ -7104,17 +5967,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    To mark a response as "already expired," an origin server sends an
    Expires date that is equal to the Date header value. (See the rules
    for expiration calculations in section 13.2.4.)
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 127]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    To mark a response as "never expires," an origin server sends an
    Expires date approximately one year from the time the response is
@@ -7164,14 +6016,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    The Host request-header field specifies the Internet host and port
    number of the resource being requested, as obtained from the original
    URI given by the user or referring resource (generally an HTTP URL,
-
-
-
-Fielding, et al.            Standards Track                   [Page 128]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    as described in section 3.2.2). The Host field value MUST represent
    the naming authority of the origin server or gateway given by the
    original URL. This allows the origin server or gateway to
@@ -7219,14 +6063,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    If any of the entity tags match the entity tag of the entity that
    would have been returned in the response to a similar GET request
    (without the If-Match header) on that resource, or if "*" is given
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 129]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    and any current entity exists for that resource, then the server MAY
    perform the requested method as if the If-Match header field did not
@@ -7276,14 +6112,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    be returned without any message-body.
 
        If-Modified-Since = "If-Modified-Since" ":" HTTP-date
-
-
-
-Fielding, et al.            Standards Track                   [Page 130]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    An example of the field is:
 
        If-Modified-Since: Sat, 29 Oct 1994 19:43:31 GMT
@@ -7332,14 +6160,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       server. This includes the possibility of race conditions if the
       document has changed between the time it was first requested and
       the If-Modified-Since date of a subsequent request, and the
-
-
-
-Fielding, et al.            Standards Track                   [Page 131]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       possibility of clock-skew-related problems if the If-Modified-
       Since date is derived from the client's clock without correction
       to the server's clock. Corrections for different time bases
@@ -7383,18 +6203,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    See section 13.3.3 for rules on how to determine if two entities tags
    match. The weak comparison function can only be used with GET or HEAD
    requests.
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 132]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    If none of the entity tags match, then the server MAY perform the
    requested method as if the If-None-Match header field did not exist,
@@ -7444,14 +6252,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
         If-Range = "If-Range" ":" ( entity-tag | HTTP-date )
 
-
-
-
-Fielding, et al.            Standards Track                   [Page 133]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    If the client has no entity tag for an entity, but does have a Last-
    Modified date, it MAY use that date in an If-Range header. (The
    server can distinguish between a valid HTTP-date and any form of
@@ -7500,14 +6300,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    which the origin server believes the variant was last modified.
 
        Last-Modified  = "Last-Modified" ":" HTTP-date
-
-
-
-Fielding, et al.            Standards Track                   [Page 134]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    An example of its use is
 
        Last-Modified: Tue, 15 Nov 1994 12:45:26 GMT
@@ -7557,13 +6349,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       and Content-Location. Also see section 13.10 for cache
       requirements of some methods.
 
-
-
-Fielding, et al.            Standards Track                   [Page 135]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 14.31 Max-Forwards
 
    The Max-Forwards request-header field provides a mechanism with the
@@ -7609,16 +6394,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    section 14.9) and is defined here for backward compatibility with
    HTTP/1.0. Clients SHOULD include both header fields when a no-cache
    request is sent to a server not known to be HTTP/1.1 compliant.
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 136]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    Pragma directives MUST be passed through by a proxy or gateway
    application, regardless of their significance to that application,
@@ -7668,14 +6443,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Authorization, the Proxy-Authorization header field applies only to
    the next outbound proxy that demanded authentication using the Proxy-
    Authenticate field. When multiple proxies are used in a chain, the
-
-
-
-Fielding, et al.            Standards Track                   [Page 137]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    Proxy-Authorization header field is consumed by the first outbound
    proxy that was expecting to receive credentials. A proxy MAY relay
    the credentials from the client request to the next proxy if that is
@@ -7723,14 +6490,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    By its choice of last-byte-pos, a client can limit the number of
    bytes retrieved without knowing the size of the entity.
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 138]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
        suffix-byte-range-spec = "-" suffix-length
        suffix-length = 1*DIGIT
@@ -7780,14 +6539,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    the entity returned as the result of the request:
 
       Range = "Range" ":" ranges-specifier
-
-
-
-Fielding, et al.            Standards Track                   [Page 139]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    A server MAY ignore the Range header. However, HTTP/1.1 origin
    servers and intermediate caches ought to support byte ranges when
    possible, since Range supports efficient recovery from partially
@@ -7835,14 +6586,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Example:
 
        Referer: http://www.w3.org/hypertext/DataSources/Overview.html
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 140]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    If the field value is a relative URI, it SHOULD be interpreted
    relative to the Request-URI. The URI MUST NOT include a fragment. See
@@ -7892,14 +6635,6 @@ RFC 2616                        HTTP/1.1                       June 1999
       implementors are encouraged to make this field a configurable
       option.
 
-
-
-
-Fielding, et al.            Standards Track                   [Page 141]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 14.39 TE
 
    The TE request-header field indicates what extension transfer-codings
@@ -7948,14 +6683,6 @@ RFC 2616                        HTTP/1.1                       June 1999
          codings listed in the TE field, then it is acceptable unless it
          is accompanied by a qvalue of 0. (As defined in section 3.9, a
          qvalue of 0 means "not acceptable.")
-
-
-
-Fielding, et al.            Standards Track                   [Page 142]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       3. If multiple transfer-codings are acceptable, then the
          acceptable transfer-coding with the highest non-zero qvalue is
          preferred.  The "chunked" transfer-coding always has a qvalue
@@ -8004,14 +6731,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Transfer-codings are defined in section 3.6. An example is:
 
      Transfer-Encoding: chunked
-
-
-
-Fielding, et al.            Standards Track                   [Page 143]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    If multiple encodings have been applied to an entity, the transfer-
    codings MUST be listed in the order in which they were applied.
    Additional information about the encoding parameters MAY be provided
@@ -8059,14 +6778,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Therefore, the upgrade keyword MUST be supplied within a Connection
    header field (section 14.10) whenever Upgrade is present in an
    HTTP/1.1 message.
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 144]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    The Upgrade header field cannot be used to indicate a switch to a
    protocol on a different connection. For that purpose, it is more
@@ -8116,14 +6827,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    cacheable response that is subject to server-driven negotiation.
    Doing so allows a cache to properly interpret future requests on that
    resource and informs the user agent about the presence of negotiation
-
-
-
-Fielding, et al.            Standards Track                   [Page 145]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    on that resource. A server MAY include a Vary header field with a
    non-cacheable response that is subject to server-driven negotiation,
    since this might provide the user agent with useful information about
@@ -8172,14 +6875,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    about the protocol capabilities of upstream applications remains
    visible to all recipients.
 
-
-
-
-Fielding, et al.            Standards Track                   [Page 146]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    The protocol-name is optional if and only if it would be "HTTP". The
    received-by field is normally the host and optional port number of a
    recipient server or client that subsequently forwarded the message.
@@ -8224,17 +6919,6 @@ RFC 2616                        HTTP/1.1                       June 1999
         could be collapsed to
 
        Via: 1.0 ricky, 1.1 mertz, 1.0 lucy
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 147]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    Applications SHOULD NOT combine multiple entries unless they are all
    under the same organizational control and the hosts have already been
@@ -8284,14 +6968,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    successfully validates a cache entry, it SHOULD remove any Warning
    headers previously attached to that entry except as specified for
 
-
-
-
-Fielding, et al.            Standards Track                   [Page 148]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    specific Warning codes. It MUST then add any Warning headers received
    in the validating response. In other words, Warning headers are those
    that would be attached to the most recent relevant response.
@@ -8340,14 +7016,6 @@ RFC 2616                        HTTP/1.1                       June 1999
      to a human user, or logged. A system receiving this warning MUST
      NOT take any automated action, besides presenting the warning to
      the user.
-
-
-
-Fielding, et al.            Standards Track                   [Page 149]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    214 Transformation applied
      MUST be added by an intermediate cache or proxy if it applies any
      transformation changing the content-coding (as specified in the
@@ -8397,13 +7065,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    definitive solutions to the problems revealed, though it does make
    some suggestions for reducing security risks.
 
-
-
-Fielding, et al.            Standards Track                   [Page 150]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 15.1 Personal Information
 
    HTTP clients are often privy to large amounts of personal information
@@ -8451,15 +7112,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    The Referer header allows reading patterns to be studied and reverse
    links drawn. Although it can be very useful, its power can be abused
    if user details are not separated from the information contained in
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 151]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    the Referer. Even when the personal information has been removed, the
    Referer header might indicate a private document's URI whose
    publication would be inappropriate.
@@ -8508,14 +7160,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    servers which are accessed. The Accept-Language header in particular
    can reveal information the user would consider to be of a private
    nature, because the understanding of particular languages is often
-
-
-
-Fielding, et al.            Standards Track                   [Page 152]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    strongly correlated to the membership of a particular ethnic group.
    User agents which offer the option to configure the contents of an
    Accept-Language header to be sent in every request are strongly
@@ -8563,14 +7207,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    inappropriate retrieval, since they might contain sensitive
    information. Experience has shown that minor bugs in such HTTP server
    implementations have turned into security risks.
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 153]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 15.3 DNS Spoofing
 
@@ -8621,13 +7257,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    documenting its use and risks for implementors. See RFC 2183 [49]
    (which updates RFC 1806) for details.
 
-
-
-Fielding, et al.            Standards Track                   [Page 154]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 15.6 Authentication Credentials and Idle Clients
 
    Existing HTTP clients and user agents typically retain authentication
@@ -8673,16 +7302,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    about organizations. Log information should be carefully guarded, and
    appropriate guidelines for use developed and followed. (Section
    15.1.1).
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 155]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    Caching proxies provide additional potential vulnerabilities, since
    the contents of the cache represent an attractive target for
@@ -8732,14 +7351,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    This document has benefited greatly from the comments of all those
    participating in the HTTP-WG. In addition to those already mentioned,
    the following individuals have contributed to this specification:
-
-
-
-Fielding, et al.            Standards Track                   [Page 156]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
        Gary Adams                  Ross Patterson
        Harald Tveit Alvestrand     Albert Lunde
        Keith Ball                  John C. Mallery
@@ -8767,7 +7378,6 @@ RFC 2616                        HTTP/1.1                       June 1999
        Paul J. Leach               Mary Ellen Zurko
        Daniel DuBois               Josh Cohen
 
-
    Much of the content and presentation of the caching design is due to
    suggestions and comments from individuals including: Shel Kaphan,
    Paul Leach, Koen Holtman, David Morris, and Larry Masinter.
@@ -8784,17 +7394,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Holtman, John Franks, Josh Cohen, Alex Hopmann, Scott Lawrence, and
    Larry Masinter for their help. And thanks go particularly to Jeff
    Mogul and Scott Lawrence for performing the "MUST/MAY/SHOULD" audit.
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 157]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    The Apache Group, Anselm Baird-Smith, author of Jigsaw, and Henrik
    Frystyk implemented RFC 2068 early, and we wish to thank them for the
@@ -8842,15 +7441,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    [12] Horton, M. and R. Adams, "Standard for Interchange of USENET
         Messages", RFC 1036, December 1987.
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 158]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    [13] Kantor, B. and P. Lapsley, "Network News Transfer Protocol", RFC
         977, February 1986.
@@ -8900,14 +7490,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    [25] Deutsch, P., "GZIP file format specification version 4.3", RFC
         1952, May 1996.
-
-
-
-Fielding, et al.            Standards Track                   [Page 159]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    [26] Venkata N. Padmanabhan, and Jeffrey C. Mogul. "Improving HTTP
         Latency", Computer Networks and ISDN Systems, v. 28, pp. 25-35,
         Dec. 1995. Slightly revised version of paper in Proc. 2nd
@@ -8955,15 +7537,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    [37] Palme, J., "Common Internet Message Headers", RFC 2076, February
         1997. [jg640]
 
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 160]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    [38] Yergeau, F., "UTF-8, a transformation format of Unicode and
         ISO-10646", RFC 2279, January 1998. [jg641]
 
@@ -9008,16 +7581,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    [49] Troost, R., Dorner, S. and K. Moore, "Communicating Presentation
         Information in Internet Messages: The Content-Disposition Header
         Field", RFC 2183, August 1997.
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 161]
-
-RFC 2616                        HTTP/1.1                       June 1999
 
 
 18 Authors' Addresses
@@ -9068,14 +7631,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    EMail: masinter@parc.xerox.com
 
 
-
-
-
-Fielding, et al.            Standards Track                   [Page 162]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    Paul J. Leach
    Microsoft Corporation
    1 Microsoft Way
@@ -9092,44 +7647,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    Fax: +1 (617) 258 8682
    EMail: timbl@w3.org
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 163]
-
-RFC 2616                        HTTP/1.1                       June 1999
 
 
 19 Appendices
@@ -9175,19 +7692,6 @@ RFC 2616                        HTTP/1.1                       June 1999
                  transmitted via E-mail.
        Security considerations: none
 
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 164]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
 19.2 Internet Media Type multipart/byteranges
 
    When an HTTP 206 (Partial Content) response message includes the
@@ -9208,7 +7712,6 @@ RFC 2616                        HTTP/1.1                       June 1999
        Encoding considerations: only "7bit", "8bit", or "binary" are
                                 permitted
        Security considerations: none
-
 
    For example:
 
@@ -9233,16 +7736,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
       1) Additional CRLFs may precede the first boundary string in the
          entity.
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 165]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
       2) Although RFC 2046 [40] permits the boundary string to be
          quoted, some existing implementations handle a quoted boundary
@@ -9292,14 +7785,6 @@ RFC 2616                        HTTP/1.1                       June 1999
         local time zone MUST NOT influence the calculation or comparison
         of an age or expiration time.
 
-
-
-
-Fielding, et al.            Standards Track                   [Page 166]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       - If an HTTP header incorrectly carries a date value with a time
         zone other than GMT, it MUST be converted into GMT using the
         most conservative possible conversion.
@@ -9348,14 +7833,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    allowed for subtypes of the "text" media type when transmitted over
    HTTP. RFC 2046 requires that content with a type of "text" represent
    line breaks as CRLF and forbids the use of CR or LF outside of line
-
-
-
-Fielding, et al.            Standards Track                   [Page 167]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    break sequences. HTTP allows CRLF, bare CR, and bare LF to indicate a
    line break within text content when a message is transmitted over
    HTTP.
@@ -9404,14 +7881,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    Proxies and gateways from HTTP to MIME-compliant protocols are
    responsible for ensuring that the message is in the correct format
    and encoding for safe transport on that protocol, where "safe
-
-
-
-Fielding, et al.            Standards Track                   [Page 168]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    transport" is defined by the limitations of the protocol being used.
    Such a proxy or gateway SHOULD label the data with an appropriate
    Content-Transfer-Encoding if doing so will improve the likelihood of
@@ -9460,14 +7929,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    across most HTTP/1.1 applications. Implementors are advised to be
    aware of these features, but cannot rely upon their presence in, or
    interoperability with, other HTTP/1.1 applications. Some of these
-
-
-
-Fielding, et al.            Standards Track                   [Page 169]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    describe proposed experimental features, and some describe features
    that experimental deployment found lacking that are now addressed in
    the base HTTP/1.1 specification.
@@ -9516,14 +7977,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
       - recognize the format of the Request-Line for HTTP/0.9, 1.0, and
         1.1 requests;
-
-
-
-Fielding, et al.            Standards Track                   [Page 170]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
       - understand any valid request in the format of HTTP/0.9, 1.0, or
         1.1;
 
@@ -9570,16 +8023,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    allocated for the sole purpose of allowing special-purpose domain
    names to be used in root-level HTTP URLs. Given the rate of growth of
    the Web, and the number of servers already deployed, it is extremely
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 171]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    important that all implementations of HTTP (including updates to
    existing HTTP/1.0 applications) correctly implement these
    requirements:
@@ -9628,14 +8071,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 
    Clarified which error code should be used for inbound server failures
    (e.g. DNS failures). (Section 10.5.5).
-
-
-
-Fielding, et al.            Standards Track                   [Page 172]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    CREATE had a race that required an Etag be sent when a resource is
    first created. (Section 10.2.2).
 
@@ -9681,16 +8116,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    were always returned; by allowing the server to only send needed
    headers in a 206 response, this problem can be avoided. (Section
    10.2.7, 13.5.3, and 14.27)
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 173]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
    Fix problem with unsatisfiable range requests; there are two cases:
    syntactic problems, and range doesn't exist in the document. The 416
@@ -9740,14 +8165,6 @@ RFC 2616                        HTTP/1.1                       June 1999
    (Section 13.1.2, 13.2.4, 13.5.2, 13.5.3, 14.9.3, and 14.46) Warning
    also needed to be a general header, as PUT or other methods may have
    need for it in requests.
-
-
-
-Fielding, et al.            Standards Track                   [Page 174]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
-
    Transfer-coding had significant problems, particularly with
    interactions with chunked encoding. The solution is that transfer-
    codings become as full fledged as content-codings. This involves
@@ -9770,39 +8187,6 @@ RFC 2616                        HTTP/1.1                       June 1999
 20 Index
 
    Please see the PostScript version of this RFC for the INDEX.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 175]
-
-RFC 2616                        HTTP/1.1                       June 1999
-
 
 21.  Full Copyright Statement
 
@@ -9836,24 +8220,3 @@ Acknowledgement
 
    Funding for the RFC Editor function is currently provided by the
    Internet Society.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Fielding, et al.            Standards Track                   [Page 176]
-
