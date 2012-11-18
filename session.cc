@@ -62,137 +62,29 @@ Session::~Session()
 
 
 /**
- * The socket is readable; advance the state machine by reading.
+ * The socket is readable and we claimed to be interested in reading;
+ * advance the state machine by doing so.
  *
  */
-Session::State Session::read(int fd, const timespec& t)
+Session::State Session::read(int fd, const timespec&)
 {
     reader.feed(fd);
 
     char* a;
     char* b;
-    while(!dead_ && reader_.read(a, b)) {
-
-	command(a, b);
-	flush();
-	if(!writer_.empty()) {
-	    break;
-	}
+    while(reader.read(a, b)) {
+	queue.push(a, b);
     }
 
-    if(!writer_.empty()) {
-	while(reader_.read(a, b)) {
-	    backlog_.push(std::string(a, b));
-	}
-    }
-
-    /* XXX Too strict; what if we have stuff to write? */
-    dead_ |= reader_.eof();
+    if(queue.bad()) return DIE;
+    return queue.complete()? WRITING: READING;
 }
 
 
 /**
- * We claimed to be WRITING, and the TCP socket is now writable.
- *
- * Continue trying to complete the pending command, and then
- * move over to the the backlog.
+ * The socket is writeable and we claimed to be interested in writing;
+ * advance the state machine by doing so.
  */
-void Session::writable()
+Session::State Session::write(int fd, const timespec&)
 {
-    assert(!dead_);
-    assert(!writer_.empty());
-
-    flush();
-
-    if(writer_.empty()) {
-	/* Ok, so the flushing of pending responses is complete, but
-	 * we may have a backlog of commands, and need to handle them
-	 * before reading.
-	 */
-	while(!dead_ && !backlog_.empty()) {
-	    const std::string s = backlog_.front();
-	    const char* const p = s.data();
-	    backlog_.pop();
-	    command(p, p+s.size());
-	    flush();
-	    if(!writer_.empty()) {
-		break;
-	    }
-	}
-    }
-}
-
-
-/**
- * Try to empty the ResponseBuf to the socket by making one
- * flush() attempt. Doesn't change state, except it may set dead_
- * in case of a fatal I/O error.
- */
-void Session::flush()
-{
-    assert(!dead_);
-    if(writer_.empty()) return;
-
-    const int n = writer_.flush(fd_);
-    if(n==-1) {
-	switch(errno) {
-	case EAGAIN:
-	case EINTR:
-	    break;
-	default:
-	    std::cerr << peer_ << ": write failed: " << strerror(errno) << '\n';
-	case ECONNRESET:
-	case EPIPE:
-	    std::cerr << peer_ << ": closing\n";
-	    dead_ = true;
-	    break;
-	}
-    }
-}
-
-
-void Session::initial()
-{
-    Command::initial(writer_, *this);
-}
-
-
-void Session::command(const char* a, const char* b)
-{
-    switch(Command::parse(&a, b)) {
-
-    case Command::UNKNOWN:
-	Command::unknown(writer_, *this);
-	break;
-
-    case Command::ARTICLE:
-    case Command::BODY:
-    case Command::CAPABILITIES:
-    case Command::DATE:
-    case Command::GROUP:
-    case Command::HDR:
-    case Command::HEAD:
-    case Command::HELP:
-    case Command::IHAVE:
-    case Command::LAST:
-    case Command::LIST:
-    case Command::LIST_ACTIVE:
-    case Command::LIST_ACTIVE_TIMES:
-    case Command::LIST_DISTRIB_PATS:
-    case Command::LIST_HEADERS:
-    case Command::LIST_NEWSGROUPS:
-    case Command::LIST_OVERVIEW_FMT:
-    case Command::LISTGROUP:
-    case Command::MODE_READER:
-    case Command::NEWGROUPS:
-    case Command::NEWNEWS:
-    case Command::NEXT:
-    case Command::OVER:
-    case Command::POST:
-    case Command::QUIT:
-    case Command::STAT:
-    default:
-	Command::not_implemented(writer_, *this);
-	break;
-    }
 }
