@@ -10,15 +10,27 @@
 #include "blob.h"
 #include "deflate.h"
 
+#include <vector>
 
+
+/**
+ * Slightly funny name for a thing used to write to a nonblocking
+ * socket, and which stores unwritten parts until the next write.
+ */
 class Backlog {
 public:
-    bool empty() const;
-    Blob buf() const;
+    bool empty() const { return v.empty(); }
+    size_t write(int fd);
+    size_t write(int fd, const Blob& a);
+    size_t write(int fd, const Blob& a, const Blob& b);
+
+    typedef std::vector<char> Buf;
 
 private:
     Backlog(const Backlog&);
     Backlog& operator= (const Backlog&);
+
+    Buf v;
 };
 
 
@@ -54,9 +66,16 @@ namespace Filter {
     class Plain {
     public:
 	Plain();
-	bool write(int fd);
-	bool write(int fd, const Blob& a);
-	bool write(int fd, const Blob& a, const Blob& b);
+	bool write(int fd) {
+	    return backlog.write(fd)==0;
+	}
+	bool write(int fd, const Blob& a) {
+	    return backlog.write(fd, a)==0;
+	}
+	bool write(int fd, const Blob& a, const Blob& b) {
+	    return backlog.write(fd, a, b)==0;
+	}
+	bool write(int fd, const Blob& a, const Blob& b, const Blob& c);
 
     private:
 	Plain(const Plain&);
@@ -73,7 +92,7 @@ namespace Filter {
     class Chunked {
     public:
 	Chunked();
-	bool write(int fd);
+	bool write(int fd) { return next.write(fd); }
 	bool write(int fd, const Blob& a);
 	bool write(int fd, const Blob& a, const Blob& b);
 

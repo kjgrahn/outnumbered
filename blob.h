@@ -8,6 +8,7 @@
 #define GB_BLOB_H_
 
 #include <stdint.h>
+#include <cstdlib>
 
 
 /**
@@ -16,11 +17,14 @@
 class Blob {
 public:
     Blob() : a(0), b(0) {}
+    Blob(const char* a, size_t n);
+    Blob(const uint8_t* a, size_t n);
     Blob(const uint8_t* a,
 	 const uint8_t* b)
 	: a(a), b(b)
     {}
     bool empty() const { return a==b; }
+    size_t size() const;
     operator const void*() const { return empty()? 0: a; }
     const uint8_t* a;
     const uint8_t* b;
