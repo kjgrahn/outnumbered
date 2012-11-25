@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <cstdlib>
+#include <vector>
 
 
 /**
@@ -23,6 +24,7 @@ public:
 	 const uint8_t* b)
 	: a(a), b(b)
     {}
+    Blob(const std::vector<uint8_t>&);
     bool empty() const { return a==b; }
     size_t size() const;
     operator const void*() const { return empty()? 0: a; }

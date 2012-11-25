@@ -8,7 +8,7 @@
 #define GB_ERROR_H_
 
 struct WriteError {
-    explicit WriteError(int err);
+    explicit WriteError(int err = 0);
 };
 
 #endif

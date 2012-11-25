@@ -31,6 +31,7 @@ libhttpd.a: events.o
 libhttpd.a: session.o
 libhttpd.a: command.o
 libhttpd.a: filter.o
+libhttpd.a: deflate.o
 #libhttpd.a: response.o
 libhttpd.a: responsebuf.o
 	$(AR) -r $@ $^
@@ -83,6 +84,7 @@ love:
 
 command.o: command.h responsebuf.h session.h time.h textread.h requestqueue.h
 command.o: response.h
+deflate.o: deflate.h blob.h error.h
 events.o: events.h session.h time.h textread.h requestqueue.h response.h
 filter.o: filter.h blob.h deflate.h error.h
 httpd.o: version.h events.h session.h time.h textread.h requestqueue.h
