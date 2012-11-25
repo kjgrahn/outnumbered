@@ -22,7 +22,7 @@ namespace {
 
     iovec iov(const Blob& a)
     {
-	iovec tmp = { (void*)a.a, a.b - a.a };
+	iovec tmp = { (void*)a.begin(), a.size() };
 	return tmp;
     }
 

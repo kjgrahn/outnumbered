@@ -50,7 +50,7 @@ Deflate::~Deflate()
 void Deflate::push(const Blob& data)
 {
     uint8_t buf[1000];
-    z->next_in = const_cast<uint8_t*>(data.a);
+    z->next_in = const_cast<uint8_t*>(data.begin());
     z->avail_in = data.size();
 
     while(z->avail_in) {
