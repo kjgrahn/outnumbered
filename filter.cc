@@ -121,10 +121,7 @@ size_t Backlog::write(int fd, const Blob& a, const Blob& b)
 }
 
 
-using Filter::Plain;
 using Filter::Chunked;
-using Filter::Zlib;
-
 
 namespace {
     const Blob crlf("\r\n", 2);
@@ -143,9 +140,53 @@ bool Chunked<Next>::write (int fd, const Blob& a)
 }
 
 
+using Filter::Zlib;
+
+
+template<class Next>
+bool Zlib<Next>::write(int fd)
+{
+    return next.write(fd);
+}
+
+
+template<class Next>
+bool Zlib<Next>::write(int fd, const Blob& a)
+{
+    compress.push(a);
+    const Blob out = compress.front();
+    if(out.empty()) return true;
+
+    bool r = next.write(fd);
+    compress.pop();
+    return r;
+}
+
+
+template<class Next>
+bool Zlib<Next>::write(int fd, const Blob& a, const Blob& b)
+{
+    compress.push(a);
+    return write(fd, b);
+}
+
+
+template<class Next>
+bool Zlib<Next>::end(int fd)
+{
+    compress.finish();
+    const Blob out = compress.front();
+    if(out.empty()) return true;
+
+    bool r = next.write(fd);
+    compress.pop();
+    return r;
+}
+
+
 /* Explicit template instantiation for the interesting cases.
  */
-
+using Filter::Plain;
 template class Zlib<Plain>;
 template class Chunked<Plain>;
 template class Zlib<Chunked<Plain> >;

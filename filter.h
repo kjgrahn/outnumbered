@@ -19,6 +19,7 @@
  */
 class Backlog {
 public:
+    Backlog() {}
     bool empty() const { return v.empty(); }
     size_t write(int fd);
     size_t write(int fd, const Blob& a);
@@ -65,7 +66,7 @@ namespace Filter {
      */
     class Plain {
     public:
-	Plain();
+	Plain() {}
 	bool write(int fd) {
 	    return backlog.write(fd)==0;
 	}
@@ -106,14 +107,20 @@ namespace Filter {
 
     /**
      * Write using zlib compression [RFC 2616 3.5, 3.6].
+     *
+     * Unlike the other filters this one has an end() function, which
+     * must be used to end the input. Otherwise it behaves as any of
+     * the write() methods; you may have to keep calling write(fd)
+     * afterwards.
      */
     template<class Next>
     class Zlib {
     public:
-	Zlib();
+	Zlib() {}
 	bool write(int fd);
 	bool write(int fd, const Blob& a);
 	bool write(int fd, const Blob& a, const Blob& b);
+	bool end(int fd);
 
     private:
 	Zlib(const Zlib&);
