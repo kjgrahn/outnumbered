@@ -77,7 +77,12 @@ Session::State Session::read(int fd, const timespec&)
     }
 
     if(queue.bad()) return DIE;
-    return queue.complete()? WRITING: READING;
+    if (!queue.complete()) return READING;
+
+    queue.pop();
+    response = new Response;
+
+    return WRITING;
 }
 
 
