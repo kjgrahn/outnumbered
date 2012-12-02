@@ -33,6 +33,8 @@ public:
     bool bad() const;
     bool complete() const;
 
+    void pop();
+
 private:
     RequestQueue(const RequestQueue&);
     RequestQueue& operator= (const RequestQueue&);
