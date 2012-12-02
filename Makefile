@@ -34,7 +34,7 @@ libhttpd.a: textread.o
 libhttpd.a: requestqueue.o
 libhttpd.a: command.o
 libhttpd.a: filter.o
-#libhttpd.a: response.o
+libhttpd.a: response.o
 libhttpd.a: responsebuf.o
 	$(AR) -r $@ $^
 
