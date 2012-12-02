@@ -28,10 +28,12 @@ checkv: tests
 
 libhttpd.a: version.o
 libhttpd.a: events.o
+libhttpd.a: time.o
 libhttpd.a: session.o
+libhttpd.a: textread.o
+libhttpd.a: requestqueue.o
 libhttpd.a: command.o
 libhttpd.a: filter.o
-libhttpd.a: deflate.o
 #libhttpd.a: response.o
 libhttpd.a: responsebuf.o
 	$(AR) -r $@ $^
@@ -39,7 +41,7 @@ libhttpd.a: responsebuf.o
 filter.o: CXXFLAGS+=-Wno-old-style-cast
 
 httpd: httpd.o libhttpd.a
-	$(CXX) -o $@ httpd.o -L. -lhttpd -L../sockutil -lsocket -lgdbm
+	$(CXX) -o $@ httpd.o -L. -lhttpd -lrt
 
 #libtest.a: test/test_response.o
 libtest.a: test/test_command.o
@@ -89,9 +91,11 @@ events.o: events.h session.h time.h textread.h requestqueue.h response.h
 filter.o: filter.h blob.h deflate.h error.h
 httpd.o: version.h events.h session.h time.h textread.h requestqueue.h
 httpd.o: response.h
+requestqueue.o: requestqueue.h
 responsebuf.o: responsebuf.h
 session.o: session.h time.h textread.h requestqueue.h response.h command.h
 textread.o: textread.h
+time.o: time.h
 version.o: version.h
 test/test_command.o: command.h
 test/test_response.o: response.h

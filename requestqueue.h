@@ -7,6 +7,9 @@
 #ifndef GB_REQUESTQUEUE_H_
 #define GB_REQUESTQUEUE_H_
 
+#include <list>
+#include <string>
+
 
 /**
  * The (partial) HTTP requests of a session. Grows line by line, and
@@ -33,6 +36,9 @@ public:
 private:
     RequestQueue(const RequestQueue&);
     RequestQueue& operator= (const RequestQueue&);
+
+    typedef std::list<std::string> Lines;
+    Lines buf;
 };
 
 #endif
