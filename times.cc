@@ -4,7 +4,7 @@
  * All rights reserved.
  *
  */
-#include "time.h"
+#include "times.h"
 
 
 /**
