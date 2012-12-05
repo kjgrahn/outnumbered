@@ -11,7 +11,7 @@
 #include <iosfwd>
 #include <netinet/in.h>
 
-#include "time.h"
+#include "times.h"
 #include "textread.h"
 #include "requestqueue.h"
 #include "response.h"

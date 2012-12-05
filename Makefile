@@ -28,7 +28,7 @@ checkv: tests
 
 libhttpd.a: version.o
 libhttpd.a: events.o
-libhttpd.a: time.o
+libhttpd.a: times.o
 libhttpd.a: session.o
 libhttpd.a: textread.o
 libhttpd.a: requestqueue.o
@@ -84,18 +84,19 @@ love:
 
 # DO NOT DELETE
 
-command.o: command.h responsebuf.h session.h time.h textread.h requestqueue.h
-command.o: response.h
+command.o: command.h responsebuf.h session.h times.h textread.h
+command.o: requestqueue.h response.h
 deflate.o: deflate.h blob.h error.h
-events.o: events.h session.h time.h textread.h requestqueue.h response.h
+events.o: events.h session.h times.h textread.h requestqueue.h response.h
 filter.o: filter.h blob.h deflate.h error.h
-httpd.o: version.h events.h session.h time.h textread.h requestqueue.h
+httpd.o: version.h events.h session.h times.h textread.h requestqueue.h
 httpd.o: response.h
 requestqueue.o: requestqueue.h
+response.o: response.h
 responsebuf.o: responsebuf.h
-session.o: session.h time.h textread.h requestqueue.h response.h command.h
+session.o: session.h times.h textread.h requestqueue.h response.h command.h
 textread.o: textread.h
-time.o: time.h
+times.o: times.h
 version.o: version.h
 test/test_command.o: command.h
 test/test_response.o: response.h
