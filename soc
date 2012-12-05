@@ -22,7 +22,7 @@ Authorization         14.8	these are my credentials
 Expect                14.20	two-phase request
 From                  14.22	[pointless]
 Host                  14.23	site name [more or less]
-If-Match              14.24	don't bother unless one of these checksums match	
+If-Match              14.24	don't bother unless one of these checksums match
 If-Modified-Since     14.25
 If-None-Match         14.26
 If-Range              14.27
@@ -39,6 +39,7 @@ Response Header Field 6.2
 
 Accept-Ranges         14.5
 Age                   14.6
+Content-Disposition   RFC 6266
 ETag                  14.19
 Location              14.30
 Proxy-Authenticate    14.33
@@ -61,3 +62,64 @@ Content-Type          14.17
 Expires               14.21
 Last-Modified         14.29
 
+------------------------------------------------------------
+
+General Header Fields 4.5
+
+Cache-Control         14.9	list
+Connection            14.10	list
+Date                  14.18	value
+Pragma                14.32	list
+Trailer               14.40	list
+Transfer-Encoding     14.41	list
+Upgrade               14.42	list
+Via                   14.45	list
+Warning               14.46	list
+
+Request Header Fields 5.3
+
+Accept                14.1	list
+Accept-Charset        14.2	list
+Accept-Encoding       14.3	list
+Accept-Language       14.4	list
+Authorization         14.8	TBD
+Expect                14.20	list
+From                  14.22	value
+Host                  14.23	value
+If-Match              14.24	list
+If-Modified-Since     14.25	value
+If-None-Match         14.26	list
+If-Range              14.27	value
+If-Unmodified-Since   14.28	value
+Max-Forwards          14.31	value
+Proxy-Authorization   14.34	value
+Range                 14.35	value
+Referer               14.36	value
+TE                    14.39	list
+User-Agent            14.43	values
+
+Response Header Field 6.2
+
+Accept-Ranges         14.5	TBD
+Age                   14.6	TBD
+Content-Disposition   RFC 6266	TBD
+ETag                  14.19	TBD
+Location              14.30	TBD
+Proxy-Authenticate    14.33	TBD
+Retry-After           14.37	TBD
+Server                14.38	TBD
+Vary                  14.44	TBD
+WWW-Authenticate      14.47	TBD
+
+Entity Header Fields  7.2
+
+Allow                 14.7	list
+Content-Encoding      14.11	list
+Content-Language      14.12	list
+Content-Length        14.13	value
+Content-Location      14.14	value
+Content-MD5           14.15	value
+Content-Range         14.16	value
+Content-Type          14.17	value
+Expires               14.21	value
+Last-Modified         14.29	value

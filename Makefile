@@ -44,6 +44,7 @@ outnumbered: httpd.o liboutnumbered.a
 	$(CXX) -o $@ httpd.o -L. -loutnumbered -lrt
 
 #libtest.a: test/test_response.o
+libtest.a: test/request.o
 libtest.a: test/test_command.o
 libtest.a: test/test_responsebuf.o
 libtest.a: test/test_dbfile.o
@@ -98,6 +99,7 @@ session.o: session.h times.h textread.h requestqueue.h response.h command.h
 textread.o: textread.h
 times.o: times.h
 version.o: version.h
+test/request.o: ./request.h
 test/test_command.o: command.h
 test/test_response.o: response.h
 test/test_responsebuf.o: responsebuf.h
