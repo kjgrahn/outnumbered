@@ -206,7 +206,7 @@ int main(int argc, char ** argv)
 
     bool daemon = false;
     string addr = "";
-    string port = "nntp";
+    string port = "http";
 
     std::cin.sync_with_stdio(false);
     std::cout.sync_with_stdio(false);
@@ -228,7 +228,7 @@ int main(int argc, char ** argv)
 	    std::cout << usage << '\n';
 	    return 0;
 	case 'v':
-	    std::cout << "XXX " << version() << '\n'
+	    std::cout << "outnumbered " << version() << '\n'
 		      << "Copyright (c) 2010, 2011, 2012 Jörgen Grahn\n";
 	    return 0;
 	    break;
