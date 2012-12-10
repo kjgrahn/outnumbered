@@ -11,14 +11,14 @@ CXXFLAGS=-Wall -Wextra -pedantic -std=c++98 -g -O3 -Wold-style-cast
 CPPFLAGS=-I..
 
 .PHONY: all
-all: libhttpd.a
-all: httpd
+all: liboutnumbered.a
+all: outnumbered
 
 .PHONY: install
-install: httpd
-install: httpd.1
-	install -m755 httpd $(INSTALLBASE)/bin/
-	install -m644 httpd.1 $(INSTALLBASE)/man/man1/
+install: outnumbered
+install: outnumbered.1
+	install -m755 outnumbered $(INSTALLBASE)/bin/
+	install -m644 outnumbered.1 $(INSTALLBASE)/man/man1/
 
 .PHONY: check checkv
 check: tests
@@ -26,22 +26,22 @@ check: tests
 checkv: tests
 	valgrind -q ./tests
 
-libhttpd.a: version.o
-libhttpd.a: events.o
-libhttpd.a: times.o
-libhttpd.a: session.o
-libhttpd.a: textread.o
-libhttpd.a: requestqueue.o
-libhttpd.a: command.o
-libhttpd.a: filter.o
-libhttpd.a: response.o
-libhttpd.a: responsebuf.o
+liboutnumbered.a: version.o
+liboutnumbered.a: events.o
+liboutnumbered.a: times.o
+liboutnumbered.a: session.o
+liboutnumbered.a: textread.o
+liboutnumbered.a: requestqueue.o
+liboutnumbered.a: command.o
+liboutnumbered.a: filter.o
+liboutnumbered.a: response.o
+liboutnumbered.a: responsebuf.o
 	$(AR) -r $@ $^
 
 filter.o: CXXFLAGS+=-Wno-old-style-cast
 
-httpd: httpd.o libhttpd.a
-	$(CXX) -o $@ httpd.o -L. -lhttpd -lrt
+outnumbered: httpd.o liboutnumbered.a
+	$(CXX) -o $@ httpd.o -L. -loutnumbered -lrt
 
 #libtest.a: test/test_response.o
 libtest.a: test/test_command.o
@@ -52,8 +52,8 @@ libtest.a: test/test_dbfile.o
 test.cc: libtest.a
 	testicle -o$@ $^
 
-tests: test.o libhttpd.a libtest.a
-	$(CXX) -o $@ test.o -L. -ltest -lhttpd -lgdbm
+tests: test.o liboutnumbered.a libtest.a
+	$(CXX) -o $@ test.o -L. -ltest -loutnumbered -lgdbm
 
 test/%.o: CPPFLAGS+=-I.
 
@@ -70,10 +70,10 @@ depend:
 
 .PHONY: clean
 clean:
-	$(RM) httpd
+	$(RM) outnumbered
 	$(RM) *.o
 	$(RM) *.ps
-	$(RM) libhttpd.a
+	$(RM) liboutnumbered.a
 	$(RM) libtest.a
 	$(RM) test/*.o
 	$(RM) test.cc tests

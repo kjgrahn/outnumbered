@@ -1,7 +1,6 @@
-httpd
+outnumbered
 *.[oa]
 test.cc
 tests
-gresabladet
 TAGS
 Makefile.bak
