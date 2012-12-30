@@ -7,6 +7,8 @@
 #ifndef GB_RESPONSE_H_
 #define GB_RESPONSE_H_
 
+#include "filter.h"
+
 /**
  * A complete, specific HTTP response. We have already decided /how/
  * we want to respond (using which status code and so on) and all that
@@ -21,6 +23,19 @@
  * our state and resume later.
  *
  */
-struct Response {};
+class Response {
+public:
+    Response();
+    bool write(int fd);
+    bool done() const;
+
+private:
+    Response(const Response&);
+    Response& operator= (const Response&);
+
+    const char* text;
+    bool done_;
+    Filter::P filter;
+};
 
 #endif
