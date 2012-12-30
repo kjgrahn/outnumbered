@@ -85,19 +85,21 @@ love:
 # DO NOT DELETE
 
 command.o: command.h responsebuf.h session.h times.h textread.h
-command.o: requestqueue.h response.h
+command.o: requestqueue.h response.h filter.h blob.h deflate.h
 deflate.o: deflate.h blob.h error.h
 events.o: events.h session.h times.h textread.h requestqueue.h response.h
+events.o: filter.h blob.h deflate.h
 filter.o: filter.h blob.h deflate.h error.h
 httpd.o: version.h events.h session.h times.h textread.h requestqueue.h
-httpd.o: response.h
+httpd.o: response.h filter.h blob.h deflate.h
 requestqueue.o: requestqueue.h
-response.o: response.h
+response.o: response.h filter.h blob.h deflate.h
 responsebuf.o: responsebuf.h
-session.o: session.h times.h textread.h requestqueue.h response.h command.h
+session.o: session.h times.h textread.h requestqueue.h response.h filter.h
+session.o: blob.h deflate.h command.h
 textread.o: textread.h
 times.o: times.h
 version.o: version.h
 test/test_command.o: command.h
-test/test_response.o: response.h
+test/test_response.o: response.h filter.h blob.h deflate.h
 test/test_responsebuf.o: responsebuf.h

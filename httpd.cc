@@ -163,12 +163,11 @@ namespace {
 			continue;
 		    }
 
-		    /* XXX inefficient to always change the event */
-		    switch(state) {
-		    case Session::READING: ev.events = EPOLLIN; break;
-		    case Session::WRITING: ev.events = EPOLLOUT; break;
+		    if(state & ev.events) {
+			continue;
 		    }
 
+		    ev.events = state;
 		    int rc = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
 		    if(rc==-1) {
 			sessions.remove(sn);

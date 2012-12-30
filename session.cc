@@ -51,8 +51,7 @@ Session::Session(const sockaddr_storage& peer)
     : peer(peer),
       reader("\r\n"),
       response(0)
-{
-}
+{}
 
 
 Session::~Session()
@@ -76,13 +75,26 @@ Session::State Session::read(int fd, const timespec&)
 	queue.push(a, b);
     }
 
+    /* At this point these are the interesting states
+     * (reader.eof(); queue.complette(); response):
+     *
+     * E Q Resp
+     * -----
+     * · y n  WRITING; new Response
+     * · · y  WRITING
+     * n n n  READING
+     * y n n  DIE
+     */
+
+    if(response) return WRITING;
     if(queue.bad()) return DIE;
-    if (!queue.complete()) return READING;
+    if (queue.complete()) {
+	queue.pop();
+	response = new Response;
+	return WRITING;
+    }
 
-    queue.pop();
-    response = new Response;
-
-    return WRITING;
+    return reader.eof() ? DIE : READING;
 }
 
 
@@ -92,4 +104,21 @@ Session::State Session::read(int fd, const timespec&)
  */
 Session::State Session::write(int fd, const timespec&)
 {
+    while(response) {
+	if(!response->write(fd)) {
+	    return WRITING;
+	}
+
+	if(response->done()) {
+	    delete response;
+	    response = 0;
+
+	    if (queue.complete()) {
+		queue.pop();
+		response = new Response;
+	    }
+	}
+    }
+
+    return reader.eof() ? DIE : READING;
 }
