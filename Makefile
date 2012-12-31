@@ -46,14 +46,13 @@ outnumbered: httpd.o liboutnumbered.a
 #libtest.a: test/test_response.o
 libtest.a: test/test_command.o
 libtest.a: test/test_responsebuf.o
-libtest.a: test/test_dbfile.o
 	$(AR) -r $@ $^
 
 test.cc: libtest.a
 	testicle -o$@ $^
 
 tests: test.o liboutnumbered.a libtest.a
-	$(CXX) -o $@ test.o -L. -ltest -loutnumbered -lgdbm
+	$(CXX) -o $@ test.o -L. -ltest -loutnumbered
 
 test/%.o: CPPFLAGS+=-I.
 
