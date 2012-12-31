@@ -34,6 +34,7 @@ liboutnumbered.a: textread.o
 liboutnumbered.a: requestqueue.o
 liboutnumbered.a: command.o
 liboutnumbered.a: filter.o
+liboutnumbered.a: deflate.o
 liboutnumbered.a: response.o
 liboutnumbered.a: responsebuf.o
 	$(AR) -r $@ $^
@@ -41,7 +42,7 @@ liboutnumbered.a: responsebuf.o
 filter.o: CXXFLAGS+=-Wno-old-style-cast
 
 outnumbered: httpd.o liboutnumbered.a
-	$(CXX) -o $@ httpd.o -L. -loutnumbered -lrt
+	$(CXX) -o $@ httpd.o -L. -loutnumbered -lrt -lz
 
 #libtest.a: test/test_response.o
 libtest.a: test/test_command.o
