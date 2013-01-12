@@ -1,6 +1,6 @@
 /* $Id: session.cc,v 1.12 2011-07-03 19:40:17 grahn Exp $
  *
- * Copyright (c) 2010, 2011 Jörgen Grahn
+ * Copyright (c) 2010, 2011, 2013 Jörgen Grahn
  * All rights reserved.
  *
  */
@@ -72,13 +72,13 @@ Session::State Session::read(int fd, const timespec&)
     char* a;
     char* b;
     while(reader.read(a, b)) {
-	queue.push(a, b);
+	req_queue.push(a, b);
     }
 
     /* At this point these are the interesting states
-     * (reader.eof(); queue.complette(); response):
-     *
-     * E Q Resp
+     * (reader.eof(); req_queue.complete(); response):
+     *  /__________________/                  /
+     * E Q Resp -----------------------------'
      * -----
      * · y n  WRITING; new Response
      * · · y  WRITING
@@ -87,9 +87,9 @@ Session::State Session::read(int fd, const timespec&)
      */
 
     if(response) return WRITING;
-    if(queue.bad()) return DIE;
-    if (queue.complete()) {
-	queue.pop();
+    if(req_queue.bad()) return DIE;
+    if (req_queue.complete()) {
+	req_queue.pop();
 	response = new Response;
 	return WRITING;
     }
@@ -113,8 +113,8 @@ Session::State Session::write(int fd, const timespec&)
 	    delete response;
 	    response = 0;
 
-	    if (queue.complete()) {
-		queue.pop();
+	    if (req_queue.complete()) {
+		req_queue.pop();
 		response = new Response;
 	    }
 	}

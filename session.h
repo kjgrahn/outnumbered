@@ -86,7 +86,7 @@ private:
 
     sockaddr_storage peer;
     sockutil::TextReader reader;
-    RequestQueue queue;
+    RequestQueue req_queue;
     Response* response;
 };
 

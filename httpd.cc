@@ -228,7 +228,7 @@ int main(int argc, char ** argv)
 	    return 0;
 	case 'v':
 	    std::cout << "outnumbered " << version() << '\n'
-		      << "Copyright (c) 2010, 2011, 2012 Jörgen Grahn\n";
+		      << "Copyright (c) 2010-2013 Jörgen Grahn\n";
 	    return 0;
 	    break;
 	case ':':
