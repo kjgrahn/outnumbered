@@ -6,8 +6,6 @@
  */
 #include "session.h"
 
-#include "command.h"
-
 #include <iostream>
 #include <sstream>
 #include <cassert>
