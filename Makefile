@@ -43,6 +43,9 @@ filter.o: CXXFLAGS+=-Wno-old-style-cast
 outnumbered: httpd.o liboutnumbered.a
 	$(CXX) -o $@ httpd.o -L. -loutnumbered -lrt -lz
 
+magic: magic.o liboutnumbered.a
+	$(CXX) -o $@ magic.o -L. -loutnumbered -lmagic
+
 #libtest.a: test/test_response.o
 libtest.a: test/test_responsebuf.o
 	$(AR) -r $@ $^
@@ -68,7 +71,7 @@ depend:
 
 .PHONY: clean
 clean:
-	$(RM) outnumbered
+	$(RM) outnumbered magic
 	$(RM) *.o
 	$(RM) *.ps
 	$(RM) liboutnumbered.a
@@ -88,6 +91,7 @@ events.o: filter.h blob.h deflate.h
 filter.o: filter.h blob.h deflate.h error.h
 httpd.o: version.h events.h session.h times.h textread.h requestqueue.h
 httpd.o: response.h filter.h blob.h deflate.h
+magic.o: version.h
 requestqueue.o: requestqueue.h
 response.o: response.h filter.h blob.h deflate.h
 responsebuf.o: responsebuf.h
