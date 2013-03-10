@@ -62,6 +62,7 @@ namespace {
  * Write the backlog to 'fd', and return the number of octets still
  * unwritten afterwards.  This means writing an empty Backlog is
  * indistinguishable from being blocked, so don't do that.
+ * XXX Surely "indistinguishable from being successful"?
  *
  * Throws an exception on real errors.
  */

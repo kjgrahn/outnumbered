@@ -28,6 +28,12 @@ bool RequestQueue::complete() const
 }
 
 
+const std::string& RequestQueue::front() const
+{
+    return buf.front();
+}
+
+
 void RequestQueue::pop()
 {
     buf.pop_front();

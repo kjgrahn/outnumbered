@@ -3,13 +3,11 @@
  *
  */
 #include "response.h"
-
-#include <cstring>
 #include <cassert>
 
 
-Response::Response()
-    : text("0123456789abcdef\n"),
+Response::Response(const std::string& request)
+    : src(request),
       done_(false)
 {}
 
@@ -23,20 +21,21 @@ bool Response::write(int fd)
 {
     assert(!done());
 
-    if(text) {
-	done_ = filter.write(fd, Blob(text, std::strlen(text)));
-	text = 0;
-	return done_;
+    if(src.alive()) {
+	char buf[8*1024];
+	size_t n = src.read(buf, sizeof buf);
+	if(n) {
+	    return filter.write(fd, Blob(buf, n));
+	}
     }
-    else {
-	done_ = filter.write(fd);
-	return done_;
-    }
+
+    return done_ = filter.write(fd);
 }
 
 
 /**
- * Return true if the response is completely written.
+ * Return true if the response has been completed (and can be
+ * destroyed).
  */
 bool Response::done() const
 {

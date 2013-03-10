@@ -36,10 +36,12 @@ liboutnumbered.a: command.o
 liboutnumbered.a: filter.o
 liboutnumbered.a: deflate.o
 liboutnumbered.a: response.o
+liboutnumbered.a: input.o
 liboutnumbered.a: responsebuf.o
 	$(AR) -r $@ $^
 
 filter.o: CXXFLAGS+=-Wno-old-style-cast
+httpd.o: CXXFLAGS+=-Wno-old-style-cast
 
 outnumbered: httpd.o liboutnumbered.a
 	$(CXX) -o $@ httpd.o -L. -loutnumbered -lrt -lz
@@ -85,21 +87,22 @@ love:
 # DO NOT DELETE
 
 command.o: command.h responsebuf.h session.h times.h textread.h
-command.o: requestqueue.h response.h filter.h blob.h deflate.h
+command.o: requestqueue.h response.h filter.h blob.h deflate.h input.h
 deflate.o: deflate.h blob.h error.h
 events.o: events.h session.h times.h textread.h requestqueue.h response.h
-events.o: filter.h blob.h deflate.h
+events.o: filter.h blob.h deflate.h input.h
 filter.o: filter.h blob.h deflate.h error.h
 httpd.o: version.h events.h session.h times.h textread.h requestqueue.h
-httpd.o: response.h filter.h blob.h deflate.h
+httpd.o: response.h filter.h blob.h deflate.h input.h
+input.o: input.h
 requestqueue.o: requestqueue.h
-response.o: response.h filter.h blob.h deflate.h
+response.o: response.h filter.h blob.h deflate.h input.h
 responsebuf.o: responsebuf.h
 session.o: session.h times.h textread.h requestqueue.h response.h filter.h
-session.o: blob.h deflate.h command.h
+session.o: blob.h deflate.h input.h command.h
 textread.o: textread.h
 times.o: times.h
 version.o: version.h
 test/test_command.o: command.h
-test/test_response.o: response.h filter.h blob.h deflate.h
+test/test_response.o: response.h filter.h blob.h deflate.h input.h
 test/test_responsebuf.o: responsebuf.h
