@@ -49,13 +49,15 @@ outnumbered: httpd.o liboutnumbered.a
 #libtest.a: test/test_response.o
 libtest.a: test/test_command.o
 libtest.a: test/test_responsebuf.o
+libtest.a: test/test_filter.o
+libtest.a: test/pipe.o
 	$(AR) -r $@ $^
 
 test.cc: libtest.a
 	testicle -o$@ $^
 
 tests: test.o liboutnumbered.a libtest.a
-	$(CXX) -o $@ test.o -L. -ltest -loutnumbered
+	$(CXX) -o $@ test.o -L. -ltest -loutnumbered -lz
 
 test/%.o: CPPFLAGS+=-I.
 
@@ -103,6 +105,8 @@ session.o: blob.h deflate.h input.h command.h
 textread.o: textread.h
 times.o: times.h
 version.o: version.h
+test/pipe.o: test/pipe.h
 test/test_command.o: command.h
+test/test_filter.o: filter.h blob.h deflate.h test/pipe.h
 test/test_response.o: response.h filter.h blob.h deflate.h input.h
 test/test_responsebuf.o: responsebuf.h
