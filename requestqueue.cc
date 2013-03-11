@@ -24,4 +24,17 @@ bool RequestQueue::bad() const
 
 bool RequestQueue::complete() const
 {
+    return !buf.empty();
+}
+
+
+const std::string& RequestQueue::front() const
+{
+    return buf.front();
+}
+
+
+void RequestQueue::pop()
+{
+    buf.pop_front();
 }

@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <cstdlib>
 #include <vector>
+#include <string>
 
 
 /**
@@ -32,6 +33,10 @@ public:
     Blob(const std::vector<uint8_t>& v)
 	: a(&v[0]),
 	  n(v.size())
+    {}
+    Blob(const std::string& s)
+	: a(reinterpret_cast<const uint8_t*>(s.c_str())),
+	  n(s.size())
     {}
 
     const uint8_t* begin() const { return a; }

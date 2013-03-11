@@ -10,6 +10,7 @@
 
 #include <iosfwd>
 #include <netinet/in.h>
+#include <sys/epoll.h>
 
 #include "times.h"
 #include "textread.h"
@@ -66,7 +67,11 @@ public:
     explicit Session(const sockaddr_storage& peer);
     ~Session();
 
-    enum State { DIE, READING, WRITING };
+    enum State {
+	DIE = 0,
+	READING = EPOLLIN,
+	WRITING = EPOLLOUT
+    };
 
     State read(int fd, const timespec& t);
     State write(int fd, const timespec& t);
@@ -81,7 +86,7 @@ private:
 
     sockaddr_storage peer;
     sockutil::TextReader reader;
-    RequestQueue queue;
+    RequestQueue req_queue;
     Response* response;
 };
 

@@ -24,6 +24,7 @@ public:
     size_t write(int fd);
     size_t write(int fd, const Blob& a);
     size_t write(int fd, const Blob& a, const Blob& b);
+    size_t write(int fd, const Blob& a, const Blob& b, const Blob& c);
 
     typedef std::vector<char> Buf;
 
@@ -76,7 +77,9 @@ namespace Filter {
 	bool write(int fd, const Blob& a, const Blob& b) {
 	    return backlog.write(fd, a, b)==0;
 	}
-	bool write(int fd, const Blob& a, const Blob& b, const Blob& c);
+	bool write(int fd, const Blob& a, const Blob& b, const Blob& c) {
+	    return backlog.write(fd, a, b, c)==0;
+	}
 
     private:
 	Plain(const Plain&);
@@ -92,7 +95,7 @@ namespace Filter {
     template<class Next>
     class Chunked {
     public:
-	Chunked();
+	Chunked() {}
 	bool write(int fd) { return next.write(fd); }
 	bool write(int fd, const Blob& a);
 	bool write(int fd, const Blob& a, const Blob& b);

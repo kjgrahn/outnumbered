@@ -32,29 +32,35 @@ liboutnumbered.a: times.o
 liboutnumbered.a: session.o
 liboutnumbered.a: textread.o
 liboutnumbered.a: requestqueue.o
-liboutnumbered.a: command.o
 liboutnumbered.a: filter.o
+liboutnumbered.a: deflate.o
 liboutnumbered.a: response.o
+liboutnumbered.a: input.o
 liboutnumbered.a: responsebuf.o
 	$(AR) -r $@ $^
 
 filter.o: CXXFLAGS+=-Wno-old-style-cast
+httpd.o: CXXFLAGS+=-Wno-old-style-cast
 
 outnumbered: httpd.o liboutnumbered.a
-	$(CXX) -o $@ httpd.o -L. -loutnumbered -lrt
+	$(CXX) -o $@ httpd.o -L. -loutnumbered -lrt -lz
+
+magic: magic.o liboutnumbered.a
+	$(CXX) -o $@ magic.o -L. -loutnumbered -lmagic
 
 #libtest.a: test/test_response.o
 libtest.a: test/request.o
 libtest.a: test/test_command.o
 libtest.a: test/test_responsebuf.o
-libtest.a: test/test_dbfile.o
+libtest.a: test/test_filter.o
+libtest.a: test/pipe.o
 	$(AR) -r $@ $^
 
 test.cc: libtest.a
 	testicle -o$@ $^
 
 tests: test.o liboutnumbered.a libtest.a
-	$(CXX) -o $@ test.o -L. -ltest -loutnumbered -lgdbm
+	$(CXX) -o $@ test.o -L. -ltest -loutnumbered -lz
 
 test/%.o: CPPFLAGS+=-I.
 
@@ -71,7 +77,7 @@ depend:
 
 .PHONY: clean
 clean:
-	$(RM) outnumbered
+	$(RM) outnumbered magic
 	$(RM) *.o
 	$(RM) *.ps
 	$(RM) liboutnumbered.a
@@ -85,21 +91,24 @@ love:
 
 # DO NOT DELETE
 
-command.o: command.h responsebuf.h session.h times.h textread.h
-command.o: requestqueue.h response.h
 deflate.o: deflate.h blob.h error.h
 events.o: events.h session.h times.h textread.h requestqueue.h response.h
+events.o: filter.h blob.h deflate.h input.h
 filter.o: filter.h blob.h deflate.h error.h
 httpd.o: version.h events.h session.h times.h textread.h requestqueue.h
-httpd.o: response.h
+httpd.o: response.h filter.h blob.h deflate.h input.h
+input.o: input.h
+magic.o: version.h
 requestqueue.o: requestqueue.h
-response.o: response.h
+response.o: response.h filter.h blob.h deflate.h input.h
 responsebuf.o: responsebuf.h
-session.o: session.h times.h textread.h requestqueue.h response.h command.h
+session.o: session.h times.h textread.h requestqueue.h response.h filter.h
+session.o: blob.h deflate.h input.h
 textread.o: textread.h
 times.o: times.h
 version.o: version.h
+test/pipe.o: test/pipe.h
 test/request.o: ./request.h
-test/test_command.o: command.h
-test/test_response.o: response.h
+test/test_filter.o: filter.h blob.h deflate.h test/pipe.h
+test/test_response.o: response.h filter.h blob.h deflate.h input.h
 test/test_responsebuf.o: responsebuf.h

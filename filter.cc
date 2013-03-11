@@ -62,6 +62,7 @@ namespace {
  * Write the backlog to 'fd', and return the number of octets still
  * unwritten afterwards.  This means writing an empty Backlog is
  * indistinguishable from being blocked, so don't do that.
+ * XXX Surely "indistinguishable from being successful"?
  *
  * Throws an exception on real errors.
  */
@@ -72,7 +73,7 @@ size_t Backlog::write(int fd)
     const iovec ovec = iov(tmp);
 
     ssize_t n = writev(fd, &ovec, 1);
-    if(n==-1 && errno==EAGAIN) {
+    if(n==-1 && errno!=EAGAIN) {
 	throw WriteError(errno);
     }
 
@@ -92,7 +93,7 @@ size_t Backlog::write(int fd, const Blob& a)
 			    iov(a) };
 
     ssize_t n = writev(fd, ovec, 2);
-    if(n==-1 && errno==EAGAIN) {
+    if(n==-1 && errno!=EAGAIN) {
 	throw WriteError(errno);
     }
 
@@ -113,11 +114,29 @@ size_t Backlog::write(int fd, const Blob& a, const Blob& b)
 			    iov(b) };
 
     ssize_t n = writev(fd, ovec, 3);
-    if(n==-1 && errno==EAGAIN) {
+    if(n==-1 && errno!=EAGAIN) {
 	throw WriteError(errno);
     }
 
     return salvage(v, ovec, 3, n);
+}
+
+
+size_t Backlog::write(int fd, const Blob& a, const Blob& b, const Blob& c)
+{
+    Buf tmp;
+    tmp.swap(v);
+    const iovec ovec[4] = { iov(tmp),
+			    iov(a),
+			    iov(b),
+			    iov(c) };
+
+    ssize_t n = writev(fd, ovec, 4);
+    if(n==-1 && errno!=EAGAIN) {
+	throw WriteError(errno);
+    }
+
+    return salvage(v, ovec, 4, n);
 }
 
 

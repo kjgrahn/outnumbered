@@ -1,12 +1,10 @@
 /* $Id: session.cc,v 1.12 2011-07-03 19:40:17 grahn Exp $
  *
- * Copyright (c) 2010, 2011 Jörgen Grahn
+ * Copyright (c) 2010, 2011, 2013 Jörgen Grahn
  * All rights reserved.
  *
  */
 #include "session.h"
-
-#include "command.h"
 
 #include <iostream>
 #include <sstream>
@@ -51,8 +49,7 @@ Session::Session(const sockaddr_storage& peer)
     : peer(peer),
       reader("\r\n"),
       response(0)
-{
-}
+{}
 
 
 Session::~Session()
@@ -73,11 +70,30 @@ Session::State Session::read(int fd, const timespec&)
     char* a;
     char* b;
     while(reader.read(a, b)) {
-	queue.push(a, b);
+	req_queue.push(a, b);
     }
 
-    if(queue.bad()) return DIE;
-    return queue.complete()? WRITING: READING;
+    /* At this point these are the interesting states
+     * (reader.eof(); req_queue.complete(); response):
+     *  /__________________/                  /
+     * E Q Resp -----------------------------'
+     * -----
+     * · y n  WRITING; new Response
+     * · · y  WRITING
+     * n n n  READING
+     * y n n  DIE
+     */
+
+    if(response) return WRITING;
+    if(req_queue.bad()) return DIE;
+    if (req_queue.complete()) {
+	std::string req = req_queue.front();
+	req_queue.pop();
+	response = new Response(req);
+	return WRITING;
+    }
+
+    return reader.eof() ? DIE : READING;
 }
 
 
@@ -87,4 +103,22 @@ Session::State Session::read(int fd, const timespec&)
  */
 Session::State Session::write(int fd, const timespec&)
 {
+    while(response) {
+	if(!response->write(fd)) {
+	    return WRITING;
+	}
+
+	if(response->done()) {
+	    delete response;
+	    response = 0;
+
+	    if (req_queue.complete()) {
+		std::string req = req_queue.front();
+		req_queue.pop();
+		response = new Response(req);
+	    }
+	}
+    }
+
+    return reader.eof() ? DIE : READING;
 }
