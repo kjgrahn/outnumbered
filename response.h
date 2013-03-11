@@ -7,7 +7,10 @@
 #ifndef GB_RESPONSE_H_
 #define GB_RESPONSE_H_
 
+#include <string>
 #include "filter.h"
+#include "input.h"
+
 
 /**
  * A complete, specific HTTP response. We have already decided /how/
@@ -25,7 +28,7 @@
  */
 class Response {
 public:
-    Response();
+    explicit Response(const std::string& request);
     bool write(int fd);
     bool done() const;
 
@@ -33,6 +36,7 @@ private:
     Response(const Response&);
     Response& operator= (const Response&);
 
+    InputFd src;
     const char* text;
     bool done_;
     Filter::P filter;

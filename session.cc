@@ -87,8 +87,9 @@ Session::State Session::read(int fd, const timespec&)
     if(response) return WRITING;
     if(req_queue.bad()) return DIE;
     if (req_queue.complete()) {
+	std::string req = req_queue.front();
 	req_queue.pop();
-	response = new Response;
+	response = new Response(req);
 	return WRITING;
     }
 
@@ -112,8 +113,9 @@ Session::State Session::write(int fd, const timespec&)
 	    response = 0;
 
 	    if (req_queue.complete()) {
+		std::string req = req_queue.front();
 		req_queue.pop();
-		response = new Response;
+		response = new Response(req);
 	    }
 	}
     }
