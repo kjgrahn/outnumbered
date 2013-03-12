@@ -24,7 +24,7 @@ install: outnumbered.1
 check: tests
 	./tests
 checkv: tests
-	valgrind -q ./tests
+	valgrind -q ./tests -v
 
 liboutnumbered.a: version.o
 liboutnumbered.a: events.o

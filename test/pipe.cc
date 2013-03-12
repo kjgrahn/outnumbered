@@ -4,6 +4,7 @@
  *
  */
 #include "pipe.h"
+#include <blob.h>
 
 #include <testicle.h>
 
@@ -40,6 +41,12 @@ void Pipe::assert_read(const std::string& s)
     ssize_t n = read(rfd, &t[0], t.size());
     testicle::assert_eq(n, t.size());
     testicle::assert_eq(s, t);
+}
+
+
+void Pipe::assert_read(const Blob& s)
+{
+    assert_read(std::string(s.begin(), s.end()));
 }
 
 

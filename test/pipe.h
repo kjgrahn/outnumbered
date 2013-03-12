@@ -9,9 +9,14 @@
 
 #include <string>
 
+class Blob;
+
 /**
  * A Unix O_NONBLOCK pipe, for test purposes.
  * Replacement for the write end of a TCP socket.
+ *
+ * Not a perfect replacement; pipe(7) describes how it's hard
+ * to accomplish a partial write on a pipe.
  */
 class Pipe {
 public:
@@ -20,6 +25,7 @@ public:
 
     int fd() const { return wfd; }
     void assert_read(const std::string& s);
+    void assert_read(const Blob& s);
     void assert_drain(size_t n);
     void assert_empty();
 

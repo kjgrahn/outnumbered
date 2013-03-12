@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
+#include <cstring>
 
 
 /**
@@ -30,13 +31,17 @@ public:
 	: a(a),
 	  n(b-a)
     {}
-    Blob(const std::vector<uint8_t>& v)
+    explicit Blob(const std::vector<uint8_t>& v)
 	: a(&v[0]),
 	  n(v.size())
     {}
-    Blob(const std::string& s)
+    explicit Blob(const std::string& s)
 	: a(reinterpret_cast<const uint8_t*>(s.c_str())),
 	  n(s.size())
+    {}
+    explicit Blob(const char* s)
+	: a(reinterpret_cast<const uint8_t*>(s)),
+	  n(std::strlen(s))
     {}
 
     const uint8_t* begin() const { return a; }
