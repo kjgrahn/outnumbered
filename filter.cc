@@ -148,14 +148,21 @@ namespace {
 
 
 template<class Next>
-bool Chunked<Next>::write (int fd, const Blob& a)
+bool Chunked<Next>::write(int fd, const Blob& a)
 {
     char buf[8+2+1];
-    const int n = std::sprintf(buf, "%u\r\n", unsigned(a.size()));
+    const int n = std::sprintf(buf, "%x\r\n", unsigned(a.size()));
     return next.write(fd,
 		      Blob(buf, n),
 		      a,
 		      crlf);
+}
+
+
+template<class Next>
+bool Chunked<Next>::end(int fd)
+{
+    return next.write(fd, Blob("0\r\n"));
 }
 
 

@@ -91,6 +91,7 @@ namespace Filter {
 
     /**
      * Write using chunked transfer coding [RFC 2616 3.6.1].
+     * Each write is exactly one chunk.
      */
     template<class Next>
     class Chunked {
@@ -98,7 +99,7 @@ namespace Filter {
 	Chunked() {}
 	bool write(int fd) { return next.write(fd); }
 	bool write(int fd, const Blob& a);
-	bool write(int fd, const Blob& a, const Blob& b);
+	bool end(int fd);
 
     private:
 	Chunked(const Chunked&);
@@ -111,7 +112,7 @@ namespace Filter {
     /**
      * Write using zlib compression [RFC 2616 3.5, 3.6].
      *
-     * Unlike the other filters this one has an end() function, which
+     * Unlike the other filters this one has a mandatory end() function; it
      * must be used to end the input. Otherwise it behaves as any of
      * the write() methods; you may have to keep calling write(fd)
      * afterwards.

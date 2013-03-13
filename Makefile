@@ -105,7 +105,7 @@ session.o: blob.h deflate.h input.h
 textread.o: textread.h
 times.o: times.h
 version.o: version.h
-test/pipe.o: test/pipe.h
+test/pipe.o: test/pipe.h blob.h
 test/test_filter.o: filter.h blob.h deflate.h test/pipe.h
 test/test_response.o: response.h filter.h blob.h deflate.h input.h
 test/test_responsebuf.o: responsebuf.h
