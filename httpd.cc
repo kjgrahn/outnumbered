@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2011, 2012 Jörgen Grahn
+ * Copyright (c) 2010--2013 Jörgen Grahn
  * All rights reserved.
  *
  */
@@ -32,6 +32,17 @@ namespace {
 	return setsockopt(fd,
 			  SOL_SOCKET, SO_REUSEADDR,
 			  &val, sizeof val) == 0;
+    }
+
+    bool setbuf(int fd, int rx, int tx)
+    {
+	int err;
+	err = setsockopt(fd, SOL_SOCKET, SO_SNDBUF,
+			 &tx, sizeof tx);
+	if(err) return false;
+	err = setsockopt(fd, SOL_SOCKET, SO_RCVBUF,
+			 &rx, sizeof rx);
+	return !err;
     }
 
     bool nonblock(int fd)
@@ -82,7 +93,9 @@ namespace {
 	    fd = socket(r.ai_family, r.ai_socktype, r.ai_protocol);
 	    if(fd == -1) continue;
 
-	    if(reuse_addr(fd) && bind(fd, r.ai_addr, r.ai_addrlen) == 0) {
+	    if(setbuf(fd, 5e3, 5e3)
+	       && reuse_addr(fd)
+	       && bind(fd, r.ai_addr, r.ai_addrlen) == 0) {
 		break;
 	    }
 
@@ -150,11 +163,16 @@ namespace {
 		    const int fd = sessions.fd(sn);
 		    Session::State state = Session::DIE;
 
-		    if(ev.events & EPOLLOUT) {
-			state = session.write(fd, ts);
+		    try {
+			if(ev.events & EPOLLOUT) {
+			    state = session.write(fd, ts);
+			}
+			else if(ev.events & EPOLLIN) {
+			    state = session.read(fd, ts);
+			}
 		    }
-		    else if(ev.events & EPOLLIN) {
-			state = session.read(fd, ts);
+		    catch(const SessionError&) {
+			;
 		    }
 
 		    if(state==Session::DIE) {
