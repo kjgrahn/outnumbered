@@ -20,6 +20,7 @@
 #include <fcntl.h>
 
 #include "version.h"
+#include "error.h"
 #include "events.h"
 #include "session.h"
 

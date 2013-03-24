@@ -93,8 +93,8 @@ deflate.o: deflate.h blob.h error.h
 events.o: events.h session.h times.h textread.h requestqueue.h response.h
 events.o: filter.h blob.h deflate.h input.h
 filter.o: filter.h blob.h deflate.h error.h
-httpd.o: version.h events.h session.h times.h textread.h requestqueue.h
-httpd.o: response.h filter.h blob.h deflate.h input.h
+httpd.o: version.h error.h events.h session.h times.h textread.h
+httpd.o: requestqueue.h response.h filter.h blob.h deflate.h input.h
 input.o: input.h
 magic.o: version.h
 requestqueue.o: requestqueue.h
