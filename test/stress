@@ -1,0 +1,10 @@
+#!/bin/bash
+
+action() {
+    while true ; do
+	echo rfc2616.txt
+	# sleep 0.3
+    done
+}
+
+action | nc -C salix 8080 | md5sum
