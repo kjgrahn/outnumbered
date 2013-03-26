@@ -30,6 +30,7 @@ liboutnumbered.a: version.o
 liboutnumbered.a: events.o
 liboutnumbered.a: times.o
 liboutnumbered.a: session.o
+liboutnumbered.a: sessionhistory.o
 liboutnumbered.a: textread.o
 liboutnumbered.a: requestqueue.o
 liboutnumbered.a: filter.o
@@ -102,6 +103,8 @@ response.o: response.h filter.h blob.h deflate.h input.h
 responsebuf.o: responsebuf.h
 session.o: session.h times.h textread.h requestqueue.h response.h filter.h
 session.o: blob.h deflate.h input.h
+sessionhistory.o: session.h times.h textread.h requestqueue.h response.h
+sessionhistory.o: filter.h blob.h deflate.h input.h
 textread.o: textread.h
 times.o: times.h
 version.o: version.h

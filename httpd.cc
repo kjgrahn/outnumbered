@@ -150,7 +150,7 @@ namespace {
 		    if(fd!=-1) {
 			nonblock(fd);
 
-			const unsigned sn = sessions.insert(fd, sa);
+			const unsigned sn = sessions.insert(fd, sa, ts);
 			ev.events = EPOLLIN;
 			ev.data.u32 = sn;
 			if(epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev)==-1) {

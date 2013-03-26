@@ -45,8 +45,10 @@ namespace {
 }
 
 
-Session::Session(const sockaddr_storage& peer)
+Session::Session(const sockaddr_storage& peer,
+		 const timespec& t)
     : peer(peer),
+      history(t),
       reader("\r\n"),
       response(0)
 {}
@@ -63,7 +65,7 @@ Session::~Session()
  * advance the state machine by doing so.
  *
  */
-Session::State Session::read(int fd, const timespec&)
+Session::State Session::read(int fd, const timespec& t)
 {
     reader.feed(fd);
 
@@ -90,6 +92,7 @@ Session::State Session::read(int fd, const timespec&)
 	std::string req = req_queue.front();
 	req_queue.pop();
 	response = new Response(req);
+	history.began(*response, t);
 	return WRITING;
     }
 
@@ -101,14 +104,16 @@ Session::State Session::read(int fd, const timespec&)
  * The socket is writeable and we claimed to be interested in writing;
  * advance the state machine by doing so.
  */
-Session::State Session::write(int fd, const timespec&)
+Session::State Session::write(int fd, const timespec& t)
 {
     while(response) {
+	history.wrote(t);
 	if(!response->write(fd)) {
 	    return WRITING;
 	}
 
 	if(response->done()) {
+	    history.ended(*response, t);
 	    delete response;
 	    response = 0;
 
@@ -116,9 +121,23 @@ Session::State Session::write(int fd, const timespec&)
 		std::string req = req_queue.front();
 		req_queue.pop();
 		response = new Response(req);
+		history.began(*response, t);
 	    }
 	}
     }
 
     return reader.eof() ? DIE : READING;
+}
+
+
+/**
+ * It's 't' o'clock; is the session is such a bad shape that the best
+ * thing to do is kill it unilaterally?
+ *
+ * XXX Should take overall load into account, not just the history of
+ * this particular session.
+ */
+bool Session::reconsider(const timespec& t)
+{
+    return history.idle(10, t) || history.wedged(10, t);
 }

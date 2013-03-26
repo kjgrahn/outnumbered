@@ -10,6 +10,7 @@
 #include <vector>
 
 struct sockaddr_storage;
+struct timespec;
 struct Session;
 
 
@@ -28,7 +29,7 @@ public:
     Events();
     ~Events();
 
-    unsigned insert(int fd, sockaddr_storage& peer);
+    unsigned insert(int fd, sockaddr_storage& peer, const timespec& t);
     void remove(unsigned n);
 
     int fd(unsigned n) const { return v[n].fd; }

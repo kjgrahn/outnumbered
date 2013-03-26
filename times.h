@@ -1,6 +1,6 @@
 /* -*- c++ -*-
  *
- * Copyright (c) 2012 Jörgen Grahn
+ * Copyright (c) 2012, 2013 Jörgen Grahn
  * All rights reserved.
  *
  */
@@ -10,5 +10,7 @@
 #include <time.h>
 
 timespec now();
+timespec operator- (const timespec& a, const timespec& b);
+bool operator> (const timespec& a, unsigned b);
 
 #endif

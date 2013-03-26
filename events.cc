@@ -27,16 +27,17 @@ Events::~Events()
  * Connect 'fd' with a new Session, and assign an index suitable for
  * epoll to the result.
  */
-unsigned Events::insert(int fd, struct sockaddr_storage& sa)
+unsigned Events::insert(int fd, struct sockaddr_storage& sa,
+			const timespec& t)
 {
     const Event nullevent;
     std::vector<Event>::iterator i = std::find(v.begin(), v.end(), nullevent);
     if(i==v.end()) {
-	v.push_back(Event(fd, new Session(sa)));
+	v.push_back(Event(fd, new Session(sa, t)));
 	i = v.end() - 1;
     }
     else {
-	*i = Event(fd, new Session(sa));
+	*i = Event(fd, new Session(sa, t));
     }
     return i - v.begin();
 }
