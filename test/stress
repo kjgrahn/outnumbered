@@ -1,10 +1,13 @@
 #!/bin/bash
 
 action() {
-    while true ; do
+    local delay=$1; shift
+    local n=$1; shift
+
+    while [ $((n--)) -gt 0 ] ; do
 	echo rfc2616.txt
-	# sleep 0.3
+	sleep $delay
     done
 }
 
-action | nc -C salix 8080 | md5sum
+action $1 $2 | nc -C salix 8080 | md5sum
