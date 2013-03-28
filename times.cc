@@ -42,5 +42,6 @@ timespec operator- (const timespec& t, const timespec& t0)
  */
 bool operator> (const timespec& a, unsigned b)
 {
-    return a.tv_sec > b || (a.tv_sec == b && a.tv_nsec);
+    time_t n = b;
+    return a.tv_sec > n || (a.tv_sec == n && a.tv_nsec);
 }

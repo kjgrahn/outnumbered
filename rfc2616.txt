@@ -2778,6 +2778,7 @@ Table of Contents
    of the metainformation known by the origin server. Use of this
    response code is not required and is only appropriate when the
    response would otherwise be 200 (OK).
+
 10.2.5 204 No Content
 
    The server has fulfilled the request but does not need to return an
@@ -3194,6 +3195,7 @@ Table of Contents
    code allows the client to place preconditions on the current resource
    metainformation (header field data) and thus prevent the requested
    method from being applied to a resource other than the one intended.
+
 10.4.14 413 Request Entity Too Large
 
    The server is refusing to process a request because the request
