@@ -222,19 +222,16 @@ int main(int argc, char ** argv)
 	{0, 0, 0, 0}
     };
 
-    bool daemon = false;
+    bool daemonize = false;
     string addr = "";
     string port = "http";
-
-    std::cin.sync_with_stdio(false);
-    std::cout.sync_with_stdio(false);
 
     int ch;
     while((ch = getopt_long(argc, argv,
 			    optstring, &long_options[0], 0)) != -1) {
 	switch(ch) {
 	case 'd':
-	    daemon = true;
+	    daemonize = true;
 	    break;
 	case 'a':
 	    addr = optarg;
@@ -271,6 +268,15 @@ int main(int argc, char ** argv)
     if(epfd==-1) {
 	std::cerr << "error: failed to create epoll fd: " << strerror(errno) << '\n';
 	return 1;
+    }
+
+    if(daemonize) {
+	int err = daemon(0, 0);
+	if(err) {
+	    std::cerr << "error: failed to move to the background: "
+		      << strerror(errno) << '\n';
+	    return 1;
+	}
     }
 
     loop(epfd, lfd);
