@@ -133,11 +133,14 @@ namespace {
 	}
 
 	Events sessions;
+	timespec ts = now();
+	Periodic audit(ts, 20);
 
 	while(1) {
 	    epoll_event events[10];
-	    const int n = epoll_wait(epfd, events, 10, -1);
-	    const timespec ts = now();
+	    const int n = epoll_wait(epfd, events, 10,
+				     audit.timeout(ts));
+	    ts = now();
 
 	    for(int i=0; i<n; ++i) {
 		epoll_event& ev = events[i];
@@ -192,6 +195,18 @@ namespace {
 			sessions.remove(sn);
 			close(fd);
 			continue;
+		    }
+		}
+	    }
+
+	    if(audit.check(ts)) {
+		for(Events::iterator i = sessions.begin();
+		    i!=sessions.end(); i++) {
+		    const Events::Event& ev = *i;
+		    Session& session = events.session(n);
+		    if(session.reconsider(ts)) {
+			sessions.remove(sn);
+			close(fd);
 		    }
 		}
 	    }

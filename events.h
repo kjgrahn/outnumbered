@@ -35,10 +35,6 @@ public:
     int fd(unsigned n) const { return v[n].fd; }
     Session& session(unsigned n) const { return *v[n].session; }
 
-private:
-    Events(const Events&);
-    Events& operator= (const Events&);
-
     struct Event {
 	Event() : fd(-1), session(0) {}
 	Event(int fd, Session* session) : fd(fd), session(session) {}
@@ -46,6 +42,14 @@ private:
 	int fd;
 	Session* session;
     };
+
+    typedef std::vector<Event>::iterator iterator;
+    iterator begin() { return v.begin(); }
+    iterator end() { return v.end(); }
+
+private:
+    Events(const Events&);
+    Events& operator= (const Events&);
 
     std::vector<Event> v;
 };

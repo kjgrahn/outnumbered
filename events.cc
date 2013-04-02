@@ -17,7 +17,7 @@ Events::Events()
 
 Events::~Events()
 {
-    for(std::vector<Event>::iterator i = v.begin(); i != v.end(); i++) {
+    for(iterator i = v.begin(); i != v.end(); i++) {
 	delete i->session;
     }
 }
@@ -31,7 +31,7 @@ unsigned Events::insert(int fd, struct sockaddr_storage& sa,
 			const timespec& t)
 {
     const Event nullevent;
-    std::vector<Event>::iterator i = std::find(v.begin(), v.end(), nullevent);
+    iterator i = std::find(v.begin(), v.end(), nullevent);
     if(i==v.end()) {
 	v.push_back(Event(fd, new Session(sa, t)));
 	i = v.end() - 1;
