@@ -17,4 +17,10 @@ struct WriteError : public SessionError {
     int err;
 };
 
+
+/**
+ * An error which means death to the whole server.
+ */
+struct FatalError {};
+
 #endif

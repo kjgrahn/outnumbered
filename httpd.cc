@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cassert>
 
 #include <getopt.h>
 #include <string.h>
@@ -15,13 +16,12 @@
 #include <netdb.h>
 #include <errno.h>
 #include <signal.h>
-#include <sys/epoll.h>
 #include <unistd.h>
 #include <fcntl.h>
 
 #include "version.h"
 #include "error.h"
-#include "events.h"
+#include "server.h"
 #include "session.h"
 
 
@@ -120,95 +120,61 @@ namespace {
      * interface, with the event structs being managed by the kernel
      * and all. But yes, it's Linux-specific.
      */
-    bool loop(const int epfd, const int lfd)
+    bool loop(const int lfd)
     {
-	static const unsigned LFD = ~0;
-
-	{
-	    epoll_event ev = {EPOLLIN, {0}};
-	    ev.data.u32 = LFD;
-	    if(epoll_ctl(epfd, EPOLL_CTL_ADD, lfd, &ev)==-1) {
-		return false;
-	    }
-	}
-
-	Events sessions;
+	Server server;
+	server.add(lfd);
 	timespec ts = now();
 	Periodic audit(ts, 20);
 
 	while(1) {
-	    epoll_event events[10];
-	    const int n = epoll_wait(epfd, events, 10,
-				     audit.timeout(ts));
+	    server.wait(20*1000);
 	    ts = now();
 
-	    for(int i=0; i<n; ++i) {
-		epoll_event& ev = events[i];
-		const unsigned sn = ev.data.u32;
+	    for(Server::iterator i = server.lbegin(); i!=server.lend(); i++) {
+		Server::Event& ev = *i;
+		Server::Entry& entry = server.entry(ev);
 
-		if(sn==LFD) {
-		    struct sockaddr_storage sa;
-		    socklen_t slen = sizeof sa;
-		    int fd = accept(lfd, reinterpret_cast<sockaddr*>(&sa), &slen);
-		    if(fd!=-1) {
-			nonblock(fd);
+		struct sockaddr_storage sa;
+		socklen_t slen = sizeof sa;
+		int fd = accept(entry.fd,
+				reinterpret_cast<sockaddr*>(&sa), &slen);
+		if(fd!=-1) {
+		    nonblock(fd);
+		    server.add(fd, sa, ts);
+		}
+	    }
 
-			const unsigned sn = sessions.insert(fd, sa, ts);
-			ev.events = EPOLLIN;
-			ev.data.u32 = sn;
-			if(epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev)==-1) {
-			    sessions.remove(sn);
-			}
+	    for(Server::iterator i = server.begin(); i!=server.end(); i++) {
+		Server::Event& ev = *i;
+		Server::Entry& entry = server.entry(ev);
+
+		Session& session = *entry.session;
+		const int fd = entry.fd;
+		Session::State state = Session::DIE;
+
+		try {
+		    if(ev.writable()) {
+			state = session.write(fd, ts);
 		    }
-		    continue;
+		    else if(ev.readable()) {
+			state = session.read(fd, ts);
+		    }
+		}
+		catch(const SessionError&) {
+		    ;
+		}
+
+		if(state==Session::DIE) {
+		    server.remove(ev);
 		}
 		else {
-		    Session& session = sessions.session(sn);
-		    const int fd = sessions.fd(sn);
-		    Session::State state = Session::DIE;
-
-		    try {
-			if(ev.events & EPOLLOUT) {
-			    state = session.write(fd, ts);
-			}
-			else if(ev.events & EPOLLIN) {
-			    state = session.read(fd, ts);
-			}
-		    }
-		    catch(const SessionError&) {
-			;
-		    }
-
-		    if(state==Session::DIE) {
-			sessions.remove(sn);
-			close(fd);
-			continue;
-		    }
-
-		    if(state & ev.events) {
-			continue;
-		    }
-
-		    ev.events = state;
-		    int rc = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
-		    if(rc==-1) {
-			sessions.remove(sn);
-			close(fd);
-			continue;
-		    }
+		    server.ctl(ev, state);
 		}
 	    }
 
 	    if(audit.check(ts)) {
-		for(Events::iterator i = sessions.begin();
-		    i!=sessions.end(); i++) {
-		    const Events::Event& ev = *i;
-		    Session& session = events.session(n);
-		    if(session.reconsider(ts)) {
-			sessions.remove(sn);
-			close(fd);
-		    }
-		}
+		server.reconsider(ts);
 	    }
 	}
 
@@ -279,12 +245,6 @@ int main(int argc, char ** argv)
 
     ignore_sigpipe();
 
-    const int epfd = epoll_create(10);
-    if(epfd==-1) {
-	std::cerr << "error: failed to create epoll fd: " << strerror(errno) << '\n';
-	return 1;
-    }
-
     if(daemonize) {
 	int err = daemon(0, 0);
 	if(err) {
@@ -294,10 +254,7 @@ int main(int argc, char ** argv)
 	}
     }
 
-    loop(epfd, lfd);
-
-    close(epfd);
-    close(lfd);
+    loop(lfd);
 
     return 0;
 }

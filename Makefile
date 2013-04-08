@@ -27,7 +27,7 @@ checkv: tests
 	valgrind -q ./tests -v
 
 liboutnumbered.a: version.o
-liboutnumbered.a: events.o
+liboutnumbered.a: server.o
 liboutnumbered.a: times.o
 liboutnumbered.a: session.o
 liboutnumbered.a: sessionhistory.o
@@ -91,16 +91,16 @@ love:
 # DO NOT DELETE
 
 deflate.o: deflate.h blob.h error.h
-events.o: events.h session.h times.h textread.h requestqueue.h response.h
-events.o: filter.h blob.h deflate.h input.h
 filter.o: filter.h blob.h deflate.h error.h
-httpd.o: version.h error.h events.h session.h times.h textread.h
+httpd.o: version.h error.h server.h session.h times.h textread.h
 httpd.o: requestqueue.h response.h filter.h blob.h deflate.h input.h
 input.o: input.h
 magic.o: version.h
 requestqueue.o: requestqueue.h
 response.o: response.h filter.h blob.h deflate.h input.h
 responsebuf.o: responsebuf.h
+server.o: server.h session.h times.h textread.h requestqueue.h response.h
+server.o: filter.h blob.h deflate.h input.h error.h
 session.o: session.h times.h textread.h requestqueue.h response.h filter.h
 session.o: blob.h deflate.h input.h
 sessionhistory.o: session.h times.h textread.h requestqueue.h response.h

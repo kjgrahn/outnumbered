@@ -9,6 +9,7 @@
 
 History::History(const timespec& t)
     : t0(t),
+      te(t),
       e(0)
 {}
 
