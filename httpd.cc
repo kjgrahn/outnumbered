@@ -94,8 +94,7 @@ namespace {
 	    fd = socket(r.ai_family, r.ai_socktype, r.ai_protocol);
 	    if(fd == -1) continue;
 
-	    if(setbuf(fd, 5e3, 5e3)
-	       && reuse_addr(fd)
+	    if(reuse_addr(fd)
 	       && bind(fd, r.ai_addr, r.ai_addrlen) == 0) {
 		break;
 	    }
@@ -115,10 +114,7 @@ namespace {
 
 
     /**
-     * The main event loop. It is epoll(7)-based not only because it's
-     * more scalable than select(2), but because it's a much better
-     * interface, with the event structs being managed by the kernel
-     * and all. But yes, it's Linux-specific.
+     * The main event loop.
      */
     bool loop(const int lfd)
     {
