@@ -5,9 +5,9 @@ action() {
     local n=$1; shift
 
     while [ $((n--)) -gt 0 ] ; do
-	echo rfc2616.txt
+	echo -ne 'rfc2616.txt\r\n'
 	sleep $delay
     done
 }
 
-action $1 $2 | nc -C salix 8080 | wc
+action $1 $2 | nc salix 8080 | wc
