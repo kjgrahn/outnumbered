@@ -33,6 +33,8 @@ public:
     bool idle(unsigned s, const timespec& t) const;
     bool wedged(unsigned s, const timespec& t) const;
 
+    std::ostream& put(std::ostream& os) const;
+
 private:
     /* t0                        tb    tw    te
      * +---------------------------------------------------+
@@ -47,6 +49,13 @@ private:
 
     bool idle() const { return !(e % 2); }
 };
+
+
+inline
+std::ostream& operator<< (std::ostream& os, const History& val)
+{
+    return val.put(os);
+}
 
 
 /**

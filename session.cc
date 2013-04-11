@@ -5,6 +5,7 @@
  *
  */
 #include "session.h"
+#include "log.h"
 
 #include <iostream>
 #include <sstream>
@@ -51,11 +52,14 @@ Session::Session(const sockaddr_storage& peer,
       history(t),
       reader("\r\n"),
       response(0)
-{}
+{
+    Info(log) << *this << " connected";
+}
 
 
 Session::~Session()
 {
+    Info(log) << *this << " closed. " << history;
     delete response;
 }
 
@@ -140,4 +144,13 @@ Session::State Session::write(int fd, const timespec& t)
 bool Session::reconsider(const timespec& t)
 {
     return history.idle(10, t) || history.wedged(10, t);
+}
+
+
+/**
+ * The session is identified simply by host:port.
+ */
+std::ostream& Session::put(std::ostream& os) const
+{
+    return os << peer;
 }

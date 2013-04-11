@@ -4,6 +4,7 @@
  */
 #include "session.h"
 
+#include <iostream>
 #include <cassert>
 
 
@@ -78,4 +79,20 @@ bool History::wedged(unsigned s, const timespec& t) const
     else {
 	return t-tb > s;
     }
+}
+
+
+/**
+ * Print as:
+ *   [0.67s, 23 req, idle]
+ *   [0.67s, 23 req]
+ */
+std::ostream& History::put(std::ostream& os) const
+{
+    const timespec age = now() - t0;
+    const float fage = age.tv_sec + age.tv_nsec/1e9;
+    os << '[' << fage << 's';
+    os << ", " << e/2 << " req";
+    if(idle()) os << ", idle";
+    return os << ']';
 }
