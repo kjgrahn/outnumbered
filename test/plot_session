@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# plot_session - plot a TCP session from a pcap file
+#
+# Simply plots segment start (i.e. the stream index of the first octet
+# in a segment) and segment size against the timestamp.
+#
+#    time seg-start seg-size
+#
+# Different streams aren't separated, but plotting should reveal
+# distinct sequences of segments anyway.
+#
+
+cap=$1; shift
+[ -z "$cap" ] && exit 1
+
+zcat -f $cap | tcpdump -ttnpr - tcp |\
+perl -ne 'print "$1 $2 $n\n" if /^.....(\d\S+).+?seq (\d+):(\d+)/, $n=$3-$2'

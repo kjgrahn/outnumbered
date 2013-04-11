@@ -10,4 +10,4 @@ action() {
     done
 }
 
-action $1 $2 | nc -C salix 8080 | md5sum
+action $1 $2 | nc -C salix 8080 | wc
