@@ -1,13 +1,12 @@
-# $Id: Makefile,v 1.23 2011-07-03 19:17:25 grahn Exp $
 #
 # Makefile
 #
-# Copyright (c) 2010, 2011, 2012 Jörgen Grahn
+# Copyright (c) 2010--2013 Jörgen Grahn
 # All rights reserved.
 
 SHELL=/bin/sh
 INSTALLBASE=/usr/local
-CXXFLAGS=-Wall -Wextra -pedantic -std=c++98 -g -O3 -Wold-style-cast
+CXXFLAGS=-Wall -Wextra -pedantic -std=c++98 -g -Os -Wold-style-cast
 CPPFLAGS=-I..
 
 .PHONY: all
@@ -24,22 +23,24 @@ install: outnumbered.1
 check: tests
 	./tests
 checkv: tests
-	valgrind -q ./tests
+	valgrind -q ./tests -v
 
 liboutnumbered.a: version.o
-liboutnumbered.a: events.o
+liboutnumbered.a: log.o
+liboutnumbered.a: server.o
 liboutnumbered.a: times.o
 liboutnumbered.a: session.o
+liboutnumbered.a: sessionhistory.o
 liboutnumbered.a: textread.o
 liboutnumbered.a: requestqueue.o
 liboutnumbered.a: filter.o
 liboutnumbered.a: deflate.o
 liboutnumbered.a: response.o
 liboutnumbered.a: input.o
-liboutnumbered.a: responsebuf.o
 	$(AR) -r $@ $^
 
 filter.o: CXXFLAGS+=-Wno-old-style-cast
+deflate.o: CXXFLAGS+=-Wno-old-style-cast
 httpd.o: CXXFLAGS+=-Wno-old-style-cast
 
 outnumbered: httpd.o liboutnumbered.a
@@ -50,10 +51,10 @@ magic: magic.o liboutnumbered.a
 
 #libtest.a: test/test_response.o
 libtest.a: test/request.o
-libtest.a: test/test_command.o
-libtest.a: test/test_responsebuf.o
 libtest.a: test/test_filter.o
+libtest.a: test/test_log.o
 libtest.a: test/pipe.o
+libtest.a: test/test_deflate.o
 	$(AR) -r $@ $^
 
 test.cc: libtest.a
@@ -92,23 +93,28 @@ love:
 # DO NOT DELETE
 
 deflate.o: deflate.h blob.h error.h
-events.o: events.h session.h times.h textread.h requestqueue.h response.h
-events.o: filter.h blob.h deflate.h input.h
 filter.o: filter.h blob.h deflate.h error.h
-httpd.o: version.h events.h session.h times.h textread.h requestqueue.h
-httpd.o: response.h filter.h blob.h deflate.h input.h
+httpd.o: version.h error.h server.h session.h times.h textread.h
+httpd.o: requestqueue.h response.h filter.h blob.h deflate.h input.h
 input.o: input.h
+log.o: log.h
 magic.o: version.h
 requestqueue.o: requestqueue.h
 response.o: response.h filter.h blob.h deflate.h input.h
 responsebuf.o: responsebuf.h
+server.o: server.h session.h times.h textread.h requestqueue.h response.h
+server.o: filter.h blob.h deflate.h input.h error.h
 session.o: session.h times.h textread.h requestqueue.h response.h filter.h
-session.o: blob.h deflate.h input.h
+session.o: blob.h deflate.h input.h log.h
+sessionhistory.o: session.h times.h textread.h requestqueue.h response.h
+sessionhistory.o: filter.h blob.h deflate.h input.h
 textread.o: textread.h
 times.o: times.h
 version.o: version.h
-test/pipe.o: test/pipe.h
+test/pipe.o: test/pipe.h blob.h
 test/request.o: ./request.h
+test/test_deflate.o: deflate.h blob.h
 test/test_filter.o: filter.h blob.h deflate.h test/pipe.h
+test/test_log.o: log.h
 test/test_response.o: response.h filter.h blob.h deflate.h input.h
 test/test_responsebuf.o: responsebuf.h

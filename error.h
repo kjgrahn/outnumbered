@@ -7,11 +7,20 @@
 #ifndef GB_ERROR_H_
 #define GB_ERROR_H_
 
-struct Error {};
+/**
+ * A TCP connection or HTTP session is too messed up to continue.
+ */
+struct SessionError {};
 
-struct WriteError : public Error {
+struct WriteError : public SessionError {
     explicit WriteError(int err = 0) : err(err) {}
     int err;
 };
+
+
+/**
+ * An error which means death to the whole server.
+ */
+struct FatalError {};
 
 #endif

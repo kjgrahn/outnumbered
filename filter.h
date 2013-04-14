@@ -1,6 +1,6 @@
 /* -*- c++ -*-
  *
- * Copyright (c) 2012 Jörgen Grahn
+ * Copyright (c) 2012, 2013 Jörgen Grahn
  * All rights reserved.
  *
  */
@@ -38,10 +38,11 @@ private:
 
 /**
  * Response writing filters.
- * These are chainable, because you can write:
+ *
+ * These are chainable, because you must be able to write:
  * (a) headers
  * (b) data (entity-body) as-is
- * (c) data compressed
+ * (c) compressed data
  * (d) chunked data
  * (e) compressed and chunked data
  *
@@ -51,12 +52,20 @@ private:
  * signal the original writer to back off until the socket becomes
  * writable again.
  *
- * bool write(fd, data) has the semantics:
- * true:  all data was successfully written to the fd, the backlog
- *        is empty, and you may continue writing
- * false: some data was /not/ written successfully, and was stored
- *        in the backlog. You may not write again unless the fd goes
- *        writable
+ * Writing through a filter means a series of write(fd, data) calls
+ * followed by one or more end(fd) calls.  The latter is used when the
+ * actual data has run out, and serves to (a) write any EOF markers
+ * mandated by the filter or underlying filters, such as the zero
+ * chunk length of a Chunked encoding, and (b) to flush the buffered
+ * data to the fd.
+ *
+ * Both write(fd, data) and end(fd) have the semantics:
+ * true:  All data was successfully written to the fd, the backlog
+ *        is empty, and you may continue writing.
+ * false: Some data was /not/ written successfully, and was stored
+ *        in the backlog. You may not write again (or count the
+ *        response as complete, in the end() case) unless the fd
+ *        goes writable.
  * All other situations map to an exception being thrown.
  *
  */
@@ -80,6 +89,9 @@ namespace Filter {
 	bool write(int fd, const Blob& a, const Blob& b, const Blob& c) {
 	    return backlog.write(fd, a, b, c)==0;
 	}
+	bool end(int fd) {
+	    return backlog.write(fd)==0;
+	}
 
     private:
 	Plain(const Plain&);
@@ -91,6 +103,7 @@ namespace Filter {
 
     /**
      * Write using chunked transfer coding [RFC 2616 3.6.1].
+     * Each write is exactly one chunk.
      */
     template<class Next>
     class Chunked {
@@ -98,7 +111,7 @@ namespace Filter {
 	Chunked() {}
 	bool write(int fd) { return next.write(fd); }
 	bool write(int fd, const Blob& a);
-	bool write(int fd, const Blob& a, const Blob& b);
+	bool end(int fd);
 
     private:
 	Chunked(const Chunked&);
@@ -110,16 +123,11 @@ namespace Filter {
 
     /**
      * Write using zlib compression [RFC 2616 3.5, 3.6].
-     *
-     * Unlike the other filters this one has an end() function, which
-     * must be used to end the input. Otherwise it behaves as any of
-     * the write() methods; you may have to keep calling write(fd)
-     * afterwards.
      */
     template<class Next>
     class Zlib {
     public:
-	Zlib() {}
+	Zlib() : ending(false) {}
 	bool write(int fd);
 	bool write(int fd, const Blob& a);
 	bool write(int fd, const Blob& a, const Blob& b);
@@ -131,10 +139,16 @@ namespace Filter {
 
 	Next next;
 	Deflate compress;
+	bool ending;
     };
 
 
-    /* shortcuts */
+    /* Shortcuts.
+     *
+     *   P <--+--- C <--- CZ
+     *        |
+     *        +--- Z
+     */
     typedef Plain P;
     typedef Zlib<Plain> Z;
     typedef Chunked<Plain> C;

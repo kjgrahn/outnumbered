@@ -1,0 +1,13 @@
+#!/bin/bash
+
+action() {
+    local delay=$1; shift
+    local n=$1; shift
+
+    while [ $((n--)) -gt 0 ] ; do
+	echo -ne 'rfc2616.txt\r\n'
+	sleep $delay
+    done
+}
+
+action $1 $2 | nc salix 8080 | wc

@@ -1,13 +1,31 @@
-/* Copyright (c) 2012 Jörgen Grahn
+/* Copyright (c) 2012, 2013 Jörgen Grahn
  * All rights reserved.
  *
  */
 #include "response.h"
 #include <cassert>
+#include <cctype>
+
+namespace {
+
+    std::string rstrip(const std::string& s)
+    {
+	std::string r = s;
+
+	const char* const p = s.c_str();
+	const char* q = p + s.size();
+	while(p!=q) {
+	    if(!isspace(*(q-1))) break;
+	    q--;
+	}
+	r.resize(q-p);
+	return r;
+    }
+}
 
 
 Response::Response(const std::string& request)
-    : src(request),
+    : src(rstrip(request)),
       done_(false)
 {}
 
@@ -19,6 +37,18 @@ Response::Response(const std::string& request)
  */
 bool Response::write(int fd)
 {
+    /* When we get here, we may be in either of several
+     * valid states:
+     *
+     * src    filter     effect
+     * ------ ------     ------
+     * 	 data      -     write data to filter
+     * 	 data   data     write data to filter
+     * 	    -      -     write eof
+     * 	    -   data     write eof
+     * 	    -   data+eof flush
+     */
+
     assert(!done());
 
     if(src.alive()) {
@@ -29,7 +59,7 @@ bool Response::write(int fd)
 	}
     }
 
-    return done_ = filter.write(fd);
+    return done_ = filter.end(fd);
 }
 
 

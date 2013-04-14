@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2010, 2011, 2012 Jörgen Grahn
+ * Copyright (c) 2010--2013 Jörgen Grahn
  * All rights reserved.
  *
  */
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cassert>
 
 #include <getopt.h>
 #include <string.h>
@@ -15,12 +16,12 @@
 #include <netdb.h>
 #include <errno.h>
 #include <signal.h>
-#include <sys/epoll.h>
 #include <unistd.h>
 #include <fcntl.h>
 
 #include "version.h"
-#include "events.h"
+#include "error.h"
+#include "server.h"
 #include "session.h"
 
 
@@ -32,6 +33,17 @@ namespace {
 	return setsockopt(fd,
 			  SOL_SOCKET, SO_REUSEADDR,
 			  &val, sizeof val) == 0;
+    }
+
+    bool setbuf(int fd, int rx, int tx)
+    {
+	int err;
+	err = setsockopt(fd, SOL_SOCKET, SO_SNDBUF,
+			 &tx, sizeof tx);
+	if(err) return false;
+	err = setsockopt(fd, SOL_SOCKET, SO_RCVBUF,
+			 &rx, sizeof rx);
+	return !err;
     }
 
     bool nonblock(int fd)
@@ -82,7 +94,8 @@ namespace {
 	    fd = socket(r.ai_family, r.ai_socktype, r.ai_protocol);
 	    if(fd == -1) continue;
 
-	    if(reuse_addr(fd) && bind(fd, r.ai_addr, r.ai_addrlen) == 0) {
+	    if(reuse_addr(fd)
+	       && bind(fd, r.ai_addr, r.ai_addrlen) == 0) {
 		break;
 	    }
 
@@ -101,80 +114,63 @@ namespace {
 
 
     /**
-     * The main event loop. It is epoll(7)-based not only because it's
-     * more scalable than select(2), but because it's a much better
-     * interface, with the event structs being managed by the kernel
-     * and all. But yes, it's Linux-specific.
+     * The main event loop.
      */
-    bool loop(const int epfd, const int lfd)
+    bool loop(const int lfd)
     {
-	static const unsigned LFD = ~0;
-
-	{
-	    epoll_event ev = {EPOLLIN, {0}};
-	    ev.data.u32 = LFD;
-	    if(epoll_ctl(epfd, EPOLL_CTL_ADD, lfd, &ev)==-1) {
-		return false;
-	    }
-	}
-
-	Events sessions;
+	Server server;
+	server.add(lfd);
+	timespec ts = now();
+	Periodic audit(ts, 20);
 
 	while(1) {
-	    epoll_event events[10];
-	    const int n = epoll_wait(epfd, events, 10, -1);
-	    const timespec ts = now();
+	    server.wait(20*1000);
+	    ts = now();
 
-	    for(int i=0; i<n; ++i) {
-		epoll_event& ev = events[i];
-		const unsigned sn = ev.data.u32;
+	    for(Server::iterator i = server.lbegin(); i!=server.lend(); i++) {
+		Server::Event& ev = *i;
+		Server::Entry& entry = server.entry(ev);
 
-		if(sn==LFD) {
-		    struct sockaddr_storage sa;
-		    socklen_t slen = sizeof sa;
-		    int fd = accept(lfd, reinterpret_cast<sockaddr*>(&sa), &slen);
-		    if(fd!=-1) {
-			nonblock(fd);
-
-			const unsigned sn = sessions.insert(fd, sa);
-			ev.events = EPOLLIN;
-			ev.data.u32 = sn;
-			if(epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev)==-1) {
-			    sessions.remove(sn);
-			}
-		    }
-		    continue;
+		struct sockaddr_storage sa;
+		socklen_t slen = sizeof sa;
+		int fd = accept(entry.fd,
+				reinterpret_cast<sockaddr*>(&sa), &slen);
+		if(fd!=-1) {
+		    nonblock(fd);
+		    server.add(fd, sa, ts);
 		}
-		else {
-		    Session& session = sessions.session(sn);
-		    const int fd = sessions.fd(sn);
-		    Session::State state = Session::DIE;
+	    }
 
-		    if(ev.events & EPOLLOUT) {
+	    for(Server::iterator i = server.begin(); i!=server.end(); i++) {
+		Server::Event& ev = *i;
+		Server::Entry& entry = server.entry(ev);
+
+		Session& session = *entry.session;
+		const int fd = entry.fd;
+		Session::State state = Session::DIE;
+
+		try {
+		    if(ev.writable()) {
 			state = session.write(fd, ts);
 		    }
-		    else if(ev.events & EPOLLIN) {
+		    else if(ev.readable()) {
 			state = session.read(fd, ts);
 		    }
-
-		    if(state==Session::DIE) {
-			sessions.remove(sn);
-			close(fd);
-			continue;
-		    }
-
-		    if(state & ev.events) {
-			continue;
-		    }
-
-		    ev.events = state;
-		    int rc = epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
-		    if(rc==-1) {
-			sessions.remove(sn);
-			close(fd);
-			continue;
-		    }
 		}
+		catch(const SessionError&) {
+		    ;
+		}
+
+		if(state==Session::DIE) {
+		    server.remove(ev);
+		}
+		else {
+		    server.ctl(ev, state);
+		}
+	    }
+
+	    if(audit.check(ts)) {
+		server.reconsider(ts);
 	    }
 	}
 
@@ -203,19 +199,16 @@ int main(int argc, char ** argv)
 	{0, 0, 0, 0}
     };
 
-    bool daemon = false;
+    bool daemonize = false;
     string addr = "";
     string port = "http";
-
-    std::cin.sync_with_stdio(false);
-    std::cout.sync_with_stdio(false);
 
     int ch;
     while((ch = getopt_long(argc, argv,
 			    optstring, &long_options[0], 0)) != -1) {
 	switch(ch) {
 	case 'd':
-	    daemon = true;
+	    daemonize = true;
 	    break;
 	case 'a':
 	    addr = optarg;
@@ -248,16 +241,16 @@ int main(int argc, char ** argv)
 
     ignore_sigpipe();
 
-    const int epfd = epoll_create(10);
-    if(epfd==-1) {
-	std::cerr << "error: failed to create epoll fd: " << strerror(errno) << '\n';
-	return 1;
+    if(daemonize) {
+	int err = daemon(0, 0);
+	if(err) {
+	    std::cerr << "error: failed to move to the background: "
+		      << strerror(errno) << '\n';
+	    return 1;
+	}
     }
 
-    loop(epfd, lfd);
-
-    close(epfd);
-    close(lfd);
+    loop(lfd);
 
     return 0;
 }

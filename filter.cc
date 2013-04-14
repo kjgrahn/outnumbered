@@ -61,8 +61,7 @@ namespace {
 /**
  * Write the backlog to 'fd', and return the number of octets still
  * unwritten afterwards.  This means writing an empty Backlog is
- * indistinguishable from being blocked, so don't do that.
- * XXX Surely "indistinguishable from being successful"?
+ * indistinguishable from being successful.
  *
  * Throws an exception on real errors.
  */
@@ -148,14 +147,22 @@ namespace {
 
 
 template<class Next>
-bool Chunked<Next>::write (int fd, const Blob& a)
+bool Chunked<Next>::write(int fd, const Blob& a)
 {
     char buf[8+2+1];
-    const int n = std::sprintf(buf, "%u\r\n", unsigned(a.size()));
+    const int n = std::sprintf(buf, "%x\r\n", unsigned(a.size()));
     return next.write(fd,
 		      Blob(buf, n),
 		      a,
 		      crlf);
+}
+
+
+template<class Next>
+bool Chunked<Next>::end(int fd)
+{
+    return next.write(fd, Blob("0\r\n"
+			       "\r\n"));
 }
 
 
@@ -165,6 +172,7 @@ using Filter::Zlib;
 template<class Next>
 bool Zlib<Next>::write(int fd)
 {
+    assert(!ending);
     return next.write(fd);
 }
 
@@ -172,6 +180,7 @@ bool Zlib<Next>::write(int fd)
 template<class Next>
 bool Zlib<Next>::write(int fd, const Blob& a)
 {
+    assert(!ending);
     compress.push(a);
     const Blob out = compress.front();
     if(out.empty()) return true;
@@ -185,6 +194,7 @@ bool Zlib<Next>::write(int fd, const Blob& a)
 template<class Next>
 bool Zlib<Next>::write(int fd, const Blob& a, const Blob& b)
 {
+    assert(!ending);
     compress.push(a);
     return write(fd, b);
 }
@@ -193,13 +203,17 @@ bool Zlib<Next>::write(int fd, const Blob& a, const Blob& b)
 template<class Next>
 bool Zlib<Next>::end(int fd)
 {
-    compress.finish();
-    const Blob out = compress.front();
-    if(out.empty()) return true;
+    if(!ending) {
+	ending = true;
+	compress.finish();
+	const Blob out = compress.front();
+	bool r = out.empty() || next.write(fd, out);
+	compress.pop();
 
-    bool r = next.write(fd);
-    compress.pop();
-    return r;
+	if(!r) return r;
+    }
+
+    return next.end(fd);
 }
 
 
