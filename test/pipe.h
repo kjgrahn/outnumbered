@@ -26,7 +26,8 @@ public:
     int fd() const { return wfd; }
     void assert_read(const std::string& s);
     void assert_read(const Blob& s);
-    void assert_drain(size_t n);
+    size_t drain(size_t len);
+    void assert_drain(size_t len);
     void assert_empty();
 
 private:

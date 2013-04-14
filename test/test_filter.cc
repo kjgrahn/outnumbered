@@ -85,6 +85,29 @@ namespace filter {
 	    p.assert_read(karen);
 	    p.assert_empty();
 	}
+
+	void test_end()
+	{
+	    Pipe p;
+	    Filter::P f;
+
+	    size_t n = 0;
+	    while(f.write(p.fd(), karen, karen, karen)) {
+		n += 3*karen.size();
+	    }
+	    assert_gt(n, 0);
+
+	    assert_eq(f.end(p.fd()), false);
+	    assert_eq(f.end(p.fd()), false);
+
+	    while(n) {
+		p.assert_read(karen);
+		n -= karen.size();
+	    }
+	    p.assert_empty();
+
+	    assert_eq(f.end(p.fd()), true);
+	}
     }
 
     namespace chunked {
@@ -105,7 +128,8 @@ namespace filter {
 			  "bat\r\n");
 	    p.assert_empty();
 	    assert_eq(f.end(p.fd()), true);
-	    p.assert_read("0\r\n");
+	    p.assert_read("0\r\n"
+			  "\r\n");
 	    p.assert_empty();
 	}
 
@@ -128,12 +152,34 @@ namespace filter {
 	    }
 	    p.assert_empty();
 
-	    assert_eq(f.write(p.fd()), true);
+	    assert_eq(f.end(p.fd()), true);
 	    p.assert_read("44\r\n");
 	    p.assert_read(karen);
 	    p.assert_read("\r\n");
+	    p.assert_read("0\r\n"
+			  "\r\n");
 	    p.assert_empty();
 	}
+    }
 
+    namespace zlib {
+
+	void test_simple()
+	{
+	    Pipe p;
+	    Filter::Z f;
+
+	    while(f.write(p.fd(), karen)) {
+		;
+	    }
+
+	    p.drain(40000);
+
+	    while(f.end(p.fd())) {
+		;
+	    }
+
+	    p.drain(40000);
+	}
     }
 }

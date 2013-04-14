@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Jörgen Grahn
+ * Copyright (c) 2012, 2013 Jörgen Grahn
  * All rights reserved.
  *
  */
@@ -19,7 +19,7 @@
  *
  * The zpipe.c example simply reads a file in 16K blocks.  Each block
  * is prepared as an input buffer. Then deflate() is called
- * repeatedly. When it results in a non-full output buffer, that also
+ * repeatedly. When it results is a non-full output buffer, that also
  * means the input buffer has been consumed and we can switch to
  * another one and continue.
  *

@@ -37,6 +37,18 @@ Response::Response(const std::string& request)
  */
 bool Response::write(int fd)
 {
+    /* When we get here, we may be in either of several
+     * valid states:
+     *
+     * src    filter     effect
+     * ------ ------     ------
+     * 	 data      -     write data to filter
+     * 	 data   data     write data to filter
+     * 	    -      -     write eof
+     * 	    -   data     write eof
+     * 	    -   data+eof flush
+     */
+
     assert(!done());
 
     if(src.alive()) {
@@ -47,7 +59,7 @@ bool Response::write(int fd)
 	}
     }
 
-    return done_ = filter.write(fd);
+    return done_ = filter.end(fd);
 }
 
 

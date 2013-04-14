@@ -53,6 +53,7 @@ magic: magic.o liboutnumbered.a
 libtest.a: test/test_filter.o
 libtest.a: test/test_log.o
 libtest.a: test/pipe.o
+libtest.a: test/test_deflate.o
 	$(AR) -r $@ $^
 
 test.cc: libtest.a
@@ -110,6 +111,7 @@ textread.o: textread.h
 times.o: times.h
 version.o: version.h
 test/pipe.o: test/pipe.h blob.h
+test/test_deflate.o: deflate.h blob.h
 test/test_filter.o: filter.h blob.h deflate.h test/pipe.h
 test/test_log.o: log.h
 test/test_response.o: response.h filter.h blob.h deflate.h input.h

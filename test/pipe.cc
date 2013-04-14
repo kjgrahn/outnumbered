@@ -50,14 +50,21 @@ void Pipe::assert_read(const Blob& s)
 }
 
 
+size_t Pipe::drain(size_t len)
+{
+    std::string t(len, ' ');
+    ssize_t n = read(rfd, &t[0], t.size());
+    return n;
+}
+
+
 /**
  * Like assert_read(s), but doesn't check the contents.
  */
 void Pipe::assert_drain(size_t len)
 {
-    std::string t(len, ' ');
-    ssize_t n = read(rfd, &t[0], t.size());
-    testicle::assert_eq(n, t.size());
+    size_t n = drain(len);
+    testicle::assert_eq(n, len);
 }
 
 
