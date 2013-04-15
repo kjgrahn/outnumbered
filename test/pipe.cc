@@ -54,6 +54,8 @@ size_t Pipe::drain(size_t len)
 {
     std::string t(len, ' ');
     ssize_t n = read(rfd, &t[0], t.size());
+    testicle::assert_(n!=-1 || errno==EAGAIN);
+    if(n==-1) n = 0;
     return n;
 }
 

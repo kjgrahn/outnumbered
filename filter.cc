@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Jörgen Grahn
+ * Copyright (c) 2012, 2013 Jörgen Grahn
  * All rights reserved.
  *
  */
@@ -185,7 +185,7 @@ bool Zlib<Next>::write(int fd, const Blob& a)
     const Blob out = compress.front();
     if(out.empty()) return true;
 
-    bool r = next.write(fd);
+    bool r = next.write(fd, out);
     compress.pop();
     return r;
 }
