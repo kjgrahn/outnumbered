@@ -8,23 +8,48 @@
 #define GB_REQUEST_H_
 
 #include <string>
+#include <vector>
 
 
 /**
- * A HTTP request, or what should be one, as recieved and parsed.
+ * A HTTP request, or what should be one, as received and parsed.
+ *
+ * RFC 2616, section [5]. A request is
+ *
+ *   method SP Request-URI SP HTTP/n.n CRLF
+ *   header CRLF
+ *   header CRLF
+ *   ...
+ *   CRLF
+ *   [body]
+ *
+ * It's implemented as a state machine, which moves forward by being
+ * fed line by line until complete(), at which point it may also be
+ * broken().
+ *
+ * The headers, and the URI, are stored in a single vector<char>,
+ * together with an array
+ *   property: offset
+ *   property: offset
+ *   ...
+ *   end: offset
  */
 class Request {
 public:
 
     enum Property {
+	UNKNOWN,
+	END,
 
 	/* request method [5.1.1] */
-	OPTIONS, GET, HEAD,
-	POST, PUT, DELETE,
-	TRACE, CONNECT,
+	OPTIONS,  GET,     HEAD,
+	POST,     PUT,     DELETE,
+	TRACE,    CONNECT,
 
 	/* HTTP version [3.1] */
 	HTTP10, HTTP11,
+
+	Request_URI,
 
 	/* general-header [4.5] */
 	Cache_Control,
@@ -38,19 +63,11 @@ public:
 	Via,
 
 	/* request-header[5.3] */
-	Accept_Charset,
-	Accept_Encoding,
-	Accept_Language,
-	Accept,
-	Authorization,
-	Expect,
-	From,
-	Host,
-	If_Match,
-	If_Modified_Since,
-	If_None_Match,
-	If_Range,
-	If_Unmodified_Since,
+	Accept_Charset,	  Authorization,  If_Match,
+	Accept_Encoding,  Expect,	  If_Modified_Since,
+	Accept_Language,  From,		  If_None_Match,
+	Accept,		  Host,		  If_Range,
+					  If_Unmodified_Since,
 	Max_Forwards,
 	Proxy_Authorization,
 	Range,
@@ -71,26 +88,46 @@ public:
 	WWW_Authenticate,
 
 	/* entity-header [7.1] */
-	Allow,
-	Content_Encoding,
-	Content_Language,
-	Content_Length,
+	Content_Encoding,  Allow,
+	Content_Language,  Expires,
+	Content_Length,	   Last_Modified,
 	Content_Location,
 	Content_MD5,
 	Content_Range,
-	Content_Type,
-	Expires,
-	Last_Modified
+	Content_Type
     };
+    typedef Property Method;
+    typedef Property HTTPVersion;
 
-    void add(const std::string& s);
+    Request();
 
-    bool complete() const;
-    bool broken() const;
+    void add(const char* a, const char* b);
 
-    Method method() const;
-    HTTPVersion http_version() const;
+    bool complete;
+    bool broken;
+    Method method;
+    HTTPVersion version;
+
     std::string request_uri() const;
+
+private:
+    struct Entry {
+	Entry(Property prop, unsigned short start)
+	    : prop(prop),
+	      start(start)
+	{}
+	Property prop;
+	unsigned short start;
+    };
+    std::vector<char> v;
+    std::vector<Entry> properties;
+
+    void first_line(const char* a, const char* const b);
+    void plain_line(const char* a, const char* const b);
+    void cont_line(const char* a, const char* const b);
+    void end_line(const char* a, const char* const b);
+
+    void insert(Property prop, const char* a, const char* const b);
 
 };
 
