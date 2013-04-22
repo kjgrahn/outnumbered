@@ -1,12 +1,15 @@
 /* -*- c++ -*-
  *
- * Copyright (c) 2012 Jörgen Grahn
+ * Copyright (c) 2012, 2013 Jörgen Grahn
  * All rights reserved.
  *
  */
 #ifndef GB_REQUEST_H_
 #define GB_REQUEST_H_
 
+#include "blob.h"
+
+#include <iosfwd>
 #include <string>
 #include <vector>
 
@@ -108,7 +111,9 @@ public:
     Method method;
     HTTPVersion version;
 
+    Blob header(Property prop) const;
     std::string request_uri() const;
+    std::ostream& put(std::ostream& os) const;
 
 private:
     struct Entry {
@@ -128,7 +133,12 @@ private:
     void end_line(const char* a, const char* const b);
 
     void insert(Property prop, const char* a, const char* const b);
-
 };
+
+inline
+std::ostream& operator<< (std::ostream& os, const Request& val) {
+    return val.put(os);
+}
+std::ostream& operator<< (std::ostream& os, const Request::Property& val);
 
 #endif

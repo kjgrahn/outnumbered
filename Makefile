@@ -34,6 +34,7 @@ liboutnumbered.a: sessionhistory.o
 liboutnumbered.a: textread.o
 liboutnumbered.a: requestqueue.o
 liboutnumbered.a: request.o
+liboutnumbered.a: names.o
 liboutnumbered.a: filter.o
 liboutnumbered.a: deflate.o
 liboutnumbered.a: response.o
@@ -100,7 +101,8 @@ httpd.o: requestqueue.h response.h filter.h blob.h deflate.h input.h
 input.o: input.h
 log.o: log.h
 magic.o: version.h
-request.o: request.h names.h
+names.o: names.h request.h blob.h
+request.o: request.h blob.h names.h
 requestqueue.o: requestqueue.h
 response.o: response.h filter.h blob.h deflate.h input.h
 responsebuf.o: responsebuf.h
@@ -117,6 +119,6 @@ test/pipe.o: test/pipe.h blob.h
 test/test_deflate.o: deflate.h blob.h
 test/test_filter.o: filter.h blob.h deflate.h test/pipe.h
 test/test_log.o: log.h
-test/test_request.o: request.h
+test/test_request.o: request.h blob.h
 test/test_response.o: response.h filter.h blob.h deflate.h input.h
 test/test_responsebuf.o: responsebuf.h

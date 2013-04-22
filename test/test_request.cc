@@ -53,6 +53,9 @@ namespace req {
 
 	assert_(req.complete);
 	assert_(!req.broken);
+	assert_eq(req.method, Request::GET);
+	assert_eq(req.request_uri(), "/contentfile/imagecrop/1.7867487?cropid=f169w225");
+	assert_eq(req.version, Request::HTTP11);
     }
 
     namespace reqline {
@@ -105,6 +108,18 @@ namespace req {
 	    assert_eq(req.method, Request::UNKNOWN);
 	    assert_eq(req.request_uri(), "foo");
 	    assert_eq(req.version, Request::UNKNOWN);
+	}
+
+	void test_spacing()
+	{
+	    Request req;
+	    add(req, "  PUT   foo bar  HTTP/1.0  ");
+	    add(req, "");
+	    assert_(req.complete);
+	    assert_(!req.broken);
+	    assert_eq(req.method, Request::PUT);
+	    assert_eq(req.request_uri(), "foo bar");
+	    assert_eq(req.version, Request::HTTP10);
 	}
     }
 }

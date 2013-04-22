@@ -6,7 +6,9 @@
 
 #include "names.h"
 
+#include <cassert>
 #include <cctype>
+#include <iostream>
 
 
 namespace {
@@ -87,7 +89,7 @@ void Request::add(const char* a, const char* b)
 	first_line(a, b);
     }
     else {
-	const char* p = non_ws(a, b);
+	const char* p = ws(a, b);
 
 	if(p==b) {
 	    end_line(a, b);
@@ -203,4 +205,68 @@ void Request::insert(Property prop,
 	v.insert(v.end(), a, b);
 	properties.push_back(Entry(prop, n));
     }
+}
+
+
+/**
+ * Return the value of the first occurence of the header 'prop' or the
+ * special Request-URI.  Undefined results if you ask for GET, HTTP10
+ * or something.  Undefined results if not complete or broken.
+ *
+ * XXX Does not handle multiple occurencies of a certain header [4.2];
+ * you cannot e.g. ask for the fourth such header.
+ */
+Blob Request::header(const Property prop) const
+{
+    assert(complete && !broken);
+    const char* p = &v[0];
+    for(unsigned i=0; i<properties.size()-1; i++) {
+	if(properties[i].prop==prop) {
+	    return Blob(p + properties[i].start,
+			properties[i+1].start - properties[i].start);
+	}
+    }
+    return Blob();
+}
+
+
+/**
+ * Return the Request-URI. Undefined unless complete.
+ */
+std::string Request::request_uri() const
+{
+    assert(complete);
+    return std::string(&v[properties[0].start],
+		       &v[properties[1].start]);
+}
+
+
+/**
+ * Debug-print a (complete) request as
+ *
+ *   METHOD(uri, version) {
+ *     header: value,
+ *     header: value,
+ *     ...
+ *   }
+ *
+ * The printing can never be perfect, since a Request doesn't retain
+ * all information, e.g. unknown headers.
+ */
+std::ostream& Request::put(std::ostream& os) const
+{
+    if(broken || !complete) {
+	return os << method;
+    }
+
+    const char* p = &v[0];
+
+    os << method << '(' << request_uri() << ", " << version << ") {\n";
+    for(unsigned i=1; i<properties.size()-1; i++) {
+	os << properties[i].prop << ": ";
+	os.write(p + properties[i].start,
+		 properties[i+1].start - properties[i].start);
+	os << ",\n";
+    }
+    return os << '}';
 }
