@@ -97,21 +97,22 @@ love:
 deflate.o: deflate.h blob.h error.h
 filter.o: filter.h blob.h deflate.h error.h
 httpd.o: version.h error.h server.h session.h times.h textread.h
-httpd.o: requestqueue.h response.h filter.h blob.h deflate.h input.h
+httpd.o: requestqueue.h request.h blob.h response.h filter.h deflate.h
+httpd.o: input.h
 input.o: input.h
 log.o: log.h
 magic.o: version.h
 names.o: names.h request.h blob.h
 request.o: request.h blob.h names.h
-requestqueue.o: requestqueue.h
-response.o: response.h filter.h blob.h deflate.h input.h
+requestqueue.o: requestqueue.h request.h blob.h
+response.o: response.h filter.h blob.h deflate.h input.h request.h
 responsebuf.o: responsebuf.h
-server.o: server.h session.h times.h textread.h requestqueue.h response.h
-server.o: filter.h blob.h deflate.h input.h error.h
-session.o: session.h times.h textread.h requestqueue.h response.h filter.h
-session.o: blob.h deflate.h input.h log.h
-sessionhistory.o: session.h times.h textread.h requestqueue.h response.h
-sessionhistory.o: filter.h blob.h deflate.h input.h
+server.o: server.h session.h times.h textread.h requestqueue.h request.h
+server.o: blob.h response.h filter.h deflate.h input.h error.h
+session.o: session.h times.h textread.h requestqueue.h request.h blob.h
+session.o: response.h filter.h deflate.h input.h log.h
+sessionhistory.o: session.h times.h textread.h requestqueue.h request.h
+sessionhistory.o: blob.h response.h filter.h deflate.h input.h
 textread.o: textread.h
 times.o: times.h
 version.o: version.h

@@ -30,6 +30,9 @@
  * fed line by line until complete(), at which point it may also be
  * broken().
  *
+ * Since we don't support POST, this class is optimized for fairly
+ * short requests, with no extremely long message body.
+ *
  * The headers, and the URI, are stored in a single vector<char>,
  * together with an array
  *   property: offset

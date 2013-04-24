@@ -3,6 +3,9 @@
  *
  */
 #include "response.h"
+
+#include "request.h"
+
 #include <cassert>
 #include <cctype>
 
@@ -24,8 +27,8 @@ namespace {
 }
 
 
-Response::Response(const std::string& request)
-    : src(rstrip(request)),
+Response::Response(const Request& request)
+    : src(request.request_uri()),
       done_(false)
 {}
 

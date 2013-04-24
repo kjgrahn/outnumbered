@@ -1,40 +1,49 @@
 /*
- * Copyright (c) 2012 Jörgen Grahn
+ * Copyright (c) 2012, 2013 Jörgen Grahn
  * All rights reserved.
  *
  */
 #include "requestqueue.h"
 
 
-RequestQueue::RequestQueue()
-{}
-
-
-void RequestQueue::push(const char* a, const char* b)
+void RequestQueue::add(const char* a, const char* b)
 {
-    buf.push_back(std::string(a, b));
+    if(val.empty() || val.back().complete) {
+	val.push(Request());
+    }
+    val.back().add(a, b);
 }
 
 
-bool RequestQueue::bad() const
-{
-    return false;
-}
-
-
+/**
+ * True if there's a complete Request.
+ */
 bool RequestQueue::complete() const
 {
-    return !buf.empty();
+    if(val.empty()) return false;
+    return val.front().complete;
+}
+
+/**
+ * True if there's a complete Request, and it's broken.
+ *
+ * This generally means something worse than just an unsupported
+ * request method or something; it makes the whole session suspect.
+ */
+bool RequestQueue::broken() const
+{
+    if(val.empty()) return false;
+    return val.front().broken;
 }
 
 
-const std::string& RequestQueue::front() const
+const Request& RequestQueue::front() const
 {
-    return buf.front();
+    return val.front();
 }
 
 
 void RequestQueue::pop()
 {
-    buf.pop_front();
+    val.pop();
 }

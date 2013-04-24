@@ -11,6 +11,7 @@
 #include "filter.h"
 #include "input.h"
 
+class Request;
 
 /**
  * A complete, specific HTTP response. We have already decided /how/
@@ -34,7 +35,7 @@
  */
 class Response {
 public:
-    explicit Response(const std::string& request);
+    explicit Response(const Request& request);
     bool write(int fd);
     bool done() const;
 
