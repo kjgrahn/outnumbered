@@ -79,15 +79,21 @@ namespace deflate {
 	testicle::assert_lt(dest.size(), .1 * 20e3*14*5);
     }
 
+    std::string random_string(size_t len)
+    {
+	std::string s(len, 'x');
+	for(unsigned i=0; i<len; i++) {
+	    s[i] = std::rand();
+	}
+	return s;
+    }
+
     void test_compresses_badly()
     {
 	Deflate d;
 	std::vector<uint8_t> dest;
-	std::string src(100, 'x');
 	for(int i=0; i<20000; i++) {
-	    for(int j=0; j<100; j++) {
-		src[j] = std::rand();
-	    }
+	    const std::string src = random_string(100);
 	    push(dest, d, src);
 	}
 	finish(dest, d);

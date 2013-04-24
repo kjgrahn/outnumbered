@@ -164,22 +164,24 @@ namespace filter {
 
     namespace zlib {
 
+	std::string random_string(size_t len)
+	{
+	    std::string s(len, 'x');
+	    for(unsigned i=0; i<len; i++) {
+		s[i] = std::rand();
+	    }
+	    return s;
+	}
+
 	void test_simple()
 	{
 	    Pipe p;
 	    Filter::Z f;
 
-	    while(f.write(p.fd(), karen)) {
-		;
-	    }
-
-	    p.drain(40000);
-
-	    while(f.end(p.fd())) {
-		;
-	    }
-
-	    p.drain(40000);
+	    while(f.write(p.fd(), Blob(random_string(40)))) ;
+	    while(p.drain(10000)) ;
+	    while(!f.end(p.fd())) ;
+	    while(p.drain(10000)) ;
 	}
     }
 }
