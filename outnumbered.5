@@ -1,0 +1,83 @@
+.
+.ss 12 0
+.de BP
+.IP \\fB\\$*
+..
+.
+.
+.TH outnumbered 5 "MAY 2013" "Outnumbered" "User Manuals"
+.
+.
+.SH "NAME"
+outnumbered \- HTTP server configuration and data model
+.
+.
+.SH "CONFIGURATION"
+.
+.
+.SH "DATA MODEL"
+Put differently, mapping between HTTP and the file system.
+What a GET request for a certain URL means, given what exists
+in the corresponding file system.
+.
+.BP foo/
+.I foo/index.html
+exists, and is the resource.
+.
+.BP foo/
+.I foo
+is a directory, and an HTML version of
+.I "ls -l foo"
+is the resource.
+.\" What about thumbnailing pictures?
+.\" What about generating text/plain instead?
+.\" What about different file name encodings?
+.
+.BP foo
+.I foo
+is a directory, and a redirect to foo/ is generated.
+.\" Why? It's how Apache does it, but there should be a reason.
+.
+.BP foo*
+No file named
+.I foo*
+exists, but applying file globbing shows
+.I foobar
+as the single match, and it becomes the resource.
+.
+.BP foo*
+Applying file globbing shows multiple matches, and the resource
+is an
+.IR ls -like
+HTML listing of them.
+.
+.BP foo.jpg
+The file does not exist, but
+.I foo.png
+does, and converted to jpeg format it becomes the resource.
+.
+.BP image/orig
+.I image
+exists and is an image. It becomes the resource.
+.
+.BP image/small
+.IR image ,
+scaled down to some reasonable size (roughly: fitting in a typical browser
+window) and converted to jpeg format, becomes the resource.
+.
+.BP image/thumb
+Like
+.BR image/small ,
+but scaled even smaller.
+.
+.BP image/lq
+Like
+.BR image/small ,
+but not scaled, just converted to low-quality jpeg \(en
+smallish, but good enough for photos intended for casual viewing.
+.
+.
+.SH "SEE ALSO"
+.BR outnumbered (1),
+.BR RFC\~2396 ,
+.BR RFC\~2616 .

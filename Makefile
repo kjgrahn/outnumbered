@@ -70,6 +70,9 @@ test/%.o: CPPFLAGS+=-I.
 %.1.ps : %.1
 	groff -man $< >$@
 
+%.5.ps : %.5
+	groff -man $< >$@
+
 .PHONY: tags
 tags: TAGS
 TAGS:
