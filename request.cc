@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <cctype>
+#include <limits>
 #include <iostream>
 
 
@@ -94,7 +95,7 @@ void Request::add(const char* a, const char* b)
 	if(p==b) {
 	    end_line(a, b);
 	}
-	else if(p==a) {
+	else if(p==a || properties.size()==1) {
 	    plain_line(a, b);
 	}
 	else {
@@ -140,14 +141,14 @@ void Request::first_line(const char* a, const char* const b)
  *
  * with whitespace allowed anywhere except in 'name'.
  */
-void Request::plain_line(const char* a, const char* const b)
+void Request::plain_line(const char* a, const char* b)
 {
     a = ws(a, b);
     const char* const name = a;
     a = token(a, b);
     const Property prop = names.lookup(name, a);
     /* If prop==UNKNOWN, we could store an empty entry now.  We must
-     * store /something/, in case of continuation lines.
+     * store /something/, in case a continuation line follows.
      */
     a = ws(a, b);
     if(a==b || *a!=':') {
@@ -156,7 +157,17 @@ void Request::plain_line(const char* a, const char* const b)
     else {
 	a++;
 	a = ws(a, b);
-	insert(prop, a, trimr(a, b));
+	b = trimr(a, b);
+
+	if(!properties.empty() && properties.back().prop == prop) {
+	    /* append to previous value as "old, new" */
+	    static const char delim[] = ", ";
+	    v.insert(v.end(), delim, delim+2);
+	    v.insert(v.end(), a, b);
+	}
+	else {
+	    insert(prop, a, b);
+	}
     }
 }
 
@@ -167,17 +178,10 @@ void Request::plain_line(const char* a, const char* const b)
  */
 void Request::cont_line(const char* a, const char* b)
 {
-    a = ws(a, b);
+    a = ws(a, b) - 1;
     b = trimr(a, b);
 
-    unsigned short n = v.size();
-    unsigned short next = n + (b-a);
-    if(broken || next < n) {
-	broken = true;
-    }
-    else {
-	v.insert(v.end(), a, b);
-    }
+    v.insert(v.end(), a, b);
 }
 
 
@@ -188,6 +192,7 @@ void Request::cont_line(const char* a, const char* b)
 void Request::end_line(const char*, const char* const)
 {
     complete = true;
+    broken = broken || v.size() > std::numeric_limits<unsigned short>::max();
     insert(END, 0, 0);
 }
 
@@ -196,15 +201,8 @@ void Request::insert(Property prop,
 		     const char* a, const char* const b)
 {
     unsigned short n = v.size();
-    unsigned short next = n + (b-a);
-    if(broken || next < n) {
-	/* integer overflow */
-	broken = true;
-    }
-    else {
-	v.insert(v.end(), a, b);
-	properties.push_back(Entry(prop, n));
-    }
+    v.insert(v.end(), a, b);
+    properties.push_back(Entry(prop, n));
 }
 
 
@@ -213,8 +211,14 @@ void Request::insert(Property prop,
  * special Request-URI.  Undefined results if you ask for GET, HTTP10
  * or something.  Undefined results if not complete or broken.
  *
- * XXX Does not handle multiple occurencies of a certain header [4.2];
- * you cannot e.g. ask for the fourth such header.
+ * Continuation lines [2.2] are taken into account, i.e. the
+ * continuation is included in the result.
+ *
+ * Multiple occurencies of a certain header [4.2] are kind of
+ * supported; their values are combined into "val, val, ..." if they
+ * appear in series. This is slighly incorrect, since it applies to
+ * headers which may not be duplicated, and since the ones who /can/
+ * don't have to come in one unbroken series.
  */
 Blob Request::header(const Property prop) const
 {
