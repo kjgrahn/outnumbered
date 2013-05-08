@@ -15,6 +15,20 @@ namespace {
 	const char* p = s.c_str();
 	req.add(p, p+s.size());
     }
+
+    void assert_header(const Request& req, Request::Property prop,
+		       const std::string& val)
+    {
+	const Blob v = req.header(prop);
+	testicle::assert_(v);
+	testicle::assert_eq(std::string(v.begin(), v.end()), val);
+    }
+
+    void assert_no_header(const Request& req, Request::Property prop)
+    {
+	const Blob v = req.header(prop);
+	testicle::assert_(!v);
+    }
 }
 
 
@@ -35,6 +49,8 @@ namespace req {
 	assert_eq(req.method, Request::GET);
 	assert_eq(req.request_uri(), "/pub/WWW/TheProject.html");
 	assert_eq(req.version, Request::HTTP11);
+	assert_header(req, Request::Host, "www.w3.org");
+	assert_no_header(req, Request::Accept);
     }
 
     void test_opera()
@@ -56,6 +72,50 @@ namespace req {
 	assert_eq(req.method, Request::GET);
 	assert_eq(req.request_uri(), "/contentfile/imagecrop/1.7867487?cropid=f169w225");
 	assert_eq(req.version, Request::HTTP11);
+	assert_header(req, Request::Cache_Control, "no-cache");
+	assert_header(req, Request::Accept_Language, "en,sv;q=0.9");
+	assert_header(req, Request::Connection, "Keep-Alive");
+    }
+
+    namespace overflow {
+
+	void test_plain()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    for(int i=0; i<50e3; i++) {
+		add(req, "Accept-Encoding: g");
+		add(req, "Accept: z");
+	    }
+	    add(req, "");
+	    assert_(req.complete);
+	    assert_(req.broken);
+	}
+
+	void test_continuation()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    add(req, "Accept-Encoding: gzip,");
+	    for(int i=0; i<10e3; i++) {
+		add(req, " deflate");
+	    }
+	    add(req, "");
+	    assert_(req.complete);
+	    assert_(req.broken);
+	}
+
+	void test_combine()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    for(int i=0; i<50e3; i++) {
+		add(req, "Accept-Encoding: gzip");
+	    }
+	    add(req, "");
+	    assert_(req.complete);
+	    assert_(req.broken);
+	}
     }
 
     namespace reqline {
@@ -120,6 +180,141 @@ namespace req {
 	    assert_eq(req.method, Request::PUT);
 	    assert_eq(req.request_uri(), "foo bar");
 	    assert_eq(req.version, Request::HTTP10);
+	}
+    }
+
+    namespace header {
+
+	void test_simple()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    add(req, "Accept-Encoding: gzip, deflate");
+	    add(req, "");
+	    assert_(req.complete); assert_(!req.broken);
+
+	    assert_header(req, Request::Accept_Encoding, "gzip, deflate");
+	}
+
+	void test_spacing()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    add(req, "Accept-Encoding :   gzip, deflate   ");
+	    add(req, "");
+	    assert_(req.complete); assert_(!req.broken);
+
+	    assert_header(req, Request::Accept_Encoding, "gzip, deflate");
+	}
+
+	void test_unknown()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    add(req, "Foo: bar");
+	    add(req, "Accept-Encoding: gzip, deflate");
+	    add(req, "Foo: bar");
+	    add(req, "");
+	    assert_(req.complete); assert_(!req.broken);
+
+	    assert_header(req, Request::Accept_Encoding, "gzip, deflate");
+	}
+
+	void test_empty()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    add(req, "Accept:");
+	    add(req, "Accept-Encoding: gzip, deflate");
+	    add(req, "Accept:");
+	    add(req, "");
+	    assert_(req.complete); assert_(!req.broken);
+
+	    assert_header(req, Request::Accept_Encoding, "gzip, deflate");
+	}
+
+	void test_nonheader()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    add(req, "Accept:");
+	    add(req, "Accept-Encoding = gzip, deflate");
+	    add(req, "Accept:");
+	    add(req, "");
+	    assert_(req.complete);
+	    assert_(req.broken);
+	}
+
+	void test_unknown_cont()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    add(req, "Foo: bar");
+	    add(req, "     baz");
+	    add(req, "Accept-Encoding: gzip, deflate");
+	    add(req, "Foo: bar");
+	    add(req, "     baz");
+	    add(req, "");
+	    assert_(req.complete); assert_(!req.broken);
+
+	    assert_header(req, Request::Accept_Encoding, "gzip, deflate");
+	}
+
+	void test_continuation()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    add(req, "Accept-Encoding: gzip,   ");
+	    add(req, "                 deflate ");
+	    add(req, "Connection:      Keep-Alive");
+	    add(req, "");
+	    assert_(req.complete); assert_(!req.broken);
+
+	    assert_header(req, Request::Accept_Encoding, "gzip, deflate");
+	    assert_header(req, Request::Connection, "Keep-Alive");
+	}
+
+	void test_pseudo_cont()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    /* probably illegal, but harmless to support */
+	    add(req, "  Accept-Encoding: gzip, deflate");
+	    add(req, "");
+	    assert_(req.complete); assert_(!req.broken);
+
+	    assert_header(req, Request::Accept_Encoding, "gzip, deflate");
+	}
+
+	void test_combine()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    add(req, "Accept-Encoding: gzip");
+	    add(req, "Accept-Encoding: deflate");
+	    add(req, "Accept-Encoding: foo");
+	    add(req, "Connection:      Keep-Alive");
+	    add(req, "");
+	    assert_(req.complete); assert_(!req.broken);
+
+	    assert_header(req, Request::Connection, "Keep-Alive");
+	    assert_header(req, Request::Accept_Encoding, "gzip, deflate, foo");
+	}
+
+	void test_combine_tricky()
+	{
+	    Request req;
+	    add(req, "GET foo HTTP/1.1");
+	    add(req, "Accept-Encoding: gzip");
+	    add(req, "Accept-Encoding: deflate");
+	    add(req, "Connection:      Keep-Alive");
+	    add(req, "Accept-Encoding: foo");
+	    add(req, "");
+	    assert_(req.complete); assert_(!req.broken);
+
+	    assert_header(req, Request::Connection, "Keep-Alive");
+	    /* documented deviation from the RFC */
+	    assert_header(req, Request::Accept_Encoding, "gzip, deflate");
 	}
     }
 }
